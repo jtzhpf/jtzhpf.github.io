@@ -1,4 +1,4 @@
-slogan: “宁静致远”
+slogan: “鹏北海，凤朝阳。又携书剑路茫茫。”
 email: jtzhpf@126.com
 logo: "/images/logo.svg"
 
@@ -11,33 +11,31 @@ favicon: # 配置网页图标
   safari_pinned_tab: /images/logo.svg
 
 subpage: # 开启“子页”功能，详见 README
-  enable: false
+  enable: true
   pages:
-    - name: page1 # 文章的分类（category）名，如 developer
+    - name: "CS&Maths" # 文章的分类（category）名，如 developer
       path: # 若不设置则默认使用 name
-      title: 子页一 # 菜单名，如 开发者
+      title: "Computer Science & Maths" # 菜单名，如 开发者
       icon: /images/icon/icon-code.svg # 图标的路径
-      description: # 描述
-    - name: page2 # 文章的分类（category）名，如 developer
-      path: # 若不设置则默认使用 name
-      title: 子页二 # 菜单名，如 开发者
-      icon: /images/icon/icon-pi.svg # 图标的路径
-      description: # 描述
+      description: "第一是数学，第二是数学，第三是数学。  ——伦琴" # 描述
+#    - name: Maths # 文章的分类（category）名，如 developer
+#      path: # 若不设置则默认使用 name
+#      title: Maths # 菜单名，如 开发者
+#      icon: /images/icon/icon-pi.svg # 图标的路径
+#      description: "第一是数学，第二是数学，第三是数学。  ——伦琴" # 描述
 
 index: # 配置首页个性化内容
-  motto: "应无所住 而生其心"
+  motto: "横行负勇气，一战净妖氛。"
   poem:
-    - 君不见高堂明镜悲白发
-    - 朝如青丝暮成雪
   photo: /images/about.jpg
   about:
     title: 关于
     text:
-      - 酒入豪肠,七分酿成了月光
+      - USTC 在读
       -
-      - 余下的三分啸成剑气
+      - 大鹏一日同风起
       -
-      - 绣口一吐就半个盛唐
+      - 扶摇直上九万里
 
 foot:
   title:
@@ -45,19 +43,19 @@ foot:
     - "天涯若比邻"
 
 links: # 朋友
-  - name: "Theme Tranquility"
-    url: https://github.com/hooozen/hexo-theme-tranquility
+#  - name: "Theme Tranquility"
+#    url: https://github.com/hooozen/hexo-theme-tranquility
 
 social: # 账号
   - name: "github"
     icon: "/images/logo-github.svg"
-    url: https://github.com/
-  - name: "微信公众号"
-    icon: "/images/logo-wx.svg"
-    url: https://mp.weixin.qq.com/s?__biz=MzI3NzQ4NDkzNg==&mid=2247484469&idx=1&sn=8a442bb67397f52cce5c38c3f9b41e36&chksm=eb64c0d2dc1349c40d2e1bb55615ae28b3f2951be22f00717b9ade98c851082e42dc666ab45d#rd
-  - name: "知乎"
-    icon: "/images/logo-zh.svg"
-    url: https://www.zhihu.com/
+    url: https://github.com/jtzhpf
+#  - name: "微信公众号"
+#    icon: "/images/logo-wx.svg"
+#    url: https://mp.weixin.qq.com/s?__biz=MzI3NzQ4NDkzNg==&mid=2247484469&idx=1&sn=8a442bb67397f52cce5c38c3f9b41e36&chksm=eb64c0d2dc1349c40d2e1bb55615ae28b3f2951be22f00717b9ade98c851082e42dc666ab45d#rd
+#  - name: "知乎"
+#    icon: "/images/logo-zh.svg"
+#    url: https://www.zhihu.com/
 
 reward: # 赞赏
   enable: false
@@ -85,7 +83,7 @@ gitalk: # gitalk 评论
 
 # see https://github.com/tea3/hexo-related-popular-posts
 related_post:
-  enable: false
+  enable: true
   config:
     maxCount: 5 # Maximum count of a list. default 5
     ulClass: # Class name of element. deafult 'popular-posts'
@@ -122,11 +120,15 @@ timeline:
     - name: article
       color: "#ee936c"
       icon: /images/icon/icon-article.svg
-      checked: false
-    - name: app
-      color: "#60a465"
-      icon: /images/icon/icon-app.svg
-      checked: false
+      checked: true
+    #- name: app
+    #  color: "#60a465"
+    #  icon: /images/icon/icon-app.svg
+    #  checked: true
+    - name: code
+      color: "#555555"
+      icon: /images/icon/icon-code.svg
+      checked: true
     - name: event
       color: "#568dc4"
       icon: /images/icon/icon-event.svg
@@ -134,6 +136,6 @@ timeline:
 
 # 标签云
 tagcloud:
-  fancy: false
+  fancy: true
   min_font: 14
   max_font: 30
