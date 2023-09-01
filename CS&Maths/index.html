@@ -5,7 +5,7 @@
     <meta name="viewport" content="initial-scale=1.0, width=device-width" />
     <title>
       
-         | Hexo
+        Computer Science & Maths | ZPF.SITE
       
     </title>
     <meta name="description" content="" />
@@ -70,7 +70,9 @@
         <input id="navBtn" type="checkbox" />
         <div class="nav-menu">
           
-            <a href='/blog/'>博客</a>
+            
+              <a class="nav-menu-item" href="/CS&Maths">Computer Science & Maths</a>
+            
           
         </div>
         <label class="nav-btn" for="navBtn"></label>
@@ -78,41 +80,22 @@
     </div>
     <div class="body">
       
-  <div class="wall wall-category--plain">
+  <div class="wall wall-category">
     <div class="wall-main">
       <div class="wall-category-title">
         <div class="title-icon"
-             style="background-image: url(/blog)"></div>
-        博客
+             style="background-image: url(/images/icon/icon-code.svg)"></div>
+        Computer Science & Maths
       </div>
-      <div class="wall-category-description"></div>
+      <div class="wall-category-description">第一是数学，第二是数学，第三是数学。  ——伦琴</div>
       <div class="wall-category-tags">
-        <div id="tags-outer"></div>
+        <div id="tags-outer"><canvas width="500" height="500" id="tagCanvas"><canvas></div>
       </div>
     </div>
   </div>
   <div class="post-list">
     
-      
-  
-  <div class="post-card">
-    <div class="post__head">
-      <a href="/2023/08/31/hello-world/" class="post-title hover-line">Hello World</a>
-      
-    </div>
-    <div class="post__body">
-      
-      <div class="post-excerpt"></div>
-    </div>
-    <div class="post__foot">
-      <div class="post-tags">
-  
-
-</div>
-    </div>
-  </div>
-
-
+      DEBUG: 该子页分类下没有文章！在指定文章头部中添加 category: CS&Maths 字段，即可将该文章添加至此页。
     
     
   </div>
@@ -133,24 +116,6 @@
         </div>
         <div class="foot__body">
           
-            <div class="foot-item">
-              <div class="foot-item__head">朋友</div>
-              <div class="foot-item__body">
-                
-                  <div class="text">
-                    <img alt="link" height="20px" width="20px" src="/images/icon/icon-link.svg" />
-                    <a class="foot-link" target="_blank" rel="noopener" href="https://github.com/hooozen/hexo-theme-tranquility">Theme Tranquility</a>
-                  </div>
-                
-                <div class="text">
-                  <img alt="link" height="20px" width="20px" src="/images/icon/icon-link+.svg" />
-                  <a class="foot-link"
-                     href="mailto:jtzhpf@126.com?subject=%E7%94%B3%E8%AF%B7%20Hozen.site%20%E7%9A%84%E5%8F%8B%E9%93%BE%E4%BD%8D%E7%BD%AE">
-                  申请友链</a>
-                </div>
-              </div>
-            </div>
-          
           
             <div class="foot-item">
               <div class="foot-item__head">账号</div>
@@ -158,17 +123,7 @@
                 
                   <div class="text">
                     <img alt="link" height="20px" width="20px" src="/images/logo-github.svg" />
-                    <a class="foot-link" target="_blank" rel="noopener" href="https://github.com/">github</a>
-                  </div>
-                
-                  <div class="text">
-                    <img alt="link" height="20px" width="20px" src="/images/logo-wx.svg" />
-                    <a class="foot-link" target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzI3NzQ4NDkzNg==&mid=2247484469&idx=1&sn=8a442bb67397f52cce5c38c3f9b41e36&chksm=eb64c0d2dc1349c40d2e1bb55615ae28b3f2951be22f00717b9ade98c851082e42dc666ab45d#rd">微信公众号</a>
-                  </div>
-                
-                  <div class="text">
-                    <img alt="link" height="20px" width="20px" src="/images/logo-zh.svg" />
-                    <a class="foot-link" target="_blank" rel="noopener" href="https://www.zhihu.com/">知乎</a>
+                    <a class="foot-link" target="_blank" rel="noopener" href="https://github.com/jtzhpf">github</a>
                   </div>
                 
               </div>
@@ -185,7 +140,7 @@
           </div>
         </div>
         <div class="copyright">
-          <a href="http://example.com">Hexo</a> &nbsp;|&nbsp;由&nbsp;<a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>&nbsp;及&nbsp;
+          <a href="http://jtzhpf.github.io">ZPF.SITE</a> &nbsp;|&nbsp;由&nbsp;<a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>&nbsp;及&nbsp;
           <svg width="20" height="20" viewBox="0 0 725 725">
             <path fill-rule="evenodd" fill="rgb(221, 221, 221)" d="M145.870,236.632 L396.955,103.578 L431.292,419.44 L156.600,522.53 L145.870,236.632 Z" />
             <path fill-rule="evenodd" fill="rgb(159, 159, 159)" d="M396.955,103.578 L564.345,234.486 L611.558,513.469 L431.292,419.44 L396.955,103.578 Z" />
@@ -196,12 +151,36 @@
       </div>
     </div>
     
-      <script src="https://unpkg.com/js-polyfills@0.1.43/es6.js"></script>
-      <script id="MathJax-script"
-              async
-              src="https://www.unpkg.com/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
     
-    
+  
+    <script type="text/javascript"
+            charset="utf-8"
+            src="/js/tagcanvas.min.js"></script>
+    <script type = "text/javascript">
+        window.onload = function() {
+            try {
+                TagCanvas.Start('tagCanvas', '', {
+                    outlineThickness: 1,
+                    maxSpeed: 0.03,
+                    // freezeActive: true,
+                    // freezeDecel: true,
+                    textColour: null,
+                    textColour: null,
+                    outlineColour: "#aaa",
+                    weight: true,
+                    padding: 4,
+                    // clickToFront: 200,
+                    fadIn: 200,
+                    // pinchZoom: true,
+                    wheelZoom: false,
+                    initial: [0.1, -0.03]
+                });
+            } catch (e) {
+                // something went wrong, hide the canvas container
+                document.getElementById('tags-outer').style.display = 'none';
+            }
+        };
+    </script>
   
 
   </body>
