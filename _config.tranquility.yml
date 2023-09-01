@@ -67,11 +67,11 @@ reward: # 赞赏
 # see https://github.com/gitalk/gitalk
 gitalk: # gitalk 评论
   enable: false
-  owner: # MUST HAVE, Your Github Username
-  admin:
-  repo: # MUST HAVE, The name of the repo you use to store Gitment comments
-  clientID: # MUST HAVE, Github client id for the Gitment
-  clientSecret: # EITHER this or proxy_gateway, Github access secret token for the Gitment
+  owner: jtzhpf # MUST HAVE, Your Github Username
+  admin: jtzhpf
+  repo: blog_comment # MUST HAVE, The name of the repo you use to store Gitment comments
+  clientID: 41acafb8aafe372b4d4a # MUST HAVE, Github client id for the Gitment
+  clientSecret: 93bb530208ced33a32cd8d4d56c6b035776656d2 # EITHER this or proxy_gateway, Github access secret token for the Gitment
 
   distractionFreeMode: false # Facebook-like distraction free mode
   # When the official proxy is not available, you can change it to your own proxy address
