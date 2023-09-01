@@ -18,8 +18,6 @@ jobs:
           node-version: "20"
       - name: Download Submodules
         run: git submodule update --init --recursive
-      - name: Download pandoc
-        run: npm un hexo-renderer-marked && npm i hexo-renderer-pandoc
       - name: Install Dependencies
         run: npm install
       - name: Build
