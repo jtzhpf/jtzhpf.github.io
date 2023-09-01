@@ -1,10 +1,10 @@
 ---
 title: 数学公式测试
+category: CS&Maths
 date: 2023-07-03 10:26:00
 toc: true
 tags: math
 mathjax: true
-category: 
 ---
 *原文来自 <www.hozen.site> [机器学习基础-“逻辑”回归 (logistic regression) 的数学原理](<https://www.hozen.site/archives/33/>*
 

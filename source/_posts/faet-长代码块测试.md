@@ -2,7 +2,7 @@
 title: 超宽代码块测试
 date: 2023-07-03 14:14:00
 tags: code
-category: CS&Maths
+category: 
 ---
 
 本文测试宽度较大的代码块的表现，正常情况下当代码块超出文章区域时会出现滚动条.
