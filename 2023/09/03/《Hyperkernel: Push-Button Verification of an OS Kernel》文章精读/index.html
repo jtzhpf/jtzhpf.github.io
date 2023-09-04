@@ -5,7 +5,7 @@
     <meta name="viewport" content="initial-scale=1.0, width=device-width" />
     <title>
       
-        《Cross-checking Semantic Correctness: The Case of Finding File System Bugs》文章精读 | ZPF.SITE
+        《Hyperkernel: Push-Button Verification of an OS Kernel》文章精读 | ZPF.SITE
       
     </title>
     <meta name="description" content="" />
@@ -84,19 +84,19 @@
   <article class="post-content">
     <div class="post-inner--toc">
       <div class="post-content__head">
-        <div class="post-title">《Cross-checking Semantic Correctness: The Case of Finding File System Bugs》文章精读</div>
+        <div class="post-title">《Hyperkernel: Push-Button Verification of an OS Kernel》文章精读</div>
         <div class="post-info">
           
   <a href="/tags/Linux/" class="post-tag">#Linux</a><a href="/tags/Staitc-Analysis/" class="post-tag">#Staitc Analysis</a><a href="/tags/SOSP/" class="post-tag">#SOSP</a>
 
 
-          <span class="post-date">2023-08-31</span>
+          <span class="post-date">2023-09-03</span>
         </div>
       </div>
       
         <aside class="toc-outer">
           <div class="toc-title">目录</div>
-          <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E8%AE%BE%E8%AE%A1"><span class="post-toc-text">设计</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%AE%9E%E7%8E%B0"><span class="post-toc-text">实现</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%97%AE%E9%A2%98"><span class="post-toc-text">问题</span></a></li></ol>
+          <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#tricks"><span class="post-toc-text">Tricks</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#finite-interfaces"><span class="post-toc-text">Finite interfaces</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E8%AE%BE%E8%AE%A1"><span class="post-toc-text">设计</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%AE%9E%E7%8E%B0"><span class="post-toc-text">实现</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%97%AE%E9%A2%98"><span class="post-toc-text">问题</span></a></li></ol>
           <a href="#" class="toc-top">回到顶部</a>
         </aside>
       
@@ -106,7 +106,42 @@
             
           </div>
         
-        <p>主要思路是统计多个文件系统的实现，计算具体文件系统与多个文件系统总体之间的差异性（直方图/信息熵），从而窥探出其文件系统的具体实现在语义上的差异。 <span id="more"></span></p>
+        <p>通过修改xv6的内核接口以支持SMT（Satisfiability Modulo Theories）求解器。 <span id="more"></span> ## 挑战与应对</p>
+<table>
+<colgroup>
+<col style="width: 0%" />
+<col style="width: 43%" />
+<col style="width: 56%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>挑战</th>
+<th>应对</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>一</td>
+<td>内核维护着大量的数据结构和不变量来管理进程、虚拟内存以及设备等资源，Hyperkernel的接口需要支持高级属性(如进程隔离)的规范和验证。<br>同时这些规范又需要可以转换为SMT求解器可以处理的低级约束。<br>需要合理的接口设计使得在可用性和验证自动化之间取得平衡。</td>
+<td>所有的系统调用、异常和中断的处理程序都不包含无限的循环和递归，使其可以使用SMT对其进行编码和验证。</td>
+</tr>
+<tr class="even">
+<td>二</td>
+<td>在x86架构中，内核和用户空间通常存在于相同的虚拟地址空间中，内核占据上半部分，而留给用户空间的是下半部分。内存的映射可能不是单射，例如两个虚拟地址映射到同一物理地址，且内核代码在执行时可以改变虚拟地址到物理地址的映射。</td>
+<td>Hyperkernel在与用户空间分离的独立地址空间中运行，使用了identity mapping（将虚拟地址空间中内核区域的虚拟地址直接映射到物理地址，实现虚拟地址等同物理地址）。<br>为了有效地实现这种分离，Hyperkernel利用了由Intel的VTx和AMD的AMD-V提供的x86虚拟化支持，使内核和用户进程分别在根（host）和非根（guest）模式下运行，使用独立的页表。</td>
+</tr>
+<tr class="odd">
+<td>三</td>
+<td>Hyperkernel是使用C语言编写的。C语言的低级操作（如访存等）使得精确建模C语言的语义和推理C程序变得困难。且编译器利用未定义行为以生成高效的代码。</td>
+<td>Hyperkernel在LLVM中间表示(IR)层面进行验证，相比C语言它具有更简单的语义，同时仍保持足够高级以避免推理机器细节。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="tricks">Tricks</h2>
+<h3 id="finite-interfaces">Finite interfaces</h3>
+<p>将在执行中随着系统变化而变化代码执行次数的路径修改为与系统状态无关的路径。</p>
+<p>追求最低可用文件描述符会导致代码路径爆炸。内核需要逐个检查所有可能的文件描述符,以找到最小的空闲描述符。SMT求解器需要展开这些代码路径来构建约束和验证程序。代码路径的数量会随着文件描述符表大小呈指数增长。验证时间和内存消耗都将随之大幅增加,难以完成验证。复杂性会随状态空间大小指数增长。即使可验证,也很难扩展到处理大规模的文件描述符情况,不易应用于实际的大型系统。这违反了有限状态验证的要求。接口的非有限性成为SMT验证的严重障碍。Hyperkernel通过修改dup的接口语义进行有限化:允许用户选择文件描述符号,而不是自动选择最小号。这样SMT求解器只需要展开一个常量级的代码路径,大大降低了验证复杂度。使验证成为与状态空间大小无关的常量时间操作,可以可扩展地适应大规模系统。</p>
 <h2 id="设计">设计</h2>
 <ol type="1">
 <li>To enable comparison, the source code of each file system is merged into one large file. This allows interprocedural analysis within a file system.</li>
@@ -144,23 +179,11 @@
     
     <div class="post-nav">
   
-    <a class="post-nav-item-left" href="/2023/09/03/%E3%80%8AHyperkernel:%20Push-Button%20Verification%20of%20an%20OS%20Kernel%E3%80%8B%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/">
-      <div class="text-align">
-        <svg t="1670570876164"
-             class="icon"
-             viewBox="0 0 1024 1024"
-             width="16"
-             height="16">
-          <path d="M384 512L731.733333 202.666667c17.066667-14.933333 19.2-42.666667 4.266667-59.733334-14.933333-17.066667-42.666667-19.2-59.733333-4.266666l-384 341.333333c-10.666667 8.533333-14.933333 19.2-14.933334 32s4.266667 23.466667 14.933334 32l384 341.333333c8.533333 6.4 19.2 10.666667 27.733333 10.666667 12.8 0 23.466667-4.266667 32-14.933333 14.933333-17.066667 14.933333-44.8-4.266667-59.733334L384 512z" p-id="14596"/>
-        </svg>
-        <span class="text-small">上一篇</span>
-      </div>
-      <div>《Hyperkernel: Push-Button Verification of an OS Kernel》文章精读</div>
-    </a>
+    <div class="post-nav-item-left"></div>
   
   <div class="vhr"></div>
   
-    <a class="post-nav-item-right" href="/2023/08/31/leetcode%2026.%20%E5%88%A0%E9%99%A4%E6%9C%89%E5%BA%8F%E6%95%B0%E7%BB%84%E4%B8%AD%E7%9A%84%E9%87%8D%E5%A4%8D%E9%A1%B9/">
+    <a class="post-nav-item-right" href="/2023/08/31/%E3%80%8ACross-checking%20Semantic%20Correctness:%20The%20Case%20of%20Finding%20File%20System%20Bugs%E3%80%8B%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/">
       <div class="text-align">
         <span class="text-small">下一篇</span>
         <svg t="1670570876164"
@@ -172,7 +195,7 @@
           <path d="M384 512L731.733333 202.666667c17.066667-14.933333 19.2-42.666667 4.266667-59.733334-14.933333-17.066667-42.666667-19.2-59.733333-4.266666l-384 341.333333c-10.666667 8.533333-14.933333 19.2-14.933334 32s4.266667 23.466667 14.933334 32l384 341.333333c8.533333 6.4 19.2 10.666667 27.733333 10.666667 12.8 0 23.466667-4.266667 32-14.933333 14.933333-17.066667 14.933333-44.8-4.266667-59.733334L384 512z" p-id="14596"/>
         </svg>
       </div>
-      leetcode 26. 删除有序数组中的重复项
+      《Cross-checking Semantic Correctness: The Case of Finding File System Bugs》文章精读
     </a>
   
 </div>
@@ -185,7 +208,7 @@
 </div>
   <div class="realated__body">
     
-      <div class="null"><div class="null-item"><div class="null-title"><a href="/2023/09/03/《Hyperkernel: Push-Button Verification of an OS Kernel》文章精读/" title="《Hyperkernel: Push-Button Verification of an OS Kernel》文章精读" rel="bookmark">《Hyperkernel: Push-Button Verification of an OS Kernel》文章精读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/08/31/leetcode 26. 删除有序数组中的重复项/" title="leetcode 26. 删除有序数组中的重复项" rel="bookmark">leetcode 26. 删除有序数组中的重复项</a></div></div></div>
+      <div class="null"><div class="null-item"><div class="null-title"><a href="/2023/08/31/《Cross-checking Semantic Correctness: The Case of Finding File System Bugs》文章精读/" title="《Cross-checking Semantic Correctness: The Case of Finding File System Bugs》文章精读" rel="bookmark">《Cross-checking Semantic Correctness: The Case of Finding File System Bugs》文章精读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/08/31/leetcode 26. 删除有序数组中的重复项/" title="leetcode 26. 删除有序数组中的重复项" rel="bookmark">leetcode 26. 删除有序数组中的重复项</a></div></div></div>
     
   </div>
 </div>
