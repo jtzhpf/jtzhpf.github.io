@@ -96,7 +96,7 @@
       
         <aside class="toc-outer">
           <div class="toc-title">目录</div>
-          <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#tricks"><span class="post-toc-text">Tricks</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#finite-interfaces"><span class="post-toc-text">Finite interfaces</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E8%AE%BE%E8%AE%A1"><span class="post-toc-text">设计</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%AE%9E%E7%8E%B0"><span class="post-toc-text">实现</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%97%AE%E9%A2%98"><span class="post-toc-text">问题</span></a></li></ol>
+          <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%8C%91%E6%88%98%E4%B8%8E%E5%BA%94%E5%AF%B9"><span class="post-toc-text">挑战与应对</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#tricks"><span class="post-toc-text">Tricks</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#finite-interfaces"><span class="post-toc-text">Finite interfaces</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E8%AE%BE%E8%AE%A1"><span class="post-toc-text">设计</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%AE%9E%E7%8E%B0"><span class="post-toc-text">实现</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%97%AE%E9%A2%98"><span class="post-toc-text">问题</span></a></li></ol>
           <a href="#" class="toc-top">回到顶部</a>
         </aside>
       
@@ -106,7 +106,8 @@
             
           </div>
         
-        <p>通过修改xv6的内核接口以支持SMT（Satisfiability Modulo Theories）求解器。 <span id="more"></span> ## 挑战与应对</p>
+        <p>通过修改xv6的内核接口以支持SMT（Satisfiability Modulo Theories）求解器。 <span id="more"></span></p>
+<h2 id="挑战与应对">挑战与应对</h2>
 <table>
 <colgroup>
 <col style="width: 0%" />
@@ -143,34 +144,8 @@
 <p>将在执行中随着系统变化而变化代码执行次数的路径修改为与系统状态无关的路径。</p>
 <p>追求最低可用文件描述符会导致代码路径爆炸。内核需要逐个检查所有可能的文件描述符,以找到最小的空闲描述符。SMT求解器需要展开这些代码路径来构建约束和验证程序。代码路径的数量会随着文件描述符表大小呈指数增长。验证时间和内存消耗都将随之大幅增加,难以完成验证。复杂性会随状态空间大小指数增长。即使可验证,也很难扩展到处理大规模的文件描述符情况,不易应用于实际的大型系统。这违反了有限状态验证的要求。接口的非有限性成为SMT验证的严重障碍。Hyperkernel通过修改dup的接口语义进行有限化:允许用户选择文件描述符号,而不是自动选择最小号。这样SMT求解器只需要展开一个常量级的代码路径,大大降低了验证复杂度。使验证成为与状态空间大小无关的常量时间操作,可以可扩展地适应大规模系统。</p>
 <h2 id="设计">设计</h2>
-<ol type="1">
-<li>To enable comparison, the source code of each file system is merged into one large file. This allows interprocedural analysis within a file system.</li>
-<li>JUXTA collects execution information for each function in the file systems by constructing control-flow graphs (CFGs) and symbolically exploring these graphs from the entry point to the end of each function.</li>
-<li>Symbols are canonicalized so that equivalent symbols have the same name across file systems. A path database that stores the extracted path information is also created, which allows applications like checkers and specification extractors to use the path information without reexecuting symbolic analysis. All of these facilitate comparison.</li>
-<li>Symbolic execution is used to explore paths through functions and build a path database. The path info contains path conditions, return values, side effects, etc.</li>
-<li>Two statistical methods are used to compare paths:
-<ul>
-<li>Histogram-based: Integer ranges are encoded into histograms and distances between histograms are computed.</li>
-<li>Entropy-based: Used for events like flags or return value checks. Low non-zero entropy indicates a likely bug.</li>
-</ul></li>
-<li>Bug reports are ranked to prioritize investigation of likely true positives. Metrics include histogram distance and entropy values.</li>
-</ol>
 <h2 id="实现">实现</h2>
-<p>需要构建8个检查器：</p>
-<ol type="1">
-<li>返回值检查器：比较不同文件系统对同一VFS接口的返回值，找到返回值有明显差异的文件系统。</li>
-<li>副作用检查器：比较同一VFS接口和返回值下的副作用，找到副作用有明显差异的文件系统。</li>
-<li>函数调用检查器：比较同一VFS接口下的函数调用，找到调用函数有明显差异的文件系统。</li>
-<li>路径条件检查器：比较同一VFS接口下的路径条件，找到路径条件有明显差异的文件系统。</li>
-<li>提取文件系统规范：从不同文件系统中提取出共性行为作为潜在规范。</li>
-<li>重构跨模块抽象：根据共性行为，可将其提升到VFS层，减少冗余。</li>
-<li>推断锁语义：推断每个路径所持有和释放的锁，跟踪受锁保护的字段。</li>
-<li>推断外部API语义：基于调用参数和返回值检查的频率分布，找出用法有明显差异的文件系统。</li>
-</ol>
 <h2 id="问题">问题</h2>
-<ol type="1">
-<li>依赖于大量实现相同功能的模块</li>
-</ol>
 
       </div>
     </div>
