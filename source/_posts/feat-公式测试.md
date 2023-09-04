@@ -1,6 +1,6 @@
 ---
 title: 数学公式测试
-category: CS&Maths
+category: 
 date: 2023-07-03 10:26:00
 toc: true
 tags: math

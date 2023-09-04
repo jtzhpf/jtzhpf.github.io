@@ -1,6 +1,6 @@
 ---
 title: Hello World from Hexo
-category: CS&Maths
+category: 
 #id: 57
 date: 2018-9-1
 tags: 
