@@ -24,7 +24,7 @@ timeline: article  # 展示在时间线列表中
 4. Symbolic execution is used to explore paths through functions and build a path database. The path info contains path conditions, return values, side effects, etc.
 5. Two statistical methods are used to compare paths:
    - Histogram-based: Integer ranges are encoded into histograms and distances between histograms are computed.
-   - Entropy-based: Used for events like flags or return value checks. Low non-zero entropy indicates a likely bug.
+   - Entropy-based: Used for **events** like flags or return value checks. Low non-zero entropy indicates a likely bug.（别的的实现均不包含这一event，则说明this event could be wrong implementation）
 6. Bug reports are ranked to prioritize investigation of likely true positives. Metrics include histogram distance and entropy values.
 
 ## 实现
