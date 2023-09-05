@@ -4,7 +4,7 @@ category: CS&Maths
 #id: 57
 date: 2023-9-3 09:00:00
 tags: 
-  - Linux
+  - xv6
   - Staitc Analysis
   - SOSP
 toc: true
@@ -13,7 +13,7 @@ toc: true
 timeline: article  # 展示在时间线列表中
 ---
 
-通过修改xv6的内核接口以支持SMT（Satisfiability Modulo Theories）求解器。
+修改xv6的内核接口，构建状态机规范和声明式规范以支持SMT（Satisfiability Modulo Theories）求解器来进行验证。
 <!--more-->
 
 ## 挑战与应对
