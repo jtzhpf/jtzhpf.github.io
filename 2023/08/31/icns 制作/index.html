@@ -5,7 +5,7 @@
     <meta name="viewport" content="initial-scale=1.0, width=device-width" />
     <title>
       
-        视频 | ZPF.SITE
+        icns 图标制作 | ZPF.SITE
       
     </title>
     <meta name="description" content="" />
@@ -84,13 +84,13 @@
   <article class="post-content">
     <div class="post-inner">
       <div class="post-content__head">
-        <div class="post-title">视频</div>
+        <div class="post-title">icns 图标制作</div>
         <div class="post-info">
           
-  <a href="/tags/media/" class="post-tag">#media</a>
+  <a href="/tags/app/" class="post-tag">#app</a>
 
 
-          <span class="post-date">2013-12-25</span>
+          <span class="post-date">2023-08-31</span>
         </div>
       </div>
       
@@ -100,11 +100,13 @@
             
           </div>
         
-        <p>This is a video test post.</p>
-<p><strong>Youtube</strong></p>
-<div class="video-container"><iframe src="https://www.youtube.com/embed/TIbZDRXM-Tg" frameborder="0" loading="lazy" allowfullscreen></iframe></div>
-<p><strong>Vimeo</strong></p>
-<div class="video-container"><iframe src="https://player.vimeo.com/video/82090131" frameborder="0" loading="lazy" allowfullscreen></iframe></div>
+        <p>想要用 <a target="_blank" rel="noopener" href="https://github.com/tw93/Pake">pake</a> 来将常用的网页打包为 app，例如 <a target="_blank" rel="noopener" href="http://clash.metacubex.one">clash dashboard</a> 等，方便服务器的使用，需要制作 icns 格式的图标。 <span id="more"></span></p>
+<ul>
+<li>准备一个 1024 * 1024 的png图片，假设名字为 <code>pic.png</code></li>
+<li>创建一个临时目录存放不同大小的图片 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">mkdir tmp.iconset<br></code></pre></td></tr></table></figure></li>
+<li>把原图片转为不同大小的图片，并放入上面的临时目录 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">全部拷贝到命令行回车执行，执行结束之后去tmp.iconset查看十张图片是否生成好</span><br>sips -z 16 16     pic.png --out tmp.iconset/icon_16x16.png<br>sips -z 32 32     pic.png --out tmp.iconset/icon_16x16@2x.png<br>sips -z 32 32     pic.png --out tmp.iconset/icon_32x32.png<br>sips -z 64 64     pic.png --out tmp.iconset/icon_32x32@2x.png<br>sips -z 128 128   pic.png --out tmp.iconset/icon_128x128.png<br>sips -z 256 256   pic.png --out tmp.iconset/icon_128x128@2x.png<br>sips -z 256 256   pic.png --out tmp.iconset/icon_256x256.png<br>sips -z 512 512   pic.png --out tmp.iconset/icon_256x256@2x.png<br>sips -z 512 512   pic.png --out tmp.iconset/icon_512x512.png<br>sips -z 1024 1024   pic.png --out tmp.iconset/icon_512x512@2x.png<br></code></pre></td></tr></table></figure></li>
+<li>通过<code>iconutil</code>生成 icns 文件，此时目录下即可得到想要的图标 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">iconutil -c icns tmp.iconset -o Icon.icns<br></code></pre></td></tr></table></figure></li>
+</ul>
 
       </div>
     </div>
@@ -113,7 +115,7 @@
     
     <div class="post-nav">
   
-    <a class="post-nav-item-left" href="/2013/12/25/excerpts/">
+    <a class="post-nav-item-left" href="/2023/09/03/%E3%80%8AHyperkernel:%20Push-Button%20Verification%20of%20an%20OS%20Kernel%E3%80%8B%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/">
       <div class="text-align">
         <svg t="1670570876164"
              class="icon"
@@ -124,12 +126,12 @@
         </svg>
         <span class="text-small">上一篇</span>
       </div>
-      <div>摘要</div>
+      <div>《Hyperkernel: Push-Button Verification of an OS Kernel》文章精读</div>
     </a>
   
   <div class="vhr"></div>
   
-    <a class="post-nav-item-right" href="/2013/12/25/gallery-post/">
+    <a class="post-nav-item-right" href="/2023/08/31/%E3%80%8ACross-checking%20Semantic%20Correctness:%20The%20Case%20of%20Finding%20File%20System%20Bugs%E3%80%8B%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/">
       <div class="text-align">
         <span class="text-small">下一篇</span>
         <svg t="1670570876164"
@@ -141,7 +143,7 @@
           <path d="M384 512L731.733333 202.666667c17.066667-14.933333 19.2-42.666667 4.266667-59.733334-14.933333-17.066667-42.666667-19.2-59.733333-4.266666l-384 341.333333c-10.666667 8.533333-14.933333 19.2-14.933334 32s4.266667 23.466667 14.933334 32l384 341.333333c8.533333 6.4 19.2 10.666667 27.733333 10.666667 12.8 0 23.466667-4.266667 32-14.933333 14.933333-17.066667 14.933333-44.8-4.266667-59.733334L384 512z" p-id="14596"/>
         </svg>
       </div>
-      图集文章
+      《Cross-checking Semantic Correctness: The Case of Finding File System Bugs》文章精读
     </a>
   
 </div>
@@ -149,12 +151,12 @@
     
       <div class="related-post">
   <div class="related__head">
-  <a href="/tags/media/" class="post-tag">#media</a>
+  <a href="/tags/app/" class="post-tag">#app</a>
 
 </div>
   <div class="realated__body">
     
-      <div class="null"><div class="null-item"><div class="null-title"><a href="/2013/12/25/gallery-post/" title="图集文章" rel="bookmark">图集文章</a></div></div><div class="null-item"><div class="null-title"><a href="/2013/12/26/images/" title="图片" rel="bookmark">图片</a></div></div><div class="null-item"><div class="null-title"><a href="/2019/07/25/code-highlight/" title="代码高亮" rel="bookmark">代码高亮</a></div></div><div class="null-item"><div class="null-title"><a href="/2013/12/24/elements/" title="元素样式" rel="bookmark">元素样式</a></div></div></div>
+      <div class="null"><div class="null-item"><div class="null-title"><a href="/2023/08/31/leetcode 26. 删除有序数组中的重复项/" title="leetcode 26. 删除有序数组中的重复项" rel="bookmark">leetcode 26. 删除有序数组中的重复项</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/05/zsh & oh-my-zsh/" title="zsh & oh-my-zsh 常用命令" rel="bookmark">zsh & oh-my-zsh 常用命令</a></div></div></div>
     
   </div>
 </div>
