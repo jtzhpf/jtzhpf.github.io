@@ -5,7 +5,7 @@
     <meta name="viewport" content="initial-scale=1.0, width=device-width" />
     <title>
       
-        置顶测试-2 | ZPF.SITE
+        将Mac微信聊天记录备份到移动硬盘，释放Mac微信备份占用的存储空间 | ZPF.SITE
       
     </title>
     <meta name="description" content="" />
@@ -84,17 +84,23 @@
     <div class="body">
       
   <article class="post-content">
-    <div class="post-inner">
+    <div class="post-inner--toc">
       <div class="post-content__head">
-        <div class="post-title">置顶测试-2</div>
+        <div class="post-title">将Mac微信聊天记录备份到移动硬盘，释放Mac微信备份占用的存储空间</div>
         <div class="post-info">
           
-  <a href="/tags/%E7%BD%AE%E9%A1%B6/" class="post-tag">#置顶</a>
+  <a href="/tags/Mac/" class="post-tag">#Mac</a><a href="/tags/%E5%BE%AE%E4%BF%A1/" class="post-tag">#微信</a>
 
 
-          <span class="post-date">2023-07-03</span>
+          <span class="post-date">2023-08-31</span>
         </div>
       </div>
+      
+        <aside class="toc-outer">
+          <div class="toc-title">目录</div>
+          <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%89%BE%E5%88%B0%E5%A4%87%E4%BB%BD%E6%96%87%E4%BB%B6%E5%A4%B9"><span class="post-toc-text">找到备份文件夹</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%88%9B%E5%BB%BA%E8%BD%AF%E8%BF%9E%E6%8E%A5"><span class="post-toc-text">创建软连接</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%87%8D%E6%96%B0%E7%AD%BE%E5%90%8D%E5%BE%AE%E4%BF%A1"><span class="post-toc-text">重新签名微信</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%9B%B4%E6%96%B0%E5%BE%AE%E4%BF%A1"><span class="post-toc-text">更新微信</span></a></li></ol>
+          <a href="#" class="toc-top">回到顶部</a>
+        </aside>
       
       <div class="post-content__body">
         
@@ -102,9 +108,17 @@
             
           </div>
         
-        <p>这篇文章用来测试置顶功能. 设置文章属性 <code>sticky: [number]</code> 来指定置顶优先级，数字越大优先级越高，但不能小于等于0. 该篇文章的 <code>sticky</code> 为 2. 它应该出现在文章列表的顶部，并高于优先级更低的文章.</p>
-<span id="more"></span>
-<p>置顶功能用来置顶非常重要的文章，希望访问者能立即读到. 或者用来组织一个系列文章的目录.</p>
+        <h2 id="找到备份文件夹">找到备份文件夹</h2>
+<p>进入访达，按下<code>command+shift+i</code>显示隐藏文件夹，然后点击菜单栏上的「前往」，点击「前往文件夹」。</p>
+<p>将下面内容输入进去。记住更改里面的用户名。 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs plaintext">/Users/这里改为你的用户名/Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/com.tencent.xinWeChat/2.0b4.0.9/Backup/<br></code></pre></td></tr></table></figure></p>
+<p><code>command+c</code>复制里面的32位字符的文件夹，<code>command+shift+v</code>移动文件夹到移动硬盘的任意文件夹中。</p>
+<h2 id="创建软连接">创建软连接</h2>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">ln -s 移动硬盘里的32位字符文件夹地址 /Users/用户名/Library/Containers/com.tencent.xinWeChat/Data/Library/Application\ Support/com.tencent.xinWeChat/2.0b4.0.9/Backup<br></code></pre></td></tr></table></figure>
+<h2 id="重新签名微信">重新签名微信</h2>
+<p>退出微信，在终端app中输入下面的内容并回车。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo codesign --sign - --force --deep /Applications/WeChat.app<br></code></pre></td></tr></table></figure>
+<h2 id="更新微信">更新微信</h2>
+<p>更新了微信客户端之后需要重复上述操作。</p>
 
       </div>
     </div>
@@ -113,7 +127,7 @@
     
     <div class="post-nav">
   
-    <a class="post-nav-item-left" href="/2023/07/03/feat-%E5%B0%81%E9%9D%A2%E6%B5%8B%E8%AF%95/">
+    <a class="post-nav-item-left" href="/2023/08/31/%E3%80%8ACross-checking%20Semantic%20Correctness:%20The%20Case%20of%20Finding%20File%20System%20Bugs%E3%80%8B%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/">
       <div class="text-align">
         <svg t="1670570876164"
              class="icon"
@@ -124,12 +138,12 @@
         </svg>
         <span class="text-small">上一篇</span>
       </div>
-      <div>封面测试</div>
+      <div>《Cross-checking Semantic Correctness: The Case of Finding File System Bugs》文章精读</div>
     </a>
   
   <div class="vhr"></div>
   
-    <a class="post-nav-item-right" href="/2023/07/03/feat-%E5%85%AC%E5%BC%8F%E6%B5%8B%E8%AF%95/">
+    <a class="post-nav-item-right" href="/2023/08/31/leetcode%2026.%20%E5%88%A0%E9%99%A4%E6%9C%89%E5%BA%8F%E6%95%B0%E7%BB%84%E4%B8%AD%E7%9A%84%E9%87%8D%E5%A4%8D%E9%A1%B9/">
       <div class="text-align">
         <span class="text-small">下一篇</span>
         <svg t="1670570876164"
@@ -141,7 +155,7 @@
           <path d="M384 512L731.733333 202.666667c17.066667-14.933333 19.2-42.666667 4.266667-59.733334-14.933333-17.066667-42.666667-19.2-59.733333-4.266666l-384 341.333333c-10.666667 8.533333-14.933333 19.2-14.933334 32s4.266667 23.466667 14.933334 32l384 341.333333c8.533333 6.4 19.2 10.666667 27.733333 10.666667 12.8 0 23.466667-4.266667 32-14.933333 14.933333-17.066667 14.933333-44.8-4.266667-59.733334L384 512z" p-id="14596"/>
         </svg>
       </div>
-      数学公式测试
+      leetcode 26. 删除有序数组中的重复项
     </a>
   
 </div>
@@ -149,12 +163,12 @@
     
       <div class="related-post">
   <div class="related__head">
-  <a href="/tags/%E7%BD%AE%E9%A1%B6/" class="post-tag">#置顶</a>
+  <a href="/tags/Mac/" class="post-tag">#Mac</a><a href="/tags/%E5%BE%AE%E4%BF%A1/" class="post-tag">#微信</a>
 
 </div>
   <div class="realated__body">
     
-      <div class="null"><div class="null-item"><div class="null-title"><a href="/2023/07/04/feat-置顶测试/" title="置顶测试-1" rel="bookmark">置顶测试-1</a></div></div><div class="null-item"><div class="null-title"><a href="/2019/07/25/code-highlight/" title="代码高亮" rel="bookmark">代码高亮</a></div></div><div class="null-item"><div class="null-title"><a href="/2013/12/24/elements/" title="元素样式" rel="bookmark">元素样式</a></div></div></div>
+      
     
   </div>
 </div>
