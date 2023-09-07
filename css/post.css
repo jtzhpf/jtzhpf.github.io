@@ -207,6 +207,10 @@
   font-size: 14px;
   padding-left: 10px;
 }
+.toc-outer .post-toc-level-4 {
+  font-size: 13px;
+  padding-left: 8px;
+}
 .post__foot {
   max-width: 900px;
   margin: 100px auto;
