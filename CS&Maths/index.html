@@ -89,13 +89,31 @@
       </div>
       <div class="wall-category-description">第一是数学，第二是数学，第三是数学。  ——伦琴</div>
       <div class="wall-category-tags">
-        <div id="tags-outer"><canvas width="500" height="500" id="tagCanvas"><a href="/tags/C/" style="font-size: 14px;">C</a> <a href="/tags/C/" style="font-size: 14px;">C++</a> <a href="/tags/Linux/" style="font-size: 30px;">Linux</a> <a href="/tags/Rust/" style="font-size: 14px;">Rust</a> <a href="/tags/SOSP/" style="font-size: 30px;">SOSP</a> <a href="/tags/Staitc-Analysis/" style="font-size: 30px;">Staitc Analysis</a> <a href="/tags/app/" style="font-size: 14px;">app</a> <a href="/tags/leetcode/" style="font-size: 14px;">leetcode</a> <a href="/tags/shell/" style="font-size: 14px;">shell</a> <a href="/tags/xv6/" style="font-size: 14px;">xv6</a><canvas></div>
+        <div id="tags-outer"><canvas width="500" height="500" id="tagCanvas"><a href="/tags/C/" style="font-size: 14px;">C</a> <a href="/tags/C/" style="font-size: 14px;">C++</a> <a href="/tags/File-System/" style="font-size: 22px;">File System</a> <a href="/tags/Linux/" style="font-size: 30px;">Linux</a> <a href="/tags/OSDI/" style="font-size: 14px;">OSDI</a> <a href="/tags/Rust/" style="font-size: 14px;">Rust</a> <a href="/tags/SOSP/" style="font-size: 22px;">SOSP</a> <a href="/tags/Staitc-Analysis/" style="font-size: 22px;">Staitc Analysis</a> <a href="/tags/app/" style="font-size: 14px;">app</a> <a href="/tags/leetcode/" style="font-size: 14px;">leetcode</a> <a href="/tags/shell/" style="font-size: 14px;">shell</a> <a href="/tags/xv6/" style="font-size: 14px;">xv6</a><canvas></div>
       </div>
     </div>
   </div>
   <div class="post-list">
     
       
+  
+  <div class="post-card">
+    <div class="post__head">
+      <a href="/2023/09/06/%E3%80%8AAll%20File%20Systems%20Are%20Not%20Created%20Equal:%20On%20the%20Complexity%20of%20Crafting%20Crash-Consistent%20Applications%E3%80%8B%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB%20/" class="post-title hover-line">《All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications》文章精读</a>
+      
+    </div>
+    <div class="post__body">
+      
+      <div class="post-excerpt"><p>本文介绍了基于现代文件系统的应用层崩溃一致性协议的首个全面研究。研究发现，应用程序使用复杂的更新协议来持久化状态，而这些协议的正确性高度依赖于底层文件系统的微妙行为，我们称之为持久性属性。作者开发了一个名为BOB的工具来测试持久性属性，并使用它来证明这些属性在六种流行的Linux文件系统中存在广泛的差异。作者还构建了一个名为ALICE的框架，分析应用程序更新协议并发现崩溃漏洞，即需要特定持久性属性才能保证正确性的更新协议代码。使用ALICE，作者分析了11个广泛使用的系统，并发现了60个漏洞，其中许多会导致严重后果。作者还展示了ALICE可以用于评估新文件系统设计对应用程序级一致性的影响。</div>
+    </div>
+    <div class="post__foot">
+      <div class="post-tags">
+  <a href="/tags/Linux/" class="post-tag">#Linux</a><a href="/tags/File-System/" class="post-tag">#File System</a><a href="/tags/OSDI/" class="post-tag">#OSDI</a>
+
+</div>
+    </div>
+  </div>
+
   
   <div class="post-card">
     <div class="post__head">
@@ -162,7 +180,7 @@
     </div>
     <div class="post__foot">
       <div class="post-tags">
-  <a href="/tags/Linux/" class="post-tag">#Linux</a><a href="/tags/Staitc-Analysis/" class="post-tag">#Staitc Analysis</a><a href="/tags/SOSP/" class="post-tag">#SOSP</a>
+  <a href="/tags/Linux/" class="post-tag">#Linux</a><a href="/tags/File-System/" class="post-tag">#File System</a><a href="/tags/Staitc-Analysis/" class="post-tag">#Staitc Analysis</a><a href="/tags/SOSP/" class="post-tag">#SOSP</a>
 
 </div>
     </div>
