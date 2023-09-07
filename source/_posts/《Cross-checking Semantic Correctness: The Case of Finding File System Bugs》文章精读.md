@@ -50,11 +50,15 @@ timeline: article  # 展示在时间线列表中
 - docker ubuntu 14.04
 - gcc 4.8
 - g++ 4.8
-### 下载 juxta
+
+### 复现步骤
+
+#### 下载 juxta
 ```shell
 git clone https://github.com/sslab-gatech/juxta.git
 ```
-### 下载并测试 Linux
+
+#### 下载并测试 Linux
 ```shell
 git clone https://github.com/torvalds/linux.git
 cd linux
@@ -64,14 +68,14 @@ make; make clean
 cd ../juxta
 ```
 
-### 编译 clang
-在编译 clang 之前在 juxta 的 `Makefile` 中增加`COMPILER := -DCMAKE_CXX_COMPILER=g++-4.8 -DCMAKE_C_COMPILER=gcc-4.8`，并且将其添加到 cmake 的调用参数中。
+#### 编译 clang
+在编译 clang 之前在 juxta 的 `Makefile` 中增加`COMPILER := -DCMAKE_CXX_COMPILER=g++-4.8 -DCMAKE_C_COMPILER=gcc-4.8`，并且将其添加到 cmake 的参数中。
 ```shell
 make clang-full   (first time only)
 make clang        (from the next)
 ```
 
-### 构建 path database
+#### 构建 path database
 合并文件系统代码
 ```shell
 cd analyzer
@@ -90,12 +94,12 @@ cd analyzer
 ./ctrl.py pickle_all (for all file systems)
 ```
 
-### code checker
+#### code checker
 ```shell
 ./ckrtn.py
 ```
 
-### get sorted results of checker output
+#### get sorted results of checker output
 ```shell
 ./catcklog.sh [checker output dir]
 ```
