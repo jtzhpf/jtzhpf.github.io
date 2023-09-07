@@ -18,6 +18,11 @@ subpage: # 开启“子页”功能，详见 README
       title: "Computer Science & Maths" # 菜单名，如 开发者
       icon: /images/icon/icon-code.svg # 图标的路径
       description: "第一是数学，第二是数学，第三是数学。  ——伦琴" # 描述
+    - name: "Life" # 文章的分类（category）名，如 developer
+      path: # 若不设置则默认使用 name
+      title: "Life" # 菜单名，如 开发者
+      icon: /images/icon/icon-sunrise.svg # 图标的路径
+      description: "So this is life." # 描述
 #    - name: Maths # 文章的分类（category）名，如 developer
 #      path: # 若不设置则默认使用 name
 #      title: Maths # 菜单名，如 开发者
@@ -121,10 +126,10 @@ timeline:
       color: "#ee936c"
       icon: /images/icon/icon-article.svg
       checked: true
-    #- name: app
-    #  color: "#60a465"
-    #  icon: /images/icon/icon-app.svg
-    #  checked: true
+    - name: app
+      color: "#60a465"
+      icon: /images/icon/icon-app.svg
+      checked: true
     - name: code
       color: "#555555"
       icon: /images/icon/icon-code.svg

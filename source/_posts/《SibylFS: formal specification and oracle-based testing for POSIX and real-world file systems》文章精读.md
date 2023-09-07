@@ -1,12 +1,10 @@
 ---
-title: "《Cross-checking Semantic Correctness: The Case of Finding File System Bugs》文章精读"
+title: "《SibylFS: formal specification and oracle-based testing for POSIX and real-world file systems》文章精读"
 category: CS&Maths
 #id: 57
-date: 2023-8-31 20:42:32
+date: 2023-9-7 18:00:00
 tags: 
-  - Linux
   - File System
-  - Staitc Analysis
   - SOSP
   - 论文
 toc: true
