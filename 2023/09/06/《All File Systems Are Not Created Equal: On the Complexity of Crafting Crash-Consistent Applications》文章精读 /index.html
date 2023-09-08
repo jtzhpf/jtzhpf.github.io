@@ -114,7 +114,7 @@
 <img src="/《All%20File%20Systems%20Are%20Not%20Created%20Equal:%20On%20the%20Complexity%20of%20Crafting%20Crash-Consistent%20Applications》文章精读/image1.png" alt="" /><figcaption>Crash States</figcaption>
 </figure>
 <h2 id="bob">BOB</h2>
-<p>BOB是一个简单的工具，用于收集文件系统下的块级追踪，并重新排序以探索可能出现的磁盘崩溃状态，用于测试文件系统的持久性属性。它通过运行一个简单的工作负载来测试持久性属性，收集块I/O并重新排序，生成可能的磁盘状态。然后运行文件系统恢复并检查持久性属性是否成立。如果BOB找到一个检查失败的磁盘映像，则知道该属性在文件系统上不成立。但BOB无法证明属性在所有情况下都成立。</p>
+<p>BOB是一个简单的工具，用于收集文件系统下的块级追踪，并重新排序以探索可能出现的磁盘崩溃状态，用于测试文件系统的持久性属性。它通过运行一个简单的工作负载来测试持久性属性，收集块I/O并重新排序，生成可能的磁盘状态。然后运行文件系统恢复并检查持久性属性是否成立。如果BOB找到一个检查失败的磁盘映像，则知道该属性在文件系统上不成立。 <img src="/《All%20File%20Systems%20Are%20Not%20Created%20Equal:%20On%20the%20Complexity%20of%20Crafting%20Crash-Consistent%20Applications》文章精读/image3.png" alt="Persistence Properties" /></p>
 <h2 id="alice">ALICE</h2>
 <p>本文研究现代应用程序的崩溃一致性协议实现是否正确。为了回答这个问题，研究者们开发了一个名为ALICE的框架，可以系统地研究应用程序级别的崩溃一致性。</p>
 <p>ALICE将应用工作负载中的系统调用跟踪转换为逻辑操作。逻辑操作将当前读写偏移量、文件描述符等细节抽象化，并将一组大量的系统调用和其他产生I/O行为转换为一小组文件系统操作。逻辑操作还将每个涉及的文件或目录关联到一个概念上的inode。</p>
