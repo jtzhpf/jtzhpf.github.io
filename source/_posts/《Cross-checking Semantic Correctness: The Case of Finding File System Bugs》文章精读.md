@@ -76,32 +76,39 @@ cd ../juxta
 #### 编译 clang
 在编译 clang 之前在 juxta 的 `Makefile` 中增加`COMPILER := -DCMAKE_CXX_COMPILER=g++-4.8 -DCMAKE_C_COMPILER=gcc-4.8`，并且将其添加到 cmake 的参数中。
 ```shell
-make clang-full   (first time only)
-make clang        (from the next)
+make clang-full       # first time only
+make clang            # from the next
 ```
 
 #### 构建 path database
 合并文件系统代码
 ```shell
 cd analyzer
-./ctrl.py merge_all  (for all file systems)
-./ctrl.py merge ext4 (for ext4)
+./ctrl.py merge_all   # for all file systems
+./ctrl.py merge ext4  # for ext4
 ```
 
 对合并的文件系统代码静态分析
 ```shell
-./ctrl.py clang_all  (for all file systems)
-./ctrl.py clang ext4 (for ext4)
+./ctrl.py clang_all   # for all file systems
+./ctrl.py clang ext4  # for ext4
 ```
 
 构建路径数据库
 ```shell
-./ctrl.py pickle_all (for all file systems)
+./ctrl.py pickle_all  # for all file systems
 ```
 
 #### code checker
 ```shell
-./ckrtn.py
+./ckrtn.py            # Return code checker
+./ckstore.py          # Side-effect checker
+./ckcall.py           # Function call checker
+./ckcond.py           # Path condition checker
+./call_flags.py       # Argument checker
+./ckapi.py            # Error handling checker
+./lock.py             # Lock checker
+./spec.py             # Spec. generator
 ```
 
 #### get sorted results of checker output
