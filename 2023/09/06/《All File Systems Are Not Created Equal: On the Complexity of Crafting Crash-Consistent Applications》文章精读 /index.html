@@ -114,7 +114,10 @@
 <img src="/《All%20File%20Systems%20Are%20Not%20Created%20Equal:%20On%20the%20Complexity%20of%20Crafting%20Crash-Consistent%20Applications》文章精读/image1.png" alt="" /><figcaption>Crash States</figcaption>
 </figure>
 <h2 id="bob">BOB</h2>
-<p>BOB是一个简单的工具，用于收集文件系统下的块级追踪，并重新排序以探索可能出现的磁盘崩溃状态，用于测试文件系统的持久性属性。它通过运行一个简单的工作负载来测试持久性属性，收集块I/O并重新排序，生成可能的磁盘状态。然后运行文件系统恢复并检查持久性属性是否成立。如果BOB找到一个检查失败的磁盘映像，则知道该属性在文件系统上不成立。 <img src="/《All%20File%20Systems%20Are%20Not%20Created%20Equal:%20On%20the%20Complexity%20of%20Crafting%20Crash-Consistent%20Applications》文章精读/image3.png" alt="Persistence Properties" /></p>
+<p>BOB是一个简单的工具，用于收集文件系统下的块级追踪，并重新排序以探索可能出现的磁盘崩溃状态，用于测试文件系统的持久性属性。它通过运行一个简单的工作负载来测试持久性属性，收集块I/O并重新排序，生成可能的磁盘状态。然后运行文件系统恢复并检查持久性属性是否成立。如果BOB找到一个检查失败的磁盘映像，则知道该属性在文件系统上不成立。</p>
+<figure>
+<img src="/《All%20File%20Systems%20Are%20Not%20Created%20Equal:%20On%20the%20Complexity%20of%20Crafting%20Crash-Consistent%20Applications》文章精读/image3.png" alt="" /><figcaption>Persistence Properties</figcaption>
+</figure>
 <h2 id="alice">ALICE</h2>
 <p>本文研究现代应用程序的崩溃一致性协议实现是否正确。为了回答这个问题，研究者们开发了一个名为ALICE的框架，可以系统地研究应用程序级别的崩溃一致性。</p>
 <p>ALICE将应用工作负载中的系统调用跟踪转换为逻辑操作。逻辑操作将当前读写偏移量、文件描述符等细节抽象化，并将一组大量的系统调用和其他产生I/O行为转换为一小组文件系统操作。逻辑操作还将每个涉及的文件或目录关联到一个概念上的inode。</p>
@@ -124,7 +127,10 @@
 <figure>
 <img src="/《All%20File%20Systems%20Are%20Not%20Created%20Equal:%20On%20the%20Complexity%20of%20Crafting%20Crash-Consistent%20Applications》文章精读/image2.png" alt="" /><figcaption>Default APM Constraints</figcaption>
 </figure>
-<p>ALICE将系统调用跟踪转换为微操作，并计算它们之间的顺序依赖关系。ALICE通过将所选集合中的微操作顺序应用于初始状态（表示为逻辑实体），构造新的崩溃状态。对于每个崩溃状态，ALICE将逻辑实体转换回实际文件，并将其提供给检查器进行验证。用户提供的检查器验证崩溃状态。 <img src="/《All%20File%20Systems%20Are%20Not%20Created%20Equal:%20On%20the%20Complexity%20of%20Crafting%20Crash-Consistent%20Applications》文章精读/image4.png" alt="Overview of ALICE" /></p>
+<p>ALICE将系统调用跟踪转换为微操作，并计算它们之间的顺序依赖关系。ALICE通过将所选集合中的微操作顺序应用于初始状态（表示为逻辑实体），构造新的崩溃状态。对于每个崩溃状态，ALICE将逻辑实体转换回实际文件，并将其提供给检查器进行验证。用户提供的检查器验证崩溃状态。</p>
+<figure>
+<img src="/《All%20File%20Systems%20Are%20Not%20Created%20Equal:%20On%20the%20Complexity%20of%20Crafting%20Crash-Consistent%20Applications》文章精读/image4.png" alt="" /><figcaption>Overview of ALICE</figcaption>
+</figure>
 <h3 id="finding-application-requirements">Finding Application Requirements</h3>
 <h4 id="测试跨系统调用的原子性">测试跨系统调用的原子性</h4>
 <p>它通过构建每个前缀（即前X个系统调用，1&lt;X&lt;N）应用的崩溃状态来实现。如果在这些崩溃状态中发现应用程序不变量被违反，则表示开始了一个原子组。(apply prefix of operations)</p>
