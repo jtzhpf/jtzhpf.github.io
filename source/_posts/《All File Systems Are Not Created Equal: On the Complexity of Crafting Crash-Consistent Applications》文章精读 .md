@@ -39,6 +39,7 @@ APM将逻辑操作分解为微操作，以捕捉中间崩溃状态。微操作�
 ![Default APM Constraints](/《All%20File%20Systems%20Are%20Not%20Created%20Equal:%20On%20the%20Complexity%20of%20Crafting%20Crash-Consistent%20Applications》文章精读/image2.png)
 
 ALICE将系统调用跟踪转换为微操作，并计算它们之间的顺序依赖关系。ALICE通过将所选集合中的微操作顺序应用于初始状态（表示为逻辑实体），构造新的崩溃状态。对于每个崩溃状态，ALICE将逻辑实体转换回实际文件，并将其提供给检查器进行验证。用户提供的检查器验证崩溃状态。
+![Overview of ALICE](/《All%20File%20Systems%20Are%20Not%20Created%20Equal:%20On%20the%20Complexity%20of%20Crafting%20Crash-Consistent%20Applications》文章精读/image4.png)
 
 ### Finding Application Requirements
 
