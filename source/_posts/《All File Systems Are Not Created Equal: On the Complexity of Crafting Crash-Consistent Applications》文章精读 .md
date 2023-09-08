@@ -23,6 +23,7 @@ timeline: article  # 展示在时间线列表中
 
 ## BOB 
 BOB是一个简单的工具，用于收集文件系统下的块级追踪，并重新排序以探索可能出现的磁盘崩溃状态，用于测试文件系统的持久性属性。它通过运行一个简单的工作负载来测试持久性属性，收集块I/O并重新排序，生成可能的磁盘状态。然后运行文件系统恢复并检查持久性属性是否成立。如果BOB找到一个检查失败的磁盘映像，则知道该属性在文件系统上不成立。
+
 ![Persistence Properties](/《All%20File%20Systems%20Are%20Not%20Created%20Equal:%20On%20the%20Complexity%20of%20Crafting%20Crash-Consistent%20Applications》文章精读/image3.png)
 
 ## ALICE
@@ -39,6 +40,7 @@ APM将逻辑操作分解为微操作，以捕捉中间崩溃状态。微操作�
 ![Default APM Constraints](/《All%20File%20Systems%20Are%20Not%20Created%20Equal:%20On%20the%20Complexity%20of%20Crafting%20Crash-Consistent%20Applications》文章精读/image2.png)
 
 ALICE将系统调用跟踪转换为微操作，并计算它们之间的顺序依赖关系。ALICE通过将所选集合中的微操作顺序应用于初始状态（表示为逻辑实体），构造新的崩溃状态。对于每个崩溃状态，ALICE将逻辑实体转换回实际文件，并将其提供给检查器进行验证。用户提供的检查器验证崩溃状态。
+
 ![Overview of ALICE](/《All%20File%20Systems%20Are%20Not%20Created%20Equal:%20On%20the%20Complexity%20of%20Crafting%20Crash-Consistent%20Applications》文章精读/image4.png)
 
 ### Finding Application Requirements
