@@ -124,7 +124,7 @@
 <figure>
 <img src="/《All%20File%20Systems%20Are%20Not%20Created%20Equal:%20On%20the%20Complexity%20of%20Crafting%20Crash-Consistent%20Applications》文章精读/image2.png" alt="" /><figcaption>Default APM Constraints</figcaption>
 </figure>
-<p>ALICE将系统调用跟踪转换为微操作，并计算它们之间的顺序依赖关系。ALICE通过将所选集合中的微操作顺序应用于初始状态（表示为逻辑实体），构造新的崩溃状态。对于每个崩溃状态，ALICE将逻辑实体转换回实际文件，并将其提供给检查器进行验证。用户提供的检查器验证崩溃状态。</p>
+<p>ALICE将系统调用跟踪转换为微操作，并计算它们之间的顺序依赖关系。ALICE通过将所选集合中的微操作顺序应用于初始状态（表示为逻辑实体），构造新的崩溃状态。对于每个崩溃状态，ALICE将逻辑实体转换回实际文件，并将其提供给检查器进行验证。用户提供的检查器验证崩溃状态。 <img src="/《All%20File%20Systems%20Are%20Not%20Created%20Equal:%20On%20the%20Complexity%20of%20Crafting%20Crash-Consistent%20Applications》文章精读/image4.png" alt="Overview of ALICE" /></p>
 <h3 id="finding-application-requirements">Finding Application Requirements</h3>
 <h4 id="测试跨系统调用的原子性">测试跨系统调用的原子性</h4>
 <p>它通过构建每个前缀（即前X个系统调用，1&lt;X&lt;N）应用的崩溃状态来实现。如果在这些崩溃状态中发现应用程序不变量被违反，则表示开始了一个原子组。(apply prefix of operations)</p>
