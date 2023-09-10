@@ -13,98 +13,86 @@ toc: true
 timeline: article  # 展示在时间线列表中
 ---
 
-主要思路是统计多个文件系统的实现，计算具体文件系统与多个文件系统总体之间的差异性（直方图/信息熵），从而窥探出其文件系统的具体实现在语义上的差异。
+本文提出了一个名为 SibylFS 的文件系统行为规范，可以以黑盒测试方式检查文件系统实现和规范之间的行为差异。
 <!--more-->
 
-## 设计
+## 问题提出
 
-1. To enable comparison, the source code of each file system is merged into one large file. This allows interprocedural analysis within a file system.
-2. JUXTA collects execution information for each function in the file systems by constructing control-flow graphs (CFGs) and symbolically exploring these graphs from the entry point to the end of each function.
-3. Symbols are canonicalized so that equivalent symbols have the same name across file systems. A path database that stores the extracted path information is also created, which allows applications like checkers and specification extractors to use the path information without reexecuting symbolic analysis. All of these facilitate comparison.
-4. Symbolic execution is used to explore paths through functions and build a path database. The path info contains path conditions, return values, side effects, etc.
-5. Two statistical methods are used to compare paths:
-   - Histogram-based: Integer ranges are encoded into histograms and distances between histograms are computed.
-   - Entropy-based: Used for **events** like flags or return value checks. Low non-zero entropy indicates a likely bug.（别的的实现均不包含这一event，则说明this event could be wrong implementation）
-6. Bug reports are ranked to prioritize investigation of likely true positives. Metrics include histogram distance and entropy values.
+该论文提出，系统依赖于文件系统的行为，但不同文件系统实现之间以及实现和POSIX等规范之间在许多细节上存在行为差异。要构建健壮的可移植软件，需要理解这些细节和差异。但是目前没有好的方法来系统地描述、调查或测试跨多个平台的文件系统行为。
 
-## 实现
+具体来说，现有的实践依靠松散的**文字**规范和文档(如POSIX，使用英文这一自然语言来进行描述，全凭开发者来自行理解)，并没有可执行的测试准则，无法自动判定某观察行为是否被允许。这使得文件系统行为及其变化难以被文件系统开发者、上层软件开发者以及应用和文件系统移植者理解。
 
-需要构建8个检查器：
+该论文试图通过一个可执行的规范和大规模测试来明确描述文件系统的允许行为范围，并基于此进行区分测试，以解决上述问题。
 
-1. 返回值检查器：比较不同文件系统对同一VFS接口的返回值，找到返回值有明显差异的文件系统。
-2. 副作用检查器：比较同一VFS接口和返回值下的副作用，找到副作用有明显差异的文件系统。
-3. 函数调用检查器：比较同一VFS接口下的函数调用，找到调用函数有明显差异的文件系统。
-4. 路径条件检查器：比较同一VFS接口下的路径条件，找到路径条件有明显差异的文件系统。
-5. 提取文件系统规范：从不同文件系统中提取出共性行为作为潜在规范。
-6. 重构跨模块抽象：根据共性行为，可将其提升到VFS层，减少冗余。
-7. 推断锁语义：推断每个路径所持有和释放的锁，跟踪受锁保护的字段。
-8. 推断外部API语义：基于调用参数和返回值检查的频率分布，找出用法有明显差异的文件系统。
+## 解决方案
 
-## 问题
+提出了一个数学严格的可执行文件系统行为规范 SibylFS。
 
-1. 依赖于大量实现相同功能的模块
+![SibylFS](/《SibylFS: formal specification and oracle-based testing for POSIX and real-world file systems》文章精读/image1.png)
 
-## 实验复现
-### 实验环境
-- docker ubuntu 14.04
-- gcc 4.8
-- g++ 4.8
+具体来说，SibylFS 有以下关键特征：
 
-### 复现步骤
+- 它是一个测试准则，可以判断观察的系统调用追踪是否被规范允许，从而可以测试实现和验证规范。
+- 采用模块化设计。
+- 尽可能全面地描述真实世界文件系统的行为，而不仅是理想化的文件系统。
+- 使用数学严谨语言Lem编写，可以进行机器证明和转换为可执行的OCaml代码。
+- 配套一个大规模的自动生成和手写测试用例集，基本覆盖了规范的所有情况。
 
-#### 下载 juxta
-```shell
-git clone https://github.com/sslab-gatech/juxta.git
-```
+综合来说，SibylFS通过可执行规范和大规模测试提供了一个实用的文件系统行为分析和测试工具，可以发现和理解文件系统实现的细微行为差异，是该论文的关键创新。
 
-#### 下载并测试 Linux
-```shell
-git clone https://github.com/torvalds/linux.git
-cd linux
-git checkout v4.0-rc2
-cp ../juxta/config/config-x86_64-full-fs-4.0 .config
-make; make clean
-cd ../juxta
-```
+### 实验设计
+#### 生成测试用例
+实验过程从一组测试脚本开始。这些测试脚本根据它们所针对的libc函数进行组织。大部分测试脚本是由测试生成器自动生成的，但也可以包括手写的测试脚本。这些测试脚本包含了一系列文件系统命令序列，这些命令将由测试执行器通过libc接口来驱动真实的文件系统进行测试。
 
-#### 编译 clang
-在编译 clang 之前在 juxta 的 `Makefile` 中增加`COMPILER := -DCMAKE_CXX_COMPILER=g++-4.8 -DCMAKE_C_COMPILER=gcc-4.8`，并且将其添加到 cmake 的参数中。
-```shell
-make clang-full   (first time only)
-make clang        (from the next)
-```
+![](/《SibylFS: formal specification and oracle-based testing for POSIX and real-world file systems》文章精读/image2.png)
 
-#### 构建 path database
-合并文件系统代码
-```shell
-cd analyzer
-./ctrl.py merge_all  (for all file systems)
-./ctrl.py merge ext4 (for ext4)
-```
+#### 执行测试脚本
+测试执行器是一个工具或程序，用于执行测试脚本中的命令并与真实世界的文件系统进行交互。测试执行器会按照测试脚本的指令逐一执行libc调用，从一个空的文件系统状态开始设置所需的文件系统状态。一个测试脚本可能会包括多达数百次的libc函数调用。追踪文件会交错显示测试脚本中的命令以及来自真实文件系统的响应。这个追踪文件用于后续的分析和比较，以确保文件系统的行为符合预期。
+![](/《SibylFS: formal specification and oracle-based testing for POSIX and real-world file systems》文章精读/image3.png)
 
-对合并的文件系统代码静态分析
-```shell
-./ctrl.py clang_all  (for all file systems)
-./ctrl.py clang ext4 (for ext4)
-```
+#### 检查追踪
+SibylFS的核心部分是检查器，它基于Lem语言自动转换为OCaml，并与一个小型的OCaml包装器链接在一起。检查器的任务是检查追踪文件中的操作是否符合特定变种的模型，例如POSIX、Linux、OS X或FreeBSD。它还可以根据各种标志控制进一步的检查参数，例如初始进程是否以root权限运行。
 
-构建路径数据库
-```shell
-./ctrl.py pickle_all (for all file systems)
-```
+检查的输出是一组已验证的追踪，已验证的追踪包括了符合模型规范的部分，这些部分与原始追踪类似。对于不符合规范的部分，已验证的追踪包括一个错误消息以及（如果可能的话）诊断信息，以帮助识别为何行为不符合规范。
+![](/《SibylFS: formal specification and oracle-based testing for POSIX and real-world file systems》文章精读/image4.png)
 
-#### code checker
-```shell
-./ckrtn.py
-```
+由于每个追踪文件可能包含多个测试调用，因此当单个步骤失败时，检查器会尝试继续检查。在图中，SibylFS在假定返回EEXIST或ENOTEMPTY而不是EPERM的情况下继续检查追踪。
 
-#### get sorted results of checker output
-```shell
-./catcklog.sh [checker output dir]
-```
+模型的构建与测试密切相关。测试（特别是在新的操作系统和文件系统上）会发现新的真实世界行为，然后将这些行为纳入模型中。随后会添加新的测试用例，并使用更新的模型进行另一轮测试，以确保这些行为不再产生不一致。这形成了一个良性循环：在每个阶段，模型变得更准确和全面，测试套件积累了更多的测试用例。
 
-### 结果分析
-TODO
 
-### 改进
-TODO
+
+## 技术难点
+### 非确定性
+文件系统实现存在大量内部非确定性，例如：
+- 一些API调用可能会导致多个不同的错误，例如将文件重命名为非空目录时可能会返回EISDIR、EEXIST或ENOTEMPTY等不同的错误，实际返回的错误取决于文件系统实现代码中检查的顺序。
+- 读取返回的字节数可能小于请求的字节数，这取决于实现的内部状态。
+- readdir从具有多个条目的目录返回条目的顺序将取决于实现和目录数据存储布局的详细信息，这些信息都不属于抽象规范。
+- 并发API调用的行为可能由调度决定。
+
+为了处理这些变化和非确定性，规范必须足够宽松，以适应所有这些变化，但又不能牺牲规范的精确性。这会导致了一个算法问题，特别是当存在无法立即观察到的内部非确定性时。通常情况下，需要在追踪的每一步中有效地跟踪所有可能的实现状态（抽象为影响外部观察的内容），或者等效地计算出由观察到的追踪引起的规范状态的约束集合。
+
+为了解决这个问题，作者采用了不同的策略：
+
+1. **直接枚举所有可能的下一状态**：对于一些简单的非确定性，例如多个可能的API错误返回值，模型会明确计算出所有允许的错误集合，并为每个错误集合计算出下一个状态。然后，当观察到真实系统的返回值时，可以简单地选择相应的状态。类似的方法也用于处理读取或写入的字节数，只需列举可能的立即下一个状态。这种方法简单且适用于测试，尽管对于具有大量读写的测试来说，可能会引入一些不必要的计算成本。
+2. **手工制定目录列表的非确定性**：对于目录列表的非确定性，模型更具挑战性。由于目录可以以任何顺序返回条目，所以这个命令引发了重大的非确定性。此外，当目录句柄打开时，目录的修改（无论是由同一进程还是不同进程）也会引起问题。为了模拟这个行为，必须跟踪自目录句柄被打开以来的所有更改，以及已经由readdir返回的条目。通过维护“必须”和“可能”条目的集合，模型可以确定哪些条目必须返回，哪些可能返回，从而赋予整个命令语义。这种方法能够捕捉到非常复杂的目录修改和读取情况。
+3. **通过状态集合处理并发非确定性**：多个用户进程同时执行文件系统API调用会导致非确定性行为，例如一个进程重命名一个文件，而另一个进程删除它。为了处理这种情况，SibylFS模型和追踪检查器维护了明确的可能的（模型）文件系统状态集合。
+
+### 复杂性管理
+文件系统行为复杂多变，仅open函数的错误返回就有上千种组合。如何从大量观察结果归纳出简洁可读的规范是难点。
+作者以下技巧分解管理复杂性：
+
+1. **模块化**：模块是类型、纯函数和归纳关系定义的集合。SibylFS模型被组织成一组独立的模块，每个模块具有清晰定义的接口。这些模块包括状态模块、路径解析模块、文件系统模块和POSIX API模块。这种模块化结构有助于将模型分解成独立的组件，并建立重要的不变性，以及允许对单个模块进行单元测试，以确保路径解析等细节的正确性。
+2. **Trait**：特征是一种机制，用于将模型的不同方面隔离开来，同时允许用户为特定功能 "混合" 进一步的特征。例如，"permissions trait" 定义了文件权限的行为，而 "timestamps trait" 定义了文件时间戳信息的更新方式。这使得用户可以选择性地添加或忽略特定功能，以满足不同的测试需求。
+3. **单子(Monad)和组合子**(不懂)：
+   高阶逻辑是一种逻辑体系，基于对纯函数的概念构建的。在高阶逻辑中，函数被视为数学上的对象，具有输入和输出，而且没有副作用。这种逻辑形式有助于建立数学上严格和可靠的模型，用于描述系统行为。在高阶逻辑的基础上，引入了函数式编程的结构技术。这些技术包括单子和组合子。这些结构技术用于构建和组织模型的定义，使其更具可读性和可维护性。
+   
+   单子是函数式编程中的一个重要概念，它用于管理副作用和状态。在这种上下文中，单子允许将计算序列化，并处理可能引发的错误。它通常包括两个基本操作：return用于将值包装成单子，bind用于将一个单子的值传递给另一个单子。单子有助于保持计算的纯洁性。
+
+   组合子是一种函数，它接受一个或多个函数作为参数，并返回一个新的函数。组合子用于组合和转换其他函数，以创建更复杂的函数。在函数式编程中，组合子是一种强大的抽象工具，用于构建和组织函数。在文中，提到了 "parallel" 组合子（|||），它用于指定rename函数必须执行的检查。这个组合子的作用是将多个检查操作并行执行，并在任何一个检查引发错误时返回错误。这意味着这些检查是相互独立的，没有一个检查的错误会优先于其他检查。这种并行结构有助于模型清晰地表示多个检查并确保它们的行为在并行执行时不会产生不一致。
+   ![](/《SibylFS: formal specification and oracle-based testing for POSIX and real-world file systems》文章精读/image5.png)
+
+
+   通过使用单子、组合子等结构技术，SibylFS模型能够非常精确和清晰地表达系统行为。这使得模型成为现有POSIX标准的有用补充，因为它能够提供数学上严格的描述，并且具备清晰的结构，使得理解和维护模型变得更加容易。
+
+
