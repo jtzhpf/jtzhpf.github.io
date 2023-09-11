@@ -102,7 +102,7 @@
             
           </div>
         
-        <h1 id="题目描述">题目描述</h1>
+        <h2 id="题目描述">题目描述</h2>
 <p>给你一个 <strong>升序排列</strong> 的数组 <code>nums</code> ，请你 <strong>原地</strong> 删除重复出现的元素，使每个元素 <strong>只出现一次</strong> ，返回删除后数组的新长度。元素的 <strong>相对顺序</strong> 应该保持 <strong>一致</strong> 。然后返回 <code>nums</code> 中唯一元素的个数。</p>
 <p>考虑 <code>nums</code> 的唯一元素的数量为 <code>k</code> ，你需要做以下事情确保你的题解可以被通过：</p>
 <p>更改数组 <code>nums</code> ，使 <code>nums</code> 的前 <code>k</code> 个元素包含唯一元素，并按照它们最初在 nums 中出现的顺序排列。<code>nums</code> 的其余元素与 <code>nums</code> 的大小不重要。 返回 <code>k</code> 。 判题标准:</p>
@@ -114,12 +114,12 @@
 <li><code>-10^4 &lt;= nums[i] &lt;= 10^4</code></li>
 <li><code>nums</code> 已按 <strong>升序</strong> 排列</li>
 </ul>
-<h1 id="解答">解答</h1>
-<h2 id="rust">Rust</h2>
+<h2 id="解答">解答</h2>
+<h3 id="rust">Rust</h3>
 <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs Rust"><span class="hljs-keyword">impl</span> <span class="hljs-title class_">Solution</span> &#123;<br>    <span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">remove_duplicates</span>(nums: &amp;<span class="hljs-keyword">mut</span> <span class="hljs-type">Vec</span>&lt;<span class="hljs-type">i32</span>&gt;) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">i32</span> &#123;<br>        <span class="hljs-keyword">let</span> <span class="hljs-keyword">mut </span><span class="hljs-variable">slow</span>=<span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">let</span> <span class="hljs-keyword">mut </span><span class="hljs-variable">fast</span>=<span class="hljs-number">1</span>;<br>        <span class="hljs-keyword">while</span> fast &lt; nums.<span class="hljs-title function_ invoke__">len</span>()&#123;<br>            <span class="hljs-keyword">if</span> nums[fast]!=nums[slow]&#123;<br>                slow+=<span class="hljs-number">1</span>;<br>                nums[slow]=nums[fast];<br>            &#125;fast+=<span class="hljs-number">1</span>;<br>        &#125;<br>        (slow+<span class="hljs-number">1</span>) <span class="hljs-keyword">as</span> <span class="hljs-type">i32</span><br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
-<h2 id="c">C</h2>
+<h3 id="c">C</h3>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs C"><span class="hljs-type">int</span> <span class="hljs-title function_">removeDuplicates</span><span class="hljs-params">(<span class="hljs-type">int</span>* nums, <span class="hljs-type">int</span> numsSize)</span>&#123;<br>    <span class="hljs-type">int</span> *slow=nums,*fast=nums;<br>    <span class="hljs-keyword">while</span>(fast&lt;nums+numsSize)&#123;<br>        <span class="hljs-keyword">if</span>(*fast!=*slow)&#123;<br>            slow++;<br>            *slow=*fast;<br>        &#125;            <br>        fast++;<br>    &#125;<br>    <span class="hljs-keyword">return</span> slow-nums+<span class="hljs-number">1</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
-<h2 id="c-1">C++</h2>
+<h3 id="c-1">C++</h3>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">removeDuplicates</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums)</span> </span>&#123;<br>        <span class="hljs-type">int</span> slow=<span class="hljs-number">0</span>,fast=<span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">while</span>(fast&lt;nums.<span class="hljs-built_in">size</span>())&#123;<br>            <span class="hljs-keyword">if</span>(nums[fast]!=nums[slow])<br>                nums[++slow]=nums[fast];<br>            fast++;<br>        &#125;<br>        <span class="hljs-keyword">return</span> slow+<span class="hljs-number">1</span>;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
 
       </div>
@@ -140,7 +140,7 @@
         </svg>
         <span class="text-small">上一篇</span>
       </div>
-      <div>将Mac微信聊天记录备份到移动硬盘，释放Mac微信备份占用的存储空间</div>
+      <div>将Mac微信聊天记录备份到移动硬盘</div>
     </a>
   
   <div class="vhr"></div>
@@ -170,7 +170,7 @@
 </div>
   <div class="realated__body">
     
-      <div class="null"><div class="null-item"><div class="null-title"><a href="/2023/08/31/icns 制作/" title="icns 图标制作" rel="bookmark">icns 图标制作</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/05/zsh & oh-my-zsh/" title="zsh & oh-my-zsh 常用命令" rel="bookmark">zsh & oh-my-zsh 常用命令</a></div></div></div>
+      <div class="null"><div class="null-item"><div class="null-title"><a href="/2023/09/05/zsh & oh-my-zsh/" title="zsh & oh-my-zsh 常用命令" rel="bookmark">zsh & oh-my-zsh 常用命令</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/06/《All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications》文章精读/" title="《All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications》文章精读" rel="bookmark">《All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications》文章精读</a></div></div></div>
     
   </div>
 </div>
