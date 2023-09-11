@@ -1,6 +1,6 @@
 ---
 title: "icns 图标制作"
-category: CS&Maths
+category: Life
 #id: 57
 date: 2023-8-31 20:42:32
 tags: 
@@ -11,7 +11,7 @@ tags:
 #timeline: article  # 展示在时间线列表中
 ---
 
-想要用 [pake](https://github.com/tw93/Pake) 来将常用的网页打包为 app，例如 [clash dashboard](http://clash.metacubex.one) 等，方便服务器的使用，需要制作 icns 格式的图标。
+想要用 [pake](https://github.com/tw93/Pake) 来将常用的网页打包为 app，例如 [claude](http://claude.ai) 等，方便自己使用，需要制作 icns 格式的图标。
 <!--more-->
 
 - 准备一个 1024 * 1024 的png图片，假设名字为 `pic.png`

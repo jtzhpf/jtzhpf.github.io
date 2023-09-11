@@ -1,5 +1,5 @@
 ---
-title: "将Mac微信聊天记录备份到移动硬盘，释放Mac微信备份占用的存储空间"
+title: "将Mac微信聊天记录备份到移动硬盘"
 category: Life
 #id: 57
 date: 2023-8-31 20:42:32
@@ -11,6 +11,8 @@ toc: true
 #cover: /images/about.jpg # 指定封面图片的 URL
 timeline: app  # 展示在时间线列表中
 ---
+释放Mac微信备份占用的存储空间
+<!--more-->
 
 ## 找到备份文件夹
 
