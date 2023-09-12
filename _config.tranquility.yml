@@ -75,7 +75,7 @@ gitalk: # gitalk 评论
   owner: jtzhpf # MUST HAVE, Your Github Username
   admin: jtzhpf
   repo: blog_comment # MUST HAVE, The name of the repo you use to store Gitment comments
-  clientID: ${{ secrets.CLIENTID }} # MUST HAVE, Github client id for the Gitment
+  clientID: 41acafb8aafe372b4d4a # MUST HAVE, Github client id for the Gitment
   clientSecret: ${{ secrets.CLIENTSECRET }} # EITHER this or proxy_gateway, Github access secret token for the Gitment
 
   distractionFreeMode: false # Facebook-like distraction free mode
