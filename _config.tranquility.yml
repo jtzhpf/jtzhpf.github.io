@@ -71,7 +71,7 @@ reward: # 赞赏
 
 # see https://github.com/gitalk/gitalk
 gitalk: # gitalk 评论
-  enable: true
+  enable: false
   owner: jtzhpf # MUST HAVE, Your Github Username
   admin: jtzhpf
   repo: blog_comment # MUST HAVE, The name of the repo you use to store Gitment comments
