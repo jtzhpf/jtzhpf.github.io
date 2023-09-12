@@ -106,7 +106,8 @@ baidu_site_verification:
 # Baidu Analytics
 # See: https://tongji.baidu.com
 baidu_analytics: # <app_id>
-
+cv:
+  enable: false
 # 自定义字体，用于美化部分汉字的显示效果.
 # 可以通过替换 _font/ 目录下的字体文件替换自己喜欢的字体
 zh_font:
