@@ -76,7 +76,7 @@ gitalk: # gitalk 评论
   admin: jtzhpf
   repo: blog_comment # MUST HAVE, The name of the repo you use to store Gitment comments
   clientID: 41acafb8aafe372b4d4a # MUST HAVE, Github client id for the Gitment
-  clientSecret: ${{ secrets.CLIENTSECRET }} # EITHER this or proxy_gateway, Github access secret token for the Gitment
+  clientSecret: 14049b87f6368723c134b051c1568129ae46439c # EITHER this or proxy_gateway, Github access secret token for the Gitment
 
   distractionFreeMode: false # Facebook-like distraction free mode
   # When the official proxy is not available, you can change it to your own proxy address
