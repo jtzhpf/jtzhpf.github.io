@@ -99,7 +99,7 @@
   background-color: #ffeef0;
 }
 .body {
-  line-height: 2em;
+  line-height: 1.75em;
   padding-left: 50px;
   padding-right: 50px;
 }
@@ -110,12 +110,12 @@
 }
 .post-inner--toc,
 .post-inner--toc--toc {
-  max-width: 760px;
-  padding-right: 230px;
+  max-width: 800px;
+  padding-right: 200px;
 }
 .post-inner--toc .post-content__body,
 .post-inner--toc--toc .post-content__body {
-  max-width: 760px;
+  max-width: 800px;
 }
 .post-inner .video-container,
 .post-inner--toc .video-container {
@@ -136,7 +136,7 @@
   width: 100%;
 }
 .post-content {
-  padding: 10px 0;
+  padding: 0px 0;
   margin: 0 auto;
 }
 .post-gallery {
@@ -147,7 +147,7 @@
   margin-bottom: 20px;
 }
 .post-title {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: bold;
 }
 .post-content__head {
@@ -170,8 +170,8 @@
 .toc-outer .toc-top {
   display: inline-block;
   padding: 8px 0;
-  color: #555;
-  font-size: 0.875em;
+  color: #444;
+  font-size: 1.125em;
   height: 30px;
   line-height: 30px;
 }
@@ -206,11 +206,11 @@
 }
 .toc-outer .post-toc-level-3 {
   font-size: 14px;
-  padding-left: 10px;
+  padding-left: 20px;
 }
 .toc-outer .post-toc-level-4 {
   font-size: 13px;
-  padding-left: 8px;
+  padding-left: 20px;
 }
 .post__foot {
   max-width: 900px;

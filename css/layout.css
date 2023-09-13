@@ -1,7 +1,7 @@
 html {
   font-family: sans-serif;
-  font-size: 17px;
-  color: #555;
+  font-size: 16px;
+  color: #444;
   text-align: justify;
   scroll-behavior: smooth;
 }
@@ -15,10 +15,10 @@ body {
   justify-content: space-between;
 }
 a {
-  color: #555;
+  color: #444;
 }
 a:hover {
-  color: #222;
+  color: #111;
 }
 blockquote {
   border-left: 4px solid #ddd;
@@ -78,7 +78,7 @@ figure img {
 }
 code {
   border-radius: 3px;
-  font-size: 0.875em;
+  font-size: 1em;
   padding: 2px 4px;
   overflow-wrap: break-word;
 }
@@ -217,7 +217,7 @@ mjx-container {
   transition: all 200ms ease-out;
 }
 .page-number:hover {
-  background-color: #555;
+  background-color: #444;
   color: #fff;
 }
 .post-info {
@@ -419,6 +419,7 @@ mjx-container {
   padding: 0 50px;
   height: 90px;
   font-weight: bold;
+  font-size: 1.1em;
 }
 #navBtn {
   top: -100px;
@@ -567,7 +568,7 @@ mjx-container {
   justify-content: center;
   text-align: center;
   font-size: 0.8125em;
-  color: #555;
+  color: #444;
 }
 .copyright a:hover {
   color: #666;

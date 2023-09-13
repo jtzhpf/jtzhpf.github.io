@@ -61,7 +61,7 @@
 .hello-world .cursor {
   height: 2px;
   width: 20px;
-  background-color: #555;
+  background-color: #444;
 }
 .normal-eqt {
   position: absolute;
@@ -478,7 +478,7 @@
     padding: 4px;
   }
   .about-detail {
-    font-size: 17px;
+    font-size: 16px;
   }
   .hello-world {
     top: 15%;
