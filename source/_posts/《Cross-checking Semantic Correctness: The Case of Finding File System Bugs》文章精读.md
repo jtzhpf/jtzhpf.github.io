@@ -432,7 +432,59 @@ def prepare_rewritting(target, codes):
     return (static_symbols, rewriting_plan)
 ```
 #### StaticDecl类
+16 - 31 行的目的是为了找出所有的静态函数并将函数名添加到`self.table`中（除去函数名开头为`DEFINE_`、`LIST_HEAD`、`LLIST_HEAD`、`DECLARE_DELAYED_WORK`的函数）。
 
+32 - 44 行的目的是为了找出所有的结构体并将结构体名添加到`self.table`中。
+
+最后一行`lookup.append((ttype, value))`跳过了`self.blacklist`（不包括预处理指令中的，预处理指令中的格式是`Token.Comment.Preproc, u'define nfsd3_voidres\t\t\tnfsd3_voidargs'`，没有单独的`nfsd3_voidargs`）和函数名开头为`DEFINE_`、`LIST_HEAD`、`LLIST_HEAD`、`DECLARE_DELAYED_WORK`的函数。
+```python
+class StaticDecl(Formatter):
+    def __init__(self):
+        self.table = set()
+        # NOTE. nothing yet
+        self.blacklist = set(["nfsd3_voidargs"])
+
+    def is_dot_tok(self, token, value):     # it seems never used
+        return token is Token.Punctuation and value == "."
+
+    def format(self, tokensource, outfile): # outfile never used
+        lookup = []
+        for ttype, value in tokensource:
+            # strong blacklisting
+            if value in self.blacklist:
+                continue
+            if ttype is Token.Name.Function:
+                # e.g., DEFINE_SPINLOCK() or DEFINE_RWLOCK()
+                if value.startswith("DEFINE_") \
+                   or value.startswith("LIST_HEAD") \
+                   or value.startswith("LLIST_HEAD") \
+                   or value.startswith("DECLARE_DELAYED_WORK"):
+                    continue
+
+                # NOTE. arbitrary tokens can be inserted before static
+                # shows up, but usually 5.
+                is_static = False   # never used
+                for i in range(8):
+                    if lookup[-i][0] is Token.Keyword \
+                       and lookup[-i][1] == "static":
+                        self.table.add(value)
+                        break
+            if ttype is Token.Punctuation and value == "{":
+                struct_name = None
+                struct_keyword = None
+                for i in range(5):
+                    (typ, val) = lookup[-i]
+                    if typ is Token.Keyword and val == "struct":
+                        struct_keyword = True
+                        break
+                    if typ is Token.Name and struct_keyword is None:
+                        struct_name = val
+
+                if struct_keyword and struct_name:
+                    self.table.add(struct_name)
+
+            lookup.append((ttype, value))
+```
 
 #### TokenRewritter类
 `TokenRewritter`是一个自定义的Pygments格式化器类，它继承自Pygments中的 `Formatter` 类。这个类的主要目的是在代码高亮和着色的过程中，根据预定的重写计划对特定符号进行替换。
@@ -505,3 +557,6 @@ TODO
 
 ## 改进
 TODO
+
+向量数据库？
+相关系数矩阵？协方差矩阵？等传统数学建模技术
