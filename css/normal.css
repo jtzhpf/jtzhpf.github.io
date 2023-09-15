@@ -1,7 +1,7 @@
 html {
   font-family: sans-serif;
   font-size: 16px;
-  color: #444;
+  color: #333;
   text-align: justify;
   scroll-behavior: smooth;
 }
@@ -15,7 +15,7 @@ body {
   justify-content: space-between;
 }
 a {
-  color: #444;
+  color: #333;
 }
 a:hover {
   color: #111;

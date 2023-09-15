@@ -9,7 +9,7 @@
 */
 .hljs {
   color: #24292e;
-  background: #f7f7f7;
+  background: #f5f5f5;
 }
 .hljs-doctag,
 .hljs-keyword,
@@ -170,7 +170,7 @@
 .toc-outer .toc-top {
   display: inline-block;
   padding: 8px 0;
-  color: #444;
+  color: #333;
   font-size: 1.125em;
   height: 30px;
   line-height: 30px;
