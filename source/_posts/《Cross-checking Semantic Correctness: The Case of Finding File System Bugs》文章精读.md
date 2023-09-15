@@ -31,7 +31,7 @@ timeline: article  # 展示在时间线列表中
   
   ![Histogram-based comparison](/《Cross-checking Semantic Correctness: The Case of Finding File System Bugs》文章精读/image2.png)
   
-1. Bug reports are ranked to prioritize investigation of likely true positives. Metrics include histogram distance and entropy values.
+6. Bug reports are ranked to prioritize investigation of likely true positives. Metrics include histogram distance and entropy values.
 
 ## 实现
 
@@ -210,13 +210,7 @@ analyzer目录如下所示：
 
 ### merger.py 文件
 
-#### merge_fs函数
-`adjust_file_path(src_d, files)`输入的`src_d`是Linux某一文件系统的绝对路径，`files`是该文件系统具体文件，`adjust_file_path`函数返回相对于当前目录（analyzer）的路径。
-
-`prepare_dir(fs, opts.linux, src_d, dst_d, cflags)`将文件系统下的`Kconfig`、`Makefile`、以及`.h`文件复制到`analyzer/out`目录对应的文件系统下，并创建用于构建模块的Makefile.build和Makefile（舍弃了之前复制过来的）。
-
-随后将代码合并并写入`one.c`文件中，每个文件系统都有一个`one.c`文件。再对预处理后的代码进行重写，将特定符号替换为新的符号，并将重写后的代码写入输出文件。还会返回符号表和重写计划用于调试。
-
+#### merge_fs 函数
 ```python
 # process a fs
 def merge_fs(opts, fs):
@@ -252,8 +246,15 @@ def merge_fs(opts, fs):
     # final touch
     post_adjust_per_fs(fs, dst_d, out)
 ```
+`adjust_file_path(src_d, files)`输入的`src_d`是Linux某一文件系统的绝对路径，`files`是该文件系统具体文件，`adjust_file_path`函数返回相对于当前目录（analyzer）的路径。
 
-#### preprocess函数
+`prepare_dir(fs, opts.linux, src_d, dst_d, cflags)`将文件系统下的`Kconfig`、`Makefile`、以及`.h`文件复制到`analyzer/out`目录对应的文件系统下，并创建用于构建模块的Makefile.build和Makefile（舍弃了之前复制过来的）。
+
+随后将代码合并并写入`one.c`文件中，每个文件系统都有一个`one.c`文件。再对预处理后的代码进行重写，将特定符号替换为新的符号，并将重写后的代码写入输出文件。还会返回符号表和重写计划用于调试。
+
+最后注释掉或修复特定文件中的特定代码段。自此就完成了文件系统的合并。
+
+#### preprocess 函数
 preprocess(fs, src_d, files)对某一文件系统下的所有文件进行预处理，包括处理头文件引用和内联C文件，并将处理后的代码存储在一个列表中以供后续使用。
 
 ```python
@@ -271,7 +272,7 @@ def preprocess(fs, src_d, files):
 
     return codes
 ```
-#### preprocess_headers函数
+#### preprocess_headers 函数
 `preprocess_headers(fs, src_d, code, headers)`函数预处理文件系统C代码中的头文件。
 
 `preprocess_headers` 函数接受四个参数：
@@ -342,8 +343,10 @@ extern void BUG();
 最后，将处理后的代码行逐行 `yield` 出来，生成器函数返回处理后的C代码。
 
 
-#### rewrite函数
+#### rewrite 函数
 `rewrite(fs, codes, out)`将代码中的特定符号（symbols）替换为新的符号，然后将重写后的代码写入输出文件。
+
+首先利用`prepare_rewritting`函数生成重写计划。
 
 `rewritten = highlight(code, CLexer(), TokenRewritter(pn, rewriting_plan))`这一行代码用于重写代码。它执行以下操作：
 
@@ -369,10 +372,7 @@ def rewrite(fs, codes, out):
 
     return (static_symbols, rewriting_plan)
 ```
-#### prepare_rewritting函数
-`FS_FORCE_REWRITE` 是一个字典，它的键是文件系统的名称，值是需要手动进行符号替换的符号列表。
-
-例如`nfs3_ftypes`，既存在于`nfsd/nfs3xdr.c`中，又存在于`nfsd/nfs3proc.c`中，合并文件后会导致函数重复定义的错误，所以需要手动替换。
+#### prepare_rewritting 函数
 ```python
 # manual opt out
 #  (see, logfs defines hash_32() which was included by other c files)
@@ -385,8 +385,10 @@ FS_FORCE_REWRITE = {
     "nfsd" : ["NFSDDBG_FACILITY", "nfs3_ftypes"],
 }
 ```
+`FS_FORCE_REWRITE` 是一个字典，它的键是文件系统的名称，值是需要手动进行符号替换的符号列表。
 
-`def _to_canonical(pn, sym)`是一个内部辅助函数，用于将符号名 `sym` 转换为规范化的形式，以确保唯一性。它基于文件名 `pn` 构建了一个规范化的符号名，并返回。
+例如`nfs3_ftypes`，既存在于`nfsd/nfs3xdr.c`中，又存在于`nfsd/nfs3proc.c`中，合并文件后会导致函数重复定义的错误，所以需要手动替换。
+
 
 ```python
 # parse and prepare conflicted symbols
@@ -431,12 +433,41 @@ def prepare_rewritting(target, codes):
 
     return (static_symbols, rewriting_plan)
 ```
-#### StaticDecl类
-16 - 31 行的目的是为了找出所有的静态函数并将函数名添加到`self.table`中（除去函数名开头为`DEFINE_`、`LIST_HEAD`、`LLIST_HEAD`、`DECLARE_DELAYED_WORK`的函数）。
+首先先通过名为`formatter`的`StaticDecl`对象，使用`highlight`函数，`CLexer()`词法分析器和`formatter`来解析代码，获取`static symbols`。
 
-32 - 44 行的目的是为了找出所有的结构体并将结构体名添加到`self.table`中。
+`static symbols`的格式如下所示：
+```
+{'../../linux/fs/minix/namei.c': set([u'minix_create', u'minix_rename', u'minix_unlink', u'add_nondir', u'minix_mknod', u'minix_lookup', u'minix_link', u'minix_mkdir', u'minix_rmdir', u'minix_tmpfile', u'minix_symlink']), 
+'../../linux/fs/minix/inode.c': set([u'V2_minix_iget', u'minix_destroy_inode', u'minix_fill_super', u'minix_writepage', u'exit_minix_fs', u'minix_write_inode', u'minix_remount', u'minix_evict_inode', u'minix_get_block', u'destroy_inodecache', u'minix_i_callback', u'minix_mount', u'minix_write_failed', u'minix_bmap', u'minix_alloc_inode', u'minix_statfs', u'V1_minix_iget', u'init_once', u'init_inodecache', u'minix_readpage', u'minix_put_super', u'minix_write_begin', u'init_minix_fs']), 
+...}
+```
 
-最后一行`lookup.append((ttype, value))`跳过了`self.blacklist`（不包括预处理指令中的，预处理指令中的格式是`Token.Comment.Preproc, u'define nfsd3_voidres\t\t\tnfsd3_voidargs'`，没有单独的`nfsd3_voidargs`）和函数名开头为`DEFINE_`、`LIST_HEAD`、`LLIST_HEAD`、`DECLARE_DELAYED_WORK`的函数。
+随后创建`rewriting_plan`字典，用于存储重写计划。它将跟踪哪些符号需要进行重写，以解决符号冲突问题。
+
+20-33行检查符号冲突和生成重写计划。外部循环遍历`static_symbols`字典的键值对，其中`pivot_pn`是文件名，`pivot_tbl`是该文件的静态符号表。
+内部循环遍历同样的`static_symbols`字典，但排除了与外部文件名相同的文件。如果在不同文件中的找到相同的符号，会调用`_to_canonical`函数，更新外部循环对应文件的符号重写计划。`_to_canonical(pn, sym)`是一个内部辅助函数，为符号 `sym` 生成一个新的规范名称，以确保符号的唯一性。一个文件的符号重写计划处理完之后（第二个`for`循环执行结束后）会更新该文件的符号表为重写后的符号，以最小化重写。
+
+36-39行制作`FS_FORCE_REWRITE`中符号的重写计划。
+
+最后，函数返回一个包含两个元素的元组，第一个元素是新的`static_symbols`字典，第二个元素是静态符号的`rewriting_plan`字典。
+
+
+
+
+#### StaticDecl 类
+`Token.Comment.Preproc`（预处理器注释令牌）是指用于表示预处理器指令或注释的特殊类型的标记（Token）。在 C 语言中常见的可标注为`Token.Comment.Preproc`的例子如下：
+
+1. 条件编译指令：
+```c
+#if DEBUG
+    // 这是一个调试模式下的代码块
+#endif
+```
+2. 宏定义：
+```c
+#define MAX_SIZE 100
+```
+
 ```python
 class StaticDecl(Formatter):
     def __init__(self):
@@ -485,9 +516,17 @@ class StaticDecl(Formatter):
 
             lookup.append((ttype, value))
 ```
+16 - 31 行的目的是为了找出所有的静态函数并将函数名添加到`self.table`中（除去函数名开头为`DEFINE_`、`LIST_HEAD`、`LLIST_HEAD`、`DECLARE_DELAYED_WORK`的函数）。
 
-#### TokenRewritter类
+32 - 44 行的目的是为了找出所有的结构体并将结构体名添加到`self.table`中。
+
+`self.table`中存储的即为static symbols。
+
+最后一行`lookup.append((ttype, value))`跳过了`self.blacklist`（不包括预处理指令中的，预处理指令中的格式是`Token.Comment.Preproc, u'define nfsd3_voidres\t\t\tnfsd3_voidargs'`，没有单独的`nfsd3_voidargs`）和函数名开头为`DEFINE_`、`LIST_HEAD`、`LLIST_HEAD`、`DECLARE_DELAYED_WORK`的函数。
+
+#### TokenRewritter 类
 `TokenRewritter`是一个自定义的Pygments格式化器类，它继承自Pygments中的 `Formatter` 类。这个类的主要目的是在代码高亮和着色的过程中，根据预定的重写计划对特定符号进行替换。
+
 ```python
 class TokenRewritter(Formatter):
     def __init__(self, pn, plan):
@@ -536,20 +575,14 @@ class TokenRewritter(Formatter):
             lookup.append((ttype, value))
 ```
 `pn`表示当前处理的文件名（包含路径）。
-`plan`表示重写计划，一个字典，包含了要替换的符号对应关系。
 
-`Token.Comment.Preproc`（预处理器注释令牌）是指用于表示预处理器指令或注释的特殊类型的标记（Token）。在 C 语言中常见的可标注为`Token.Comment.Preproc`的例子如下：
+`plan`表示重写计划，一个字典，包含了要替换的符号对应关系，将旧的标识符映射到新的标识符或宏定义。
 
-1. 条件编译指令：
-```c
-#if DEBUG
-    // 这是一个调试模式下的代码块
-#endif
-```
-2. 宏定义：
-```c
-#define MAX_SIZE 100
-```
+`self.stat` 是一个 `Counter` 对象，用于跟踪替换操作的统计信息。
+
+`self.lookup` 是一个空列表，用于存储遍历Token时的历史信息。
+
+
 
 
 ## 结果分析
