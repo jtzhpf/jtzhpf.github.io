@@ -208,6 +208,68 @@ analyzer目录如下所示：
 - 分析脚本从clang-log目录读取结果文件,进行各种分析,如锁使用分析等,结果输出到results目录下。
 - status命令可以查看合并和分析的状态。
 
+#### merge 操作
+```python
+def cmd_merge(opts, args):
+    """merge fs specified (e.g., 'merge ext3 ext4')"""
+
+    import merger
+    for fs in args:
+        merger.merge_fs(opts, fs)
+```
+当执行`./ctrl.py merge ext3`的时候，调用这里的`cmd_merge`函数，该函数调用下文写到的`merger`模块中的`merge_fs`函数，实现文件系统的合并。
+
+```python
+def cmd_merge_all(opts, _):
+    """merge all fs (e.g., 'merge_all')"""
+
+    pool = mp.Pool(mp.cpu_count())
+    for fs in fsop.get_fs("M"):
+        pool.apply_async(_run_merger, args = (fs, opts.linux))
+    pool.close()
+    pool.join()
+
+    return 0
+```
+`./ctrl.py merge_all`的情况则更为复杂一点。通过调用`fsop.get_fs`函数来获得需要被合并的文件列表。
+
+`fsop`的`get_fs`函数如下所示，先读取`analyzer`目录下的`NOTE.fs`文件，从中获得内容的格式为
+```
+[配置参数] 键名 其他文本
+```
+
+`配置参数`有
+
+- M: known to be merged as a single code
+- C: known to run it with clang pass
+- F: failed with clang pass
+
+此处`get_fs`将配置参数为`M`的文件系统列表返回给`cmd_merge_all`，`cmd_merge_all`并行进行文件系统合并。
+```python
+ROOT = os.path.dirname(__file__)
+
+# XXX. hide
+def load_conf(pn):
+    conf = []
+    for l in open(pn):
+        m = re.match("\[([\\w ]*)\] (\\w+).*", l)
+        if m:
+            tok = m.groups()
+            conf.append((tok[0].strip(), tok[1]))
+    return conf
+
+global CONF
+CONF = load_conf(os.path.join(ROOT, "NOTE.fs"))
+
+def get_fs(kind):
+    global CONF
+    rtn = []
+    for (tag, fs) in CONF:
+        if all(t in tag for t in kind):
+            rtn.append(fs)
+    return rtn
+```
+
 ### merger.py 文件
 
 #### merge_fs 函数
