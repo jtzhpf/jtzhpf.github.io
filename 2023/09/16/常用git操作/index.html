@@ -5,7 +5,7 @@
     <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
     <title>
       
-        将Mac微信聊天记录备份到移动硬盘 | ZPF.SITE
+        常用git操作 | ZPF.SITE
       
     </title>
     <meta name="description" content=""/>
@@ -87,19 +87,19 @@
   <article class="post-content">
     <div class="post-inner--toc">
       <div class="post-content__head">
-        <div class="post-title">将Mac微信聊天记录备份到移动硬盘</div>
+        <div class="post-title">常用git操作</div>
         <div class="post-info">
           
-  <a href="/tags/Mac/" class="post-tag">#Mac</a><a href="/tags/%E5%BE%AE%E4%BF%A1/" class="post-tag">#微信</a>
+  <a href="/tags/git/" class="post-tag">#git</a>
 
 
-          <span class="post-date">2023-08-31</span>
+          <span class="post-date">2023-09-16</span>
         </div>
       </div>
       
         <aside class="toc-outer">
           <div class="toc-title">目录</div>
-          <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%89%BE%E5%88%B0%E5%A4%87%E4%BB%BD%E6%96%87%E4%BB%B6%E5%A4%B9"><span class="post-toc-text">找到备份文件夹</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%88%9B%E5%BB%BA%E8%BD%AF%E8%BF%9E%E6%8E%A5"><span class="post-toc-text">创建软连接</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%87%8D%E6%96%B0%E7%AD%BE%E5%90%8D%E5%BE%AE%E4%BF%A1"><span class="post-toc-text">重新签名微信</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%9B%B4%E6%96%B0%E5%BE%AE%E4%BF%A1"><span class="post-toc-text">更新微信</span></a></li></ol>
+          <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%90%88%E5%B9%B6-git-push-%E8%AE%B0%E5%BD%95"><span class="post-toc-text">合并 git push 记录</span></a></li></ol>
           <a href="#" class="toc-top">回到顶部</a>
         </aside>
       
@@ -109,18 +109,16 @@
             
           </div>
         
-        <p>释放Mac微信备份占用的存储空间 <span id="more"></span></p>
-<h2 id="找到备份文件夹">找到备份文件夹</h2>
-<p>进入访达，按下<code>command+shift+i</code>显示隐藏文件夹，然后点击菜单栏上的「前往」，点击「前往文件夹」。</p>
-<p>将下面内容输入进去。记住更改里面的用户名。 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs plaintext">/Users/这里改为你的用户名/Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/com.tencent.xinWeChat/2.0b4.0.9/Backup/<br></code></pre></td></tr></table></figure></p>
-<p><code>command+c</code>复制里面的32位字符的文件夹，<code>command+shift+v</code>移动文件夹到移动硬盘的任意文件夹中。</p>
-<h2 id="创建软连接">创建软连接</h2>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">ln -s 移动硬盘里的32位字符文件夹地址 /Users/用户名/Library/Containers/com.tencent.xinWeChat/Data/Library/Application\ Support/com.tencent.xinWeChat/2.0b4.0.9/Backup<br></code></pre></td></tr></table></figure>
-<h2 id="重新签名微信">重新签名微信</h2>
-<p>退出微信，在终端app中输入下面的内容并回车。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo codesign --sign - --force --deep /Applications/WeChat.app<br></code></pre></td></tr></table></figure>
-<h2 id="更新微信">更新微信</h2>
-<p>更新了微信客户端之后需要重复上述操作。</p>
+        <p>记录一下常用的git操作。 <span id="more"></span></p>
+<h2 id="合并-git-push-记录">合并 git push 记录</h2>
+<p>首先，在本地仓库中，确保工作目录是干净的，没有未提交的更改。可以使用 <code>git status</code> 命令来检查工作目录的状态。</p>
+<p>执行以下命令，将本地分支的历史合并为一次提交：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">git reset --soft HEAD~n<br></code></pre></td></tr></table></figure>
+<p>其中，<code>n</code> 是想要合并的提交次数。这个命令将会将最近的 <code>n</code> 次提交合并为一个暂存区的更改，但不会删除它们。</p>
+<p>然后，使用以下命令创建一个新的提交，将这些更改提交到本地仓库： <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">git commit -m &quot;合并多次提交&quot;<br></code></pre></td></tr></table></figure></p>
+<p>最后，执行强制推送到远程仓库：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">git push -f origin &lt;branch_name&gt;<br></code></pre></td></tr></table></figure>
+<p>其中，<code>&lt;branch_name&gt;</code> 是要推送的分支的名称。 这将覆盖远程仓库上的提交历史，并将多次提交合并为一次提交。请确保在执行强制推送之前，已经备份了远程仓库或确信不会造成数据丢失。</p>
 
       </div>
     </div>
@@ -129,7 +127,7 @@
     
     <div class="post-nav">
   
-    <a class="post-nav-item-left" href="/2023/08/31/%E3%80%8ACross-checking%20Semantic%20Correctness:%20The%20Case%20of%20Finding%20File%20System%20Bugs%E3%80%8B%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/">
+    <a class="post-nav-item-left" href="/2023/09/18/%E3%80%8AScaling%20symbolic%20evaluation%20for%20automated%20verification%20of%20systems%20code%20with%20Serval%E3%80%8B%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/">
       <div class="text-align">
         <svg t="1670570876164"
              class="icon"
@@ -140,12 +138,12 @@
         </svg>
         <span class="text-small">上一篇</span>
       </div>
-      <div>《Cross-checking Semantic Correctness: The Case of Finding File System Bugs》文章精读</div>
+      <div>《Scaling symbolic evaluation for automated verification of systems code with Serval》文章精读</div>
     </a>
   
   <div class="vhr"></div>
   
-    <a class="post-nav-item-right" href="/2023/08/31/leetcode%2026.%20%E5%88%A0%E9%99%A4%E6%9C%89%E5%BA%8F%E6%95%B0%E7%BB%84%E4%B8%AD%E7%9A%84%E9%87%8D%E5%A4%8D%E9%A1%B9/">
+    <a class="post-nav-item-right" href="/2023/09/07/%E3%80%8ASibylFS:%20formal%20specification%20and%20oracle-based%20testing%20for%20POSIX%20and%20real-world%20file%20systems%E3%80%8B%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/">
       <div class="text-align">
         <span class="text-small">下一篇</span>
         <svg t="1670570876164"
@@ -157,7 +155,7 @@
           <path d="M384 512L731.733333 202.666667c17.066667-14.933333 19.2-42.666667 4.266667-59.733334-14.933333-17.066667-42.666667-19.2-59.733333-4.266666l-384 341.333333c-10.666667 8.533333-14.933333 19.2-14.933334 32s4.266667 23.466667 14.933334 32l384 341.333333c8.533333 6.4 19.2 10.666667 27.733333 10.666667 12.8 0 23.466667-4.266667 32-14.933333 14.933333-17.066667 14.933333-44.8-4.266667-59.733334L384 512z" p-id="14596"/>
         </svg>
       </div>
-      leetcode 26. 删除有序数组中的重复项
+      《SibylFS: formal specification and oracle-based testing for POSIX and real-world file systems》文章精读
     </a>
   
 </div>
@@ -165,12 +163,12 @@
     
       <div class="related-post">
   <div class="related__head">
-  <a href="/tags/Mac/" class="post-tag">#Mac</a><a href="/tags/%E5%BE%AE%E4%BF%A1/" class="post-tag">#微信</a>
+  <a href="/tags/git/" class="post-tag">#git</a>
 
 </div>
   <div class="realated__body">
     
-      <div class="null"><div class="null-item"><div class="null-title"><a href="/2023/08/31/icns 制作/" title="icns 图标制作" rel="bookmark">icns 图标制作</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/16/常用git操作/" title="常用git操作" rel="bookmark">常用git操作</a></div></div></div>
+      <div class="null"><div class="null-item"><div class="null-title"><a href="/2023/08/31/icns 制作/" title="icns 图标制作" rel="bookmark">icns 图标制作</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/08/31/将Mac微信聊天记录备份到移动硬盘，释放Mac微信备份占用的存储空间/" title="将Mac微信聊天记录备份到移动硬盘" rel="bookmark">将Mac微信聊天记录备份到移动硬盘</a></div></div></div>
     
   </div>
 </div>
