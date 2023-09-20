@@ -191,21 +191,21 @@ analyzer目录如下所示：
 ```
 
 ### ctrl.py 文件
-主要功能包括:
+主要功能包括：
 
-- merge:将多个文件系统的源代码合并成一个文件,方便进行静态分析。
-- clang:使用Clang对合并后的代码进行静态分析,生成结果文件。
-- grep_decl:搜索并输出文件系统的常见操作函数声明。
-- analyze_lock:分析文件系统对锁的使用情况。
-- analyze_lock_range:分析文件系统锁的作用范围。
-- analyze_lock_promo:分析文件系统锁的提升情况。
-- status:显示文件合并和静态分析的状态。
+- merge：将多个文件系统的源代码合并成一个文件，方便进行静态分析。
+- clang：使用Clang对合并后的代码进行静态分析，生成结果文件。
+- grep_decl：搜索并输出文件系统的常见操作函数声明。
+- analyze_lock：分析文件系统对锁的使用情况。
+- analyze_lock_range：分析文件系统锁的作用范围。
+- analyze_lock_promo：分析文件系统锁的提升情况。
+- status：显示文件合并和静态分析的状态。
 
-主要流程:
+主要流程：
 
-- 通过merge命令将多个文件系统的源代码合并成一个文件,存放在out目录下。
-- 通过clang命令使用Clang对合并后的代码进行静态分析,生成结果文件存放在clang-log目录下。
-- 分析脚本从clang-log目录读取结果文件,进行各种分析,如锁使用分析等,结果输出到results目录下。
+- 通过merge命令将多个文件系统的源代码合并成一个文件，存放在out目录下。
+- 通过clang命令使用Clang对合并后的代码进行静态分析，生成结果文件存放在clang-log目录下。
+- 分析脚本从clang-log目录读取结果文件，进行各种分析，如锁使用分析等，结果输出到results目录下。
 - status命令可以查看合并和分析的状态。
 
 #### merge 操作
@@ -269,6 +269,88 @@ def get_fs(kind):
             rtn.append(fs)
     return rtn
 ```
+以ext3文件系统为例，执行完merge操作后的`out/ext3`目录下的文件如下所示：
+```
+.
+|-- Kconfig
+|-- Makefile
+|-- Makefile.build
+|-- acl.h
+|-- ext3.h
+|-- namei.h
+|-- one.c
+|-- rewriting.info
+|-- symbols.info
+`-- xattr.h
+```
+具体各文件是如何生成的将在[merger.py 文件](#merger.py-文件)中具体介绍。
+
+#### clang 操作（静态分析）
+类似于`cmd_merge_all`函数，`cmd_clang`和`cmd_clang_all`函数通过调用`_run_clang`函数进行静态分析。
+```python
+def _run_clang(fs, clang):
+    one_d = join(ROOT, "out", fs)
+    if not os.path.exists(one_d):
+        print("ERROR: %s doesn't exist (need to merge first)" % one_d)
+        return None
+
+    out_d = join(ROOT, "out", fs, "clang-log")
+
+    # could you tweak this to run clang pass
+    env = copy.copy(os.environ)
+    env["CCC_CC"] = clang
+    env["CLANG"] = clang
+
+    mkdirp(out_d)
+
+    clang_result = join(out_d, "fss_output")
+    clang_stdout = open(join(out_d, "log.stdout"), "w")
+    clang_stderr = open(join(out_d, "log.stderr"), "w")
+
+    with chdir(one_d):
+        env["PWD"] = os.getcwd()
+        p = subprocess.Popen([FSCK,
+                              "--use-analyzer=%s" % clang,
+                              "--fss-output-dir=%s" % clang_result,
+                              "make",
+                              "CC=%s" % clang,
+                              "-f", "Makefile.build"],
+                             stdout=clang_stdout,
+                             stderr=clang_stderr,
+                             cwd=os.getcwd(),
+                             env=env)
+        print("[%s] parsing %s" % (p.pid, fs))
+        p.wait()
+
+    del clang_stdout
+    del clang_stderr
+```
+当执行`./ctrl.py merge ext3`时，传递给`subprocess.Popen`的参数为`['/home/juxta/analyzer/../llvm/tools/clang/tools/scan-build/fss-build', '--use-analyzer=/home/juxta/analyzer/../bin/llvm/bin/clang', '--fss-output-dir=/home/juxta/analyzer/out/ext3/clang-log/fss_output', 'make', 'CC=/home/juxta/analyzer/../bin/llvm/bin/clang', '-f', 'Makefile.build']`。
+
+相较于merge之后，`out/ext3`目录下多出来了如下文件。其中`log.stdout`和`log.stderr`是Clang的标准输出和标准错误日志。`make`命令将其以模块的形式编译。
+```
+.
+|-- Module.symvers
+|-- clang-log
+|   |-- fss_output
+|   |   |-- analyzer
+|   |   |   `-- out
+|   |   |       `-- ext3
+|   |   |           |-- ext3.mod.c.fss
+|   |   |           `-- one.c.fss
+|   |   |-- clang_output_25P0jk
+|   |   `-- dev
+|   |       `-- null.fss
+|   |-- log.stderr
+|   `-- log.stdout
+|-- ext3.ko
+|-- ext3.mod.c
+|-- ext3.mod.o
+|-- ext3.o
+|-- modules.order
+`-- one.o
+```
+接下来我们将进入`analyzer/../llvm/tools/clang/tools/scan-build`目录下，来[深入探究一下`fss-build`函数做了哪些工作](#fss-build-工具)。
 
 ### merger.py 文件
 
@@ -644,6 +726,9 @@ class TokenRewritter(Formatter):
 
 `self.lookup` 是一个空列表，用于存储遍历Token时的历史信息。
 
+
+### Clang 相关代码解析
+#### fss-build 工具
 
 
 
