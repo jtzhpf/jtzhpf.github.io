@@ -5,7 +5,7 @@
     <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
     <title>
       
-        《SibylFS: formal specification and oracle-based testing for POSIX and real-world file systems》文章精读 | ZPF.SITE
+        SibylFS: formal specification and oracle-based testing for POSIX and real-world file systems 阅读 | ZPF.SITE
       
     </title>
     <meta name="description" content=""/>
@@ -87,7 +87,7 @@
   <article class="post-content">
     <div class="post-inner--toc">
       <div class="post-content__head">
-        <div class="post-title">《SibylFS: formal specification and oracle-based testing for POSIX and real-world file systems》文章精读</div>
+        <div class="post-title">SibylFS: formal specification and oracle-based testing for POSIX and real-world file systems 阅读</div>
         <div class="post-info">
           
   <a href="/tags/File-System/" class="post-tag">#File System</a><a href="/tags/%E8%AE%BA%E6%96%87/" class="post-tag">#论文</a><a href="/tags/SOSP/" class="post-tag">#SOSP</a>
@@ -117,7 +117,7 @@
 <h2 id="解决方案">解决方案</h2>
 <p>提出了一个数学严格的可执行文件系统行为规范 SibylFS。</p>
 <figure>
-<img src="/《SibylFS:%20formal%20specification%20and%20oracle-based%20testing%20for%20POSIX%20and%20real-world%20file%20systems》文章精读/image1.png" alt="" /><figcaption>SibylFS</figcaption>
+<img src="/SibylFS:%20formal%20specification%20and%20oracle-based%20testing%20for%20POSIX%20and%20real-world%20file%20systems%20阅读/image1.png" alt="" /><figcaption>SibylFS</figcaption>
 </figure>
 <p>具体来说，SibylFS 有以下关键特征：</p>
 <ul>
@@ -131,12 +131,12 @@
 <h3 id="实验设计">实验设计</h3>
 <h4 id="生成测试用例">生成测试用例</h4>
 <p>实验过程从一组测试脚本开始。这些测试脚本根据它们所针对的libc函数进行组织。大部分测试脚本是由测试生成器自动生成的，但也可以包括手写的测试脚本。这些测试脚本包含了一系列文件系统命令序列，这些命令将由测试执行器通过libc接口来驱动真实的文件系统进行测试。</p>
-<p><img src="/《SibylFS:%20formal%20specification%20and%20oracle-based%20testing%20for%20POSIX%20and%20real-world%20file%20systems》文章精读/image2.png" /></p>
+<p><img src="/SibylFS:%20formal%20specification%20and%20oracle-based%20testing%20for%20POSIX%20and%20real-world%20file%20systems%20阅读/image2.png" /></p>
 <h4 id="执行测试脚本">执行测试脚本</h4>
-<p>测试执行器是一个工具或程序，用于执行测试脚本中的命令并与真实世界的文件系统进行交互。测试执行器会按照测试脚本的指令逐一执行libc调用，从一个空的文件系统状态开始设置所需的文件系统状态。一个测试脚本可能会包括多达数百次的libc函数调用。追踪文件会交错显示测试脚本中的命令以及来自真实文件系统的响应。这个追踪文件用于后续的分析和比较，以确保文件系统的行为符合预期。 <img src="/《SibylFS:%20formal%20specification%20and%20oracle-based%20testing%20for%20POSIX%20and%20real-world%20file%20systems》文章精读/image3.png" /></p>
+<p>测试执行器是一个工具或程序，用于执行测试脚本中的命令并与真实世界的文件系统进行交互。测试执行器会按照测试脚本的指令逐一执行libc调用，从一个空的文件系统状态开始设置所需的文件系统状态。一个测试脚本可能会包括多达数百次的libc函数调用。追踪文件会交错显示测试脚本中的命令以及来自真实文件系统的响应。这个追踪文件用于后续的分析和比较，以确保文件系统的行为符合预期。 <img src="/SibylFS:%20formal%20specification%20and%20oracle-based%20testing%20for%20POSIX%20and%20real-world%20file%20systems%20阅读/image3.png" /></p>
 <h4 id="检查追踪">检查追踪</h4>
 <p>SibylFS的核心部分是检查器，它基于<a target="_blank" rel="noopener" href="https://github.com/rems-project/lem">Lem语言</a>自动转换为OCaml，并与一个小型的OCaml包装器链接在一起。检查器的任务是检查追踪文件中的操作是否符合特定变种的模型，例如POSIX、Linux、OS X或FreeBSD。它还可以根据各种标志控制进一步的检查参数，例如初始进程是否以root权限运行。</p>
-<p>检查的输出是一组已验证的追踪，已验证的追踪包括了符合模型规范的部分，这些部分与原始追踪类似。对于不符合规范的部分，已验证的追踪包括一个错误消息以及（如果可能的话）诊断信息，以帮助识别为何行为不符合规范。 <img src="/《SibylFS:%20formal%20specification%20and%20oracle-based%20testing%20for%20POSIX%20and%20real-world%20file%20systems》文章精读/image4.png" /></p>
+<p>检查的输出是一组已验证的追踪，已验证的追踪包括了符合模型规范的部分，这些部分与原始追踪类似。对于不符合规范的部分，已验证的追踪包括一个错误消息以及（如果可能的话）诊断信息，以帮助识别为何行为不符合规范。 <img src="/SibylFS:%20formal%20specification%20and%20oracle-based%20testing%20for%20POSIX%20and%20real-world%20file%20systems%20阅读/image4.png" /></p>
 <p>由于每个追踪文件可能包含多个测试调用，因此当单个步骤失败时，检查器会尝试继续检查。在图中，SibylFS在假定返回EEXIST或ENOTEMPTY而不是EPERM的情况下继续检查追踪。</p>
 <p>模型的构建与测试密切相关。测试（特别是在新的操作系统和文件系统上）会发现新的真实世界行为，然后将这些行为纳入模型中。随后会添加新的测试用例，并使用更新的模型进行另一轮测试，以确保这些行为不再产生不一致。这形成了一个良性循环：在每个阶段，模型变得更准确和全面，测试套件积累了更多的测试用例。</p>
 <h2 id="技术难点">技术难点</h2>
@@ -162,7 +162,7 @@
 <li><p><strong>Trait</strong>：特征是一种机制，用于将模型的不同方面隔离开来，同时允许用户为特定功能 "混合" 进一步的特征。例如，"permissions trait" 定义了文件权限的行为，而 "timestamps trait" 定义了文件时间戳信息的更新方式。这使得用户可以选择性地添加或忽略特定功能，以满足不同的测试需求。</p></li>
 <li><p><strong><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/65449477">Monad</a>和Combinator</strong>： 高阶逻辑是一种逻辑体系，基于对纯函数的概念构建的。在高阶逻辑中，函数被视为数学上的对象，具有输入和输出，而且没有副作用。这种逻辑形式有助于建立数学上严格和可靠的模型，用于描述系统行为。在高阶逻辑的基础上，引入了函数式编程的结构技术。这些技术包括Monad和Combinator。这些结构技术用于构建和组织模型的定义，使其更具可读性和可维护性。</p>
 <p>Monad是函数式编程中的一个重要概念，它用于管理副作用和状态。在这种上下文中，Monad允许将计算序列化，并处理可能引发的错误。它通常包括两个基本操作：return用于将值包装成Monad，bind用于将一个Monad的值传递给另一个Monad。Monad有助于保持计算的纯洁性。</p>
-<p>Combinator是一种函数，它接受一个或多个函数作为参数，并返回一个新的函数。Combinator用于组合和转换其他函数，以创建更复杂的函数。在函数式编程中，Combinator是一种强大的抽象工具，用于构建和组织函数。在文中，提到了 "parallel" Combinator（|||），它用于指定rename函数必须执行的检查。这个Combinator的作用是将多个检查操作并行执行，并在任何一个检查引发错误时返回错误。这意味着这些检查是相互独立的，没有一个检查的错误会优先于其他检查。这种并行结构有助于模型清晰地表示多个检查并确保它们的行为在并行执行时不会产生不一致。 <img src="/《SibylFS:%20formal%20specification%20and%20oracle-based%20testing%20for%20POSIX%20and%20real-world%20file%20systems》文章精读/image5.png" /></p>
+<p>Combinator是一种函数，它接受一个或多个函数作为参数，并返回一个新的函数。Combinator用于组合和转换其他函数，以创建更复杂的函数。在函数式编程中，Combinator是一种强大的抽象工具，用于构建和组织函数。在文中，提到了 "parallel" Combinator（|||），它用于指定rename函数必须执行的检查。这个Combinator的作用是将多个检查操作并行执行，并在任何一个检查引发错误时返回错误。这意味着这些检查是相互独立的，没有一个检查的错误会优先于其他检查。这种并行结构有助于模型清晰地表示多个检查并确保它们的行为在并行执行时不会产生不一致。 <img src="/SibylFS:%20formal%20specification%20and%20oracle-based%20testing%20for%20POSIX%20and%20real-world%20file%20systems%20阅读/image5.png" /></p>
 <p>通过使用Monad、Combinator等结构技术，SibylFS模型能够非常精确和清晰地表达系统行为。这使得模型成为现有POSIX标准的有用补充，因为它能够提供数学上严格的描述，并且具备清晰的结构，使得理解和维护模型变得更加容易。</p></li>
 </ol>
 
@@ -189,7 +189,7 @@
   
   <div class="vhr"></div>
   
-    <a class="post-nav-item-right" href="/2023/09/06/%E3%80%8AAll%20File%20Systems%20Are%20Not%20Created%20Equal:%20On%20the%20Complexity%20of%20Crafting%20Crash-Consistent%20Applications%E3%80%8B%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/">
+    <a class="post-nav-item-right" href="/2023/09/06/All%20File%20Systems%20Are%20Not%20Created%20Equal:%20On%20the%20Complexity%20of%20Crafting%20Crash-Consistent%20Applications%20%E9%98%85%E8%AF%BB/">
       <div class="text-align">
         <span class="text-small">下一篇</span>
         <svg t="1670570876164"
@@ -201,7 +201,7 @@
           <path d="M384 512L731.733333 202.666667c17.066667-14.933333 19.2-42.666667 4.266667-59.733334-14.933333-17.066667-42.666667-19.2-59.733333-4.266666l-384 341.333333c-10.666667 8.533333-14.933333 19.2-14.933334 32s4.266667 23.466667 14.933334 32l384 341.333333c8.533333 6.4 19.2 10.666667 27.733333 10.666667 12.8 0 23.466667-4.266667 32-14.933333 14.933333-17.066667 14.933333-44.8-4.266667-59.733334L384 512z" p-id="14596"/>
         </svg>
       </div>
-      《All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications》文章精读
+      All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读
     </a>
   
 </div>
@@ -214,7 +214,7 @@
 </div>
   <div class="realated__body">
     
-      <div class="null"><div class="null-item"><div class="null-title"><a href="/2023/08/31/《Cross-checking Semantic Correctness: The Case of Finding File System Bugs》文章精读/" title="《Cross-checking Semantic Correctness: The Case of Finding File System Bugs》文章精读" rel="bookmark">《Cross-checking Semantic Correctness: The Case of Finding File System Bugs》文章精读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/06/《All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications》文章精读/" title="《All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications》文章精读" rel="bookmark">《All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications》文章精读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/03/《Hyperkernel: Push-Button Verification of an OS Kernel》文章精读/" title="《Hyperkernel: Push-Button Verification of an OS Kernel》文章精读" rel="bookmark">《Hyperkernel: Push-Button Verification of an OS Kernel》文章精读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/08/31/leetcode 26. 删除有序数组中的重复项/" title="leetcode 26. 删除有序数组中的重复项" rel="bookmark">leetcode 26. 删除有序数组中的重复项</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/05/zsh & oh-my-zsh/" title="zsh & oh-my-zsh 常用命令" rel="bookmark">zsh & oh-my-zsh 常用命令</a></div></div></div>
+      <div class="null"><div class="null-item"><div class="null-title"><a href="/2023/08/31/Cross-checking Semantic Correctness: The Case of Finding File System Bugs 阅读/" title="Cross-checking Semantic Correctness: The Case of Finding File System Bugs 阅读" rel="bookmark">Cross-checking Semantic Correctness: The Case of Finding File System Bugs 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/06/All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读/" title="All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读" rel="bookmark">All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/03/Hyperkernel: Push-Button Verification of an OS Kernel 阅读/" title="Hyperkernel: Push-Button Verification of an OS Kernel 阅读" rel="bookmark">Hyperkernel: Push-Button Verification of an OS Kernel 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/18/Scaling symbolic evaluation for automated verification of systems code with Serval 阅读/" title="Scaling symbolic evaluation for automated verification of systems code with Serval 阅读" rel="bookmark">Scaling symbolic evaluation for automated verification of systems code with Serval 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/08/31/leetcode 26. 删除有序数组中的重复项/" title="leetcode 26. 删除有序数组中的重复项" rel="bookmark">leetcode 26. 删除有序数组中的重复项</a></div></div></div>
     
   </div>
 </div>

@@ -5,7 +5,7 @@
     <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
     <title>
       
-        《All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications》文章精读 | ZPF.SITE
+        All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读 | ZPF.SITE
       
     </title>
     <meta name="description" content=""/>
@@ -87,7 +87,7 @@
   <article class="post-content">
     <div class="post-inner--toc">
       <div class="post-content__head">
-        <div class="post-title">《All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications》文章精读</div>
+        <div class="post-title">All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读</div>
         <div class="post-info">
           
   <a href="/tags/Linux/" class="post-tag">#Linux</a><a href="/tags/File-System/" class="post-tag">#File System</a><a href="/tags/OSDI/" class="post-tag">#OSDI</a><a href="/tags/%E8%AE%BA%E6%96%87/" class="post-tag">#论文</a>
@@ -112,12 +112,12 @@
         <p>本文介绍了基于现代文件系统的应用层崩溃一致性协议的首个全面研究。研究发现，应用程序使用复杂的更新协议来持久化状态，而这些协议的正确性高度依赖于底层文件系统的微妙行为，我们称之为持久性属性。作者开发了一个名为BOB的工具来测试持久性属性，并使用它来证明这些属性在六种流行的Linux文件系统中存在广泛的差异。作者还构建了一个名为ALICE的框架，分析应用程序更新协议并发现崩溃漏洞，即需要特定持久性属性才能保证正确性的更新协议代码。使用ALICE，作者分析了11个广泛使用的系统，并发现了60个漏洞，其中许多会导致严重后果。作者还展示了ALICE可以用于评估新文件系统设计对应用程序级一致性的影响。 <span id="more"></span></p>
 <p>研究发现，应用程序的一致性高度依赖于底层文件系统的持久性属性。如果应用程序的正确性依赖于特定的文件系统持久性属性，就会存在崩溃漏洞；在不同的文件系统上运行应用程序可能导致不正确的行为。</p>
 <figure>
-<img src="/《All%20File%20Systems%20Are%20Not%20Created%20Equal:%20On%20the%20Complexity%20of%20Crafting%20Crash-Consistent%20Applications》文章精读/image1.png" alt="" /><figcaption>Crash States</figcaption>
+<img src="/All%20File%20Systems%20Are%20Not%20Created%20Equal:%20On%20the%20Complexity%20of%20Crafting%20Crash-Consistent%20Applications%20阅读/image1.png" alt="" /><figcaption>Crash States</figcaption>
 </figure>
 <h2 id="bob">BOB</h2>
 <p>BOB是一个简单的工具，用于收集文件系统下的块级追踪，并重新排序以探索可能出现的磁盘崩溃状态，用于测试文件系统的持久性属性。它通过运行一个简单的工作负载来测试持久性属性，收集块I/O并重新排序，生成可能的磁盘状态。然后运行文件系统恢复并检查持久性属性是否成立。如果BOB找到一个检查失败的磁盘映像，则知道该属性在文件系统上不成立。</p>
 <figure>
-<img src="/《All%20File%20Systems%20Are%20Not%20Created%20Equal:%20On%20the%20Complexity%20of%20Crafting%20Crash-Consistent%20Applications》文章精读/image3.png" alt="" /><figcaption>Persistence Properties</figcaption>
+<img src="/All%20File%20Systems%20Are%20Not%20Created%20Equal:%20On%20the%20Complexity%20of%20Crafting%20Crash-Consistent%20Applications%20阅读/image3.png" alt="" /><figcaption>Persistence Properties</figcaption>
 </figure>
 <h2 id="alice">ALICE</h2>
 <p>本文研究现代应用程序的崩溃一致性协议实现是否正确。为了回答这个问题，研究者们开发了一个名为ALICE的框架，可以系统地研究应用程序级别的崩溃一致性。</p>
@@ -126,11 +126,11 @@
 <p>APM将崩溃状态表示为两个逻辑实体：包含数据和文件大小的file inode + 包含目录项的directory。</p>
 <p>APM将逻辑操作分解为微操作，以捕捉中间崩溃状态。微操作是对每个逻辑实体执行的最小原子修改。共有五个微操作：write_block, change_file_size, create_dir_entry, delete_dir_entry。APM通过定义将逻辑操作转化为微操作来指定原子性约束。APM通过定义哪些微操作可以在其他微操作之前到达磁盘来指定排序约束。</p>
 <figure>
-<img src="/《All%20File%20Systems%20Are%20Not%20Created%20Equal:%20On%20the%20Complexity%20of%20Crafting%20Crash-Consistent%20Applications》文章精读/image2.png" alt="" /><figcaption>Default APM Constraints</figcaption>
+<img src="/All%20File%20Systems%20Are%20Not%20Created%20Equal:%20On%20the%20Complexity%20of%20Crafting%20Crash-Consistent%20Applications%20阅读/image2.png" alt="" /><figcaption>Default APM Constraints</figcaption>
 </figure>
 <p>ALICE将系统调用跟踪转换为微操作，并计算它们之间的顺序依赖关系。ALICE通过将所选集合中的微操作顺序应用于初始状态（表示为逻辑实体），构造新的崩溃状态。对于每个崩溃状态，ALICE将逻辑实体转换回实际文件，并将其提供给检查器进行验证。用户提供的检查器验证崩溃状态。</p>
 <figure>
-<img src="/《All%20File%20Systems%20Are%20Not%20Created%20Equal:%20On%20the%20Complexity%20of%20Crafting%20Crash-Consistent%20Applications》文章精读/image4.png" alt="" /><figcaption>Overview of ALICE</figcaption>
+<img src="/All%20File%20Systems%20Are%20Not%20Created%20Equal:%20On%20the%20Complexity%20of%20Crafting%20Crash-Consistent%20Applications%20阅读/image4.png" alt="" /><figcaption>Overview of ALICE</figcaption>
 </figure>
 <h3 id="finding-application-requirements">Finding Application Requirements</h3>
 <h4 id="测试跨系统调用的原子性">测试跨系统调用的原子性</h4>
@@ -148,7 +148,7 @@
     
     <div class="post-nav">
   
-    <a class="post-nav-item-left" href="/2023/09/07/%E3%80%8ASibylFS:%20formal%20specification%20and%20oracle-based%20testing%20for%20POSIX%20and%20real-world%20file%20systems%E3%80%8B%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/">
+    <a class="post-nav-item-left" href="/2023/09/07/SibylFS:%20formal%20specification%20and%20oracle-based%20testing%20for%20POSIX%20and%20real-world%20file%20systems%20%E9%98%85%E8%AF%BB/">
       <div class="text-align">
         <svg t="1670570876164"
              class="icon"
@@ -159,7 +159,7 @@
         </svg>
         <span class="text-small">上一篇</span>
       </div>
-      <div>《SibylFS: formal specification and oracle-based testing for POSIX and real-world file systems》文章精读</div>
+      <div>SibylFS: formal specification and oracle-based testing for POSIX and real-world file systems 阅读</div>
     </a>
   
   <div class="vhr"></div>
@@ -189,7 +189,7 @@
 </div>
   <div class="realated__body">
     
-      <div class="null"><div class="null-item"><div class="null-title"><a href="/2023/08/31/《Cross-checking Semantic Correctness: The Case of Finding File System Bugs》文章精读/" title="《Cross-checking Semantic Correctness: The Case of Finding File System Bugs》文章精读" rel="bookmark">《Cross-checking Semantic Correctness: The Case of Finding File System Bugs》文章精读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/07/《SibylFS: formal specification and oracle-based testing for POSIX and real-world file systems》文章精读/" title="《SibylFS: formal specification and oracle-based testing for POSIX and real-world file systems》文章精读" rel="bookmark">《SibylFS: formal specification and oracle-based testing for POSIX and real-world file systems》文章精读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/05/zsh & oh-my-zsh/" title="zsh & oh-my-zsh 常用命令" rel="bookmark">zsh & oh-my-zsh 常用命令</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/08/31/leetcode 26. 删除有序数组中的重复项/" title="leetcode 26. 删除有序数组中的重复项" rel="bookmark">leetcode 26. 删除有序数组中的重复项</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/03/《Hyperkernel: Push-Button Verification of an OS Kernel》文章精读/" title="《Hyperkernel: Push-Button Verification of an OS Kernel》文章精读" rel="bookmark">《Hyperkernel: Push-Button Verification of an OS Kernel》文章精读</a></div></div></div>
+      <div class="null"><div class="null-item"><div class="null-title"><a href="/2023/08/31/Cross-checking Semantic Correctness: The Case of Finding File System Bugs 阅读/" title="Cross-checking Semantic Correctness: The Case of Finding File System Bugs 阅读" rel="bookmark">Cross-checking Semantic Correctness: The Case of Finding File System Bugs 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/07/SibylFS: formal specification and oracle-based testing for POSIX and real-world file systems 阅读/" title="SibylFS: formal specification and oracle-based testing for POSIX and real-world file systems 阅读" rel="bookmark">SibylFS: formal specification and oracle-based testing for POSIX and real-world file systems 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/05/zsh & oh-my-zsh/" title="zsh & oh-my-zsh 常用命令" rel="bookmark">zsh & oh-my-zsh 常用命令</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/03/Hyperkernel: Push-Button Verification of an OS Kernel 阅读/" title="Hyperkernel: Push-Button Verification of an OS Kernel 阅读" rel="bookmark">Hyperkernel: Push-Button Verification of an OS Kernel 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/18/Scaling symbolic evaluation for automated verification of systems code with Serval 阅读/" title="Scaling symbolic evaluation for automated verification of systems code with Serval 阅读" rel="bookmark">Scaling symbolic evaluation for automated verification of systems code with Serval 阅读</a></div></div></div>
     
   </div>
 </div>
