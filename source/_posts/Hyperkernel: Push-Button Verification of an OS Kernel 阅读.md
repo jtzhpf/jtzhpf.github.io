@@ -1,5 +1,5 @@
 ---
-title: "《Hyperkernel: Push-Button Verification of an OS Kernel》文章精读"
+title: "Hyperkernel: Push-Button Verification of an OS Kernel 阅读"
 category: CS&Maths
 #id: 57
 date: 2023-9-3 09:00:00
@@ -20,7 +20,7 @@ mathjax: true
 
 程序员使用Python编写两种规范来指定系统调用的期望行为：详细的**状态机规范**和更高级的**声明式规范**。两种规范都用Python表达，并使用Z3 SMT求解器进行验证。程序员使用C实现系统调用。验证器将Python规范和C编译成的LLVM IR实现转化为SMT查询，并调用Z3进行验证。验证后的代码与未验证的（可信任的）代码链接，生成最终的内核映像。
 
-![](/《Hyperkernel: Push-Button Verification of an OS Kernel》文章精读/image1.png){width=550}
+![](/Hyperkernel: Push-Button Verification of an OS Kernel 阅读/image1.png){width=550}
 
 ## Hyperkernel 验证面临的挑战与解决办法
 ### 挑战一
@@ -31,7 +31,7 @@ mathjax: true
 > 在Unix设计中，每个进程都有一个文件描述符表，每个槽位都指向系统范围内的文件表。文件表维护每个条目的引用计数器，以正确管理资源。
 > 
 > `dup(oldfd)`的 POSIX 语义是“创建`oldfd`的副本，使用***最小***未使用的文件描述符作为新描述符”。例如，在进程`j`中调用`dup(0)`将返回FD 1，引用文件表条目 4，并将该条目的引用计数增加到 3。
-![](/《Hyperkernel: Push-Button Verification of an OS Kernel》文章精读/image2.png){width=500}
+![](/Hyperkernel: Push-Button Verification of an OS Kernel 阅读/image2.png){width=500}
 > `dup`接口的POSIX语义是非有限的。因为最小FD需要内核检查每个小于新选择的FD的slot是否已经被占用。因此，分配最小FD需要一个随着FD表大小增长的跟踪，即跟踪长度不能被一个独立于系统参数的小常数所限制。缺乏有限界意味着`dup`的验证时间会随着FD表的大小增加而增加。
 >
 > Hyperkernel通过将POSIX接口改为`dup(oldfd, newfd)`来进行有限化处理，这要求**用户空间**选择一个新的FD值。为了实现这个接口，内核只需检查给定的`newfd`是否未使用。这个检查只需要`O(1)`，与FD表的大小无关。因此，该接口是有限的，可以进行可扩展的验证，避免了路径爆炸。
@@ -150,7 +150,7 @@ mathjax: true
 
 ## 验证
 Hyperkernel的验证主要证明了两个定理：
-![](/《Hyperkernel: Push-Button Verification of an OS Kernel》文章精读/image3.png){width=600}
+![](/Hyperkernel: Push-Button Verification of an OS Kernel 阅读/image3.png){width=600}
 
 ### Theorem 1: REFINEMENT
 验证器会对每个陷阱处理程序：
@@ -179,7 +179,7 @@ Hyperkernel的验证主要证明了两个定理：
 
 另一个例子是，如果程序员忘记在 `dup` 实现中增加文件表中的引用计数，验证器会突出显示在状态机规范中被违反的子句，并提供一个简化的解释。这个解释描述了在系统调用之前和之后的内核状态以及规范的状态。通常情况下，规范和实现在系统调用之前是等价的，但是在系统调用之后，规范中的计数器已经正确更新，而实现中的计数器保持不变，这破坏了等价性，因此证明失败。
 
-![](/《Hyperkernel: Push-Button Verification of an OS Kernel》文章精读/image4.png){width=600}
+![](/Hyperkernel: Push-Button Verification of an OS Kernel 阅读/image4.png){width=600}
 
 这个输出表明，在进程PID 32中调用`dupfd(1, 0)`会触发一个bug。系统调用之前的内核状态是：PID 32是当前运行的进程；它的FD 1指向文件1（引用计数为1）；其他FD和文件表项为空。两个`ForAll`语句分别突出了系统调用之前和之后的有问题的状态。在调用之前，规范和实现状态是等价的。在系统调用之后，规范中的计数器被正确更新（即文件1的计数器`file_nr_fds`增加了1）；然而，在实现中计数器保持不变（即`@files->struct.file::refcnt`），这破坏了等价函数，因此证明失败。
 
@@ -198,9 +198,9 @@ Hyperkernel的验证主要证明了两个定理：
 
 3. **内核正确性的定义与验证：** 内核的正确性以状态机refinement的形式定义。Z3验证器通过验证其否定是不可满足的来验证其正确性。如果找到反例，验证器会构建一个测试用例。
 
-![](/《Hyperkernel: Push-Button Verification of an OS Kernel》文章精读/image5.png){width=600}
+![](/Hyperkernel: Push-Button Verification of an OS Kernel 阅读/image5.png){width=600}
 
-![](/《Hyperkernel: Push-Button Verification of an OS Kernel》文章精读/image6.png){width=600}
+![](/Hyperkernel: Push-Button Verification of an OS Kernel 阅读/image6.png){width=600}
 
 4. **LLVM IR 的处理：** 验证器将 LLVM IR 代码作为验证目标，通过符号执行来构建 SMT 表达式。它会处理 LLVM IR 中的未定义行为，并将 LLVM IR 中的指令映射到 SMT 表达式。对于易变内存访问（如 DMA 页面），验证器会生成适当的 SMT 表达式。验证器允许程序员提供内联汇编代码的抽象模型，以简化验证过程。这个模型是被信任而不是验证的，它通常用于模拟特定的硬件行为。
 

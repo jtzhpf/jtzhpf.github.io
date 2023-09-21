@@ -1,8 +1,9 @@
 ---
-title: "《Cross-checking Semantic Correctness: The Case of Finding File System Bugs》文章精读"
+title: "Cross-checking Semantic Correctness: The Case of Finding File System Bugs 阅读"
 category: CS&Maths
 #id: 57
 date: 2023-8-31 20:42:32
+
 tags: 
   - Linux
   - File System
@@ -19,7 +20,7 @@ timeline: article  # 展示在时间线列表中
 <!--more-->
 
 ## 设计
-![Overview](/《Cross-checking Semantic Correctness: The Case of Finding File System Bugs》文章精读/image1.png)
+![Overview](/Cross-checking Semantic Correctness: The Case of Finding File System Bugs 阅读/image1.png)
 
 1. To enable comparison, the source code of each file system is merged into one large file. This allows interprocedural analysis within a file system.
 2. JUXTA collects execution information for each function in the file systems by constructing control-flow graphs (CFGs) and symbolically exploring these graphs from the entry point to the end of each function.
@@ -29,7 +30,7 @@ timeline: article  # 展示在时间线列表中
    - Histogram-based: Integer ranges are encoded into histograms and distances between histograms are computed.
    - Entropy-based: Used for **events** like flags or return value checks. Low non-zero entropy indicates a likely bug.（别的的实现均不包含这一event，则说明this event could be wrong implementation）
   
-  ![Histogram-based comparison](/《Cross-checking Semantic Correctness: The Case of Finding File System Bugs》文章精读/image2.png)
+  ![Histogram-based comparison](/Cross-checking Semantic Correctness: The Case of Finding File System Bugs 阅读/image2.png)
   
 6. Bug reports are ranked to prioritize investigation of likely true positives. Metrics include histogram distance and entropy values.
 

@@ -1,5 +1,5 @@
 ---
-title: "《Scaling symbolic evaluation for automated verification of systems code with Serval》文章精读"
+title: "Scaling symbolic evaluation for automated verification of systems code with Serval 阅读"
 category: CS&Maths
 #id: 57
 date: 2023-9-18 09:00:00
