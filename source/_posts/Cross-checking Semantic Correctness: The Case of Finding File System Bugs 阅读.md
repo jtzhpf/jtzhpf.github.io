@@ -351,7 +351,7 @@ def _run_clang(fs, clang):
 |-- modules.order
 `-- one.o
 ```
-接下来我们将进入`analyzer/../llvm/tools/clang/tools/scan-build`目录下，来[深入探究一下`fss-build`函数做了哪些工作](#fss-build-工具)。
+接下来我们将进入`analyzer/../llvm/tools/clang/tools/scan-build`目录下，来[深入探究一下`fss-build`文件做了哪些工作](#fss-build-工具)。
 
 ### merger.py 文件
 
@@ -730,8 +730,90 @@ class TokenRewritter(Formatter):
 
 ### Clang 相关代码解析
 #### fss-build 工具
+`fss-build` 是一个 Perl 脚本，用于在构建过程中运行 Clang 静态分析工具。`fss-build` 是在 `scan-build` 的基础上修改而来，在这里我们只用到了其中的部分功能。
+
+主要流程:
+
+1. 解析命令行选项，包括启用/禁用检查器、输出目录等。
+2. 设置环境变量，将 `CC` 和 `CXX` 重定向到 `fssccc-analyzer` 和 `fssc++-analyzer` wrapper 脚本。
+3. 调用构建命令，如 `make`、`xcodebuild` 等，在构建过程中运行静态分析。
+4. 收集并处理分析结果。
+
+```perl
+sub RunBuildCommand {
+  my $Args = shift;
+  my $IgnoreErrors = shift;
+  my $Cmd = $Args->[0];
+  my $CCAnalyzer = shift;
+  my $CXXAnalyzer = shift;
+  my $Options = shift;
+
+  if ($Cmd =~ /\bxcodebuild$/) {
+    return RunXcodebuild($Args, $IgnoreErrors, $CCAnalyzer, $CXXAnalyzer, $Options);
+  }
+
+  print "RunBuildCommand\n";
+  print "\$Args: $Args\n";
+  print "\$IgnoreErrors: $IgnoreErrors\n";
+  print "\$Cmd: $Cmd\n";
+  print "\$CCAnalyzer: $CCAnalyzer\n";
+  print "\$CXXAnalyzer: $CXXAnalyzer\n";
+  print "\$Options: $Options\n";
+
+  foreach my $key (keys %{$Options}) {
+      my $value = $Options->{$key};
+      print "\t$key : $value\n";
+  }
+  print "\n";
+
+  # Setup the environment.
+  SetEnv($Options);
+
+  if ($Cmd =~ /(.*\/?gcc[^\/]*$)/ or
+      $Cmd =~ /(.*\/?cc[^\/]*$)/ or
+      $Cmd =~ /(.*\/?llvm-gcc[^\/]*$)/ or
+      $Cmd =~ /(.*\/?clang$)/ or
+      $Cmd =~ /(.*\/?fssccc-analyzer[^\/]*$)/) {
+
+    if (!($Cmd =~ /fssccc-analyzer/) and !defined $ENV{"CCC_CC"}) {
+      $ENV{"CCC_CC"} = $1;
+    }
+
+    shift @$Args;
+    unshift @$Args, $CCAnalyzer;
+  }
+  elsif ($Cmd =~ /(.*\/?g\+\+[^\/]*$)/ or
+        $Cmd =~ /(.*\/?c\+\+[^\/]*$)/ or
+        $Cmd =~ /(.*\/?llvm-g\+\+[^\/]*$)/ or
+        $Cmd =~ /(.*\/?clang\+\+$)/ or
+        $Cmd =~ /(.*\/?fssc\+\+-analyzer[^\/]*$)/) {
+    if (!($Cmd =~ /fssc\+\+-analyzer/) and !defined $ENV{"CCC_CXX"}) {
+      $ENV{"CCC_CXX"} = $1;
+    }
+    shift @$Args;
+    unshift @$Args, $CXXAnalyzer;
+  }
+  elsif ($Cmd eq "make" or $Cmd eq "gmake" or $Cmd eq "mingw32-make") {
+    AddIfNotPresent($Args, "CC=$CCAnalyzer");
+    AddIfNotPresent($Args, "CXX=$CXXAnalyzer");
+    if ($IgnoreErrors) {
+      AddIfNotPresent($Args,"-k");
+      AddIfNotPresent($Args,"-i");
+    }
+  }
+
+  return (system(@$Args) >> 8);
+}
+```
 
 
+
+
+重点在`RunBuildCommand`函数，这个函数将 `CC` 和 `CXX` 重定向到 `fssccc-analyzer` 和 `fssc++-analyzer`，并通过执行`system(@$Args)`来运行静态分析，其中`$Args`的内容为
+```shell
+make CC=/home/juxta/analyzer/../bin/llvm/bin/clang -f Makefile.build CC=/home/juxta/llvm/tools/clang/tools/scan-build/fssccc-analyzer
+```
+此时的工作目录为`./analyzer/out/具体文件系统目录`。
 
 ## 结果分析
 TODO
