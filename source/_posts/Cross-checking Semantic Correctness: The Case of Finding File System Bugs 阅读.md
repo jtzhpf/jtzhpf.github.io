@@ -752,20 +752,6 @@ sub RunBuildCommand {
     return RunXcodebuild($Args, $IgnoreErrors, $CCAnalyzer, $CXXAnalyzer, $Options);
   }
 
-  print "RunBuildCommand\n";
-  print "\$Args: $Args\n";
-  print "\$IgnoreErrors: $IgnoreErrors\n";
-  print "\$Cmd: $Cmd\n";
-  print "\$CCAnalyzer: $CCAnalyzer\n";
-  print "\$CXXAnalyzer: $CXXAnalyzer\n";
-  print "\$Options: $Options\n";
-
-  foreach my $key (keys %{$Options}) {
-      my $value = $Options->{$key};
-      print "\t$key : $value\n";
-  }
-  print "\n";
-
   # Setup the environment.
   SetEnv($Options);
 
@@ -811,9 +797,83 @@ sub RunBuildCommand {
 
 重点在`RunBuildCommand`函数，这个函数将 `CC` 和 `CXX` 重定向到 `fssccc-analyzer` 和 `fssc++-analyzer`，并通过执行`system(@$Args)`来运行静态分析，其中`$Args`的内容为
 ```shell
-make CC=/home/juxta/analyzer/../bin/llvm/bin/clang -f Makefile.build CC=/home/juxta/llvm/tools/clang/tools/scan-build/fssccc-analyzer
+make CC=/home/juxta/analyzer/../bin/llvm/bin/clang -f Makefile.build CC=/home/juxta/llvm/tools/clang/tools/scan-build/fssccc-analyzer CXX=/home/juxta/llvm/tools/clang/tools/scan-build/fssc++-analyzer
 ```
 此时的工作目录为`./analyzer/out/具体文件系统目录`。
+
+
+
+#### fssccc-analyzer 工具
+
+```perl
+sub GetCCArgs {
+  my $mode = shift;
+  my $Args = shift;
+
+  pipe (FROM_CHILD, TO_PARENT);
+  my $pid = fork();
+  if ($pid == 0) {
+    close FROM_CHILD;
+    open(STDOUT,">&", \*TO_PARENT);
+    open(STDERR,">&", \*TO_PARENT);
+    exec $Clang, "-###", $mode, @$Args;
+  }
+  close(TO_PARENT);
+  my $line;
+  while (<FROM_CHILD>) {
+    next if (!/\s"?-cc1"?\s/);
+    $line = $_;
+  }
+
+  waitpid($pid,0);
+  close(FROM_CHILD);
+
+  die "could not find clang line\n" if (!defined $line);
+  # Strip leading and trailing whitespace characters.
+  $line =~ s/^\s+|\s+$//g;
+  my @items = quotewords('\s+', 0, $line);
+  my $cmd = shift @items;
+  die "cannot find 'clang' in 'clang' command\n" if (!($cmd =~ /clang/));
+  return \@items;
+}
+```
+`GetCCArgs` 函数用于获取编译器**实际**执行的命令行参数。该函数创建了一个子进程，在子进程中执行`$Clang -### $mode @$Args`命令。
+
+>`-###` 是作为命令行参数传递给 `$Clang` 的一个选项。这个选项在 Clang 中具有特殊的含义，它并不是常见的编译或链接选项，而是用于显示编译过程中的详细信息的一种特殊模式。
+>
+>具体来说，`-###` 在 Clang 中的作用是：
+>
+>1. **显示编译过程**：当你将 `-###` 选项传递给 Clang 时，它不会实际执行编译操作，而是会将编译过程的详细信息输出到标准错误（stderr）。这包括了 Clang 执行的实际命令以及每个命令的参数。
+>2. **调试和诊断**：`-###` 通常用于调试和诊断构建过程。通过查看输出，开发人员可以了解 Clang 在执行编译操作时究竟执行了哪些命令，以及这些命令使用了哪些参数。这有助于识别构建问题和调试构建系统的配置。
+>
+>**示例：**
+>假设你有一个名为 `example.c` 的源代码文件，并且你希望查看 Clang 编译该文件时实际执行的命令，你可以运行如下命令：
+>
+>```bash
+>clang -### example.c
+>```
+>
+>这将导致 Clang 输出类似以下内容的信息：
+>
+>```
+>clang version X.X.X (...)
+>Target: ...
+>Thread model: ...
+>InstalledDir: ...
+> "/path/to/clang" -cc1 -triple ... -emit-obj -mrelax-all ...
+>```
+>
+>这些输出中包括了 Clang 执行的实际命令和参数，以及编译器版本信息等。
+
+子进程的标准输出流和错误流都重定向到管道上，被父进程读取，父进程通过查找包含`-cc1`的行，即为所需要的**实际**执行的命令行参数，最后使用`quotewords`函数将命令行分解为单词并返回。
+
+
+
+#### fssc++-analyzer 工具
+
+
+
+
 
 ## 结果分析
 TODO
