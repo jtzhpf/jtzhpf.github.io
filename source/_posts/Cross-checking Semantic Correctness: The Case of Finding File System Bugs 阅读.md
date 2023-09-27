@@ -805,6 +805,22 @@ make CC=/home/juxta/analyzer/../bin/llvm/bin/clang -f Makefile.build CC=/home/ju
 
 #### fssccc-analyzer 工具
 
+`fssccc-analyzer`的主要执行流程如下：
+
+> 1 获取编译命令行参数，分析出编译选项、链接选项和输入文件\
+> 2 调用系统的编译器/链接器执行编译/链接\
+> 3 对每个输入文件:\
+> 
+>> 3.1 判断文件语言类型\
+>> 3.2 构建调用Clang的命令行，包含静态分析选项\
+>> 3.3 调用Clang进行编译+分析\
+>> 3.4 如果Clang发生崩溃或错误，保存相关文件用于调试\
+>> 3.5 提取Clang分析结果到单独的.fss文件\
+>
+> 4 如果设置了输出目录，将Clang分析结果保存到该目录\
+> 5 根据环境变量设置verbose模式，输出执行过程信息\
+> 6 返回系统编译器/链接器的返回值
+
 ```perl
 sub GetCCArgs {
   my $mode = shift;
@@ -867,10 +883,208 @@ sub GetCCArgs {
 
 子进程的标准输出流和错误流都重定向到管道上，被父进程读取，父进程通过查找包含`-cc1`的行，即为所需要的**实际**执行的命令行参数，最后使用`quotewords`函数将命令行分解为单词并返回。
 
+随后进过一系列的命令行参数处理之后，调用`Analyze`函数。
+
+```perl
+Analyze($Clang, \@CmdArgs, \@AnalyzeArgs, $FileLang, $Output, $Verbose, $HtmlDir, $file);
+
+sub Analyze {
+  my ($Clang, $OriginalArgs, $AnalyzeArgs, $Lang, $Output, $Verbose, $HtmlDir,
+      $file) = @_;
+
+  my @Args = @$OriginalArgs;
+  my $Cmd;
+  my @CmdArgs;
+  my @CmdArgsSansAnalyses;
+
+  if ($Lang =~ /header/) {  # not used
+    exit 0 if (!defined ($Output));
+    $Cmd = 'cp';
+    push @CmdArgs, $file;
+    # Remove the PCH extension.
+    $Output =~ s/[.]gch$//;
+    push @CmdArgs, $Output;
+    @CmdArgsSansAnalyses = @CmdArgs;
+  }
+  else {
+    $Cmd = $Clang;
+
+    # Create arguments for doing regular parsing.
+    my $SyntaxArgs = GetCCArgs("-fsyntax-only", \@Args);
+    @CmdArgsSansAnalyses = @$SyntaxArgs;
+
+    # Create arguments for doing static analysis.
+    if (defined $ResultFile) {
+      push @Args, '-o', $ResultFile;
+    }
+    elsif (defined $HtmlDir) {
+      push @Args, '-o', $HtmlDir;
+    }
+    if ($Verbose) {
+      push @Args, "-Xclang", "-analyzer-display-progress";
+    }
+
+    foreach my $arg (@$AnalyzeArgs) {
+      push @Args, "-Xclang", $arg;
+    }
+
+    # Display Ubiviz graph?
+    if (defined $ENV{'CCC_UBI'}) {
+      push @Args, "-Xclang", "-analyzer-viz-egraph-ubigraph";
+    }
+
+    my $AnalysisArgs = GetCCArgs("--analyze", \@Args);
+    @CmdArgs = @$AnalysisArgs;
+  }
+
+  my @PrintArgs;
+  my $dir;
+
+  if ($Verbose) {
+    $dir = getcwd();
+    print STDERR "\n[LOCATION]: $dir\n";
+    push @PrintArgs,"'$Cmd'";
+    foreach my $arg (@CmdArgs) {
+        push @PrintArgs,"\'$arg\'";
+    }
+  }
+  if ($Verbose == 1) {
+    # We MUST print to stderr.  Some clients use the stdout output of
+    # gcc for various purposes.
+    print STDERR join(' ', @PrintArgs);
+    print STDERR "\n";
+  }
+  elsif ($Verbose == 2) {
+    print STDERR "#SHELL (cd '$dir' && @PrintArgs)\n";
+  }
+
+  # Capture the STDERR of clang and send it to a temporary file.
+  # Capture the STDOUT of clang and reroute it to ccc-analyzer's STDERR.
+  # We save the output file in the 'crashes' directory if clang encounters
+  # any problems with the file.
+  pipe (FROM_CHILD, TO_PARENT);
+  my $pid = fork();
+  if ($pid == 0) {
+    close FROM_CHILD;
+    open(STDOUT,">&", \*TO_PARENT);
+    open(STDERR,">&", \*TO_PARENT);
+    exec $Cmd, @CmdArgs;
+  }
+
+  close TO_PARENT;
+  my ($ofh, $ofile) = tempfile("clang_output_XXXXXX", DIR => $HtmlDir);
+  my $fss_file = abs_path($file);
+  my @dentry = split(/\//, $fss_file);
+  my $start = ($#dentry >= 3) ? $#dentry - 3 : 0;
+  $fss_file  = "${HtmlDir}/";
+  for my $i ($start .. $#dentry)
+  {
+      if ($i == $#dentry) {
+	  system "mkdir -p ${fss_file}";
+	  print "[XXXX] ${fss_file}\n";
+      }
+      $fss_file = "${fss_file}/${dentry[$i]}";
+  }
+  open(my $fss_fh, '>', "${fss_file}.fss")  or die "Cannot open $fss_file\n";
+
+  my $is_path = 0;
+  while (<FROM_CHILD>) {
+    print $ofh $_;
+    print STDERR $_;
+
+    if (/^@@<</) {
+      $is_path = 1;
+    }
+    
+    if ($is_path) {
+      print $fss_fh $_
+    }
+
+    if (/^@@>>/) {
+      $is_path = 0;
+    }	
+  }
+  close $ofh;
+  close $fss_fh;
+
+  waitpid($pid,0);
+  close(FROM_CHILD);
+  my $Result = $?;
+
+  # Did the command die because of a signal?
+  if ($ReportFailures) {
+    if ($Result & 127 and $Cmd eq $Clang and defined $HtmlDir) {
+      ProcessClangFailure($Clang, $Lang, $file, \@CmdArgsSansAnalyses,
+                          $HtmlDir, "Crash", $ofile);
+    }
+    elsif ($Result) {
+      if ($IncludeParserRejects && !($file =~/conftest/)) {
+        ProcessClangFailure($Clang, $Lang, $file, \@CmdArgsSansAnalyses,
+                            $HtmlDir, $ParserRejects, $ofile);
+      } else {
+        ProcessClangFailure($Clang, $Lang, $file, \@CmdArgsSansAnalyses,
+                            $HtmlDir, $OtherError, $ofile);
+      }
+    }
+    else {
+      # Check if there were any unhandled attributes.
+      if (open(CHILD, $ofile)) {
+        my %attributes_not_handled;
+
+        # Don't flag warnings about the following attributes that we
+        # know are currently not supported by Clang.
+        $attributes_not_handled{"cdecl"} = 1;
+
+        my $ppfile;
+        while (<CHILD>) {
+          next if (! /warning: '([^\']+)' attribute ignored/);
+
+          # Have we already spotted this unhandled attribute?
+          next if (defined $attributes_not_handled{$1});
+          $attributes_not_handled{$1} = 1;
+
+          # Get the name of the attribute file.
+          my $dir = "$HtmlDir/failures";
+          my $afile = "$dir/attribute_ignored_$1.txt";
+
+          # Only create another preprocessed file if the attribute file
+          # doesn't exist yet.
+          next if (-e $afile);
+
+          # Add this file to the list of files that contained this attribute.
+          # Generate a preprocessed file if we haven't already.
+          if (!(defined $ppfile)) {
+            $ppfile = ProcessClangFailure($Clang, $Lang, $file,
+                                          \@CmdArgsSansAnalyses,
+                                          $HtmlDir, $AttributeIgnored, $ofile);
+          }
+
+          mkpath $dir;
+          open(AFILE, ">$afile");
+          print AFILE "$ppfile\n";
+          close(AFILE);
+        }
+        close CHILD;
+      }
+    }
+  }
+
+  unlink($ofile);
+}
+```
+
+`Analyze` 函数接受多个参数，包括 `$Clang`（Clang 编译器的路径）、`$OriginalArgs`（原始的编译选项和参数数组）、`$AnalyzeArgs`（分析相关的选项数组）、`$Lang`（文件的语言类型）、`$Output`（输出文件名）、`$Verbose`（详细程度）、`$HtmlDir`（HTML 输出目录，实际上也用作`clang-log`输出目录，只不过和HTML无关）和 `$file`（要处理的文件名）。
+
+首先，函数检查 `$Lang` 是否包含 "header"，如果是，说明要处理的文件是头文件，而不是源代码文件。如果 `$Output` 未定义，就退出，否则执行文件拷贝操作。
+如果不是头文件，函数将构建用于执行 Clang 静态代码分析的命令参数。它使用 `GetCCArgs` 函数获取了语法分析的参数（`$SyntaxArgs`）和静态分析的参数（`@CmdArgs`）。
+
+函数通过 `fork` 创建了一个子进程，然后在子进程中执行 Clang 命令，进行语法分析和静态分析。它使用 `pipe` 创建了两个管道，分别用于捕获 Clang 的标准输出和标准错误。然后，子进程将标准输出和标准错误重定向到这两个管道，并执行 Clang 命令。
+
+父进程中，函数会从管道中读取 Clang 的标准输出和标准错误，并将它们同时输出到标准错误流和一个临时文件（`$ofile`）中。在处理输出的过程中，它还会检测是否遇到特定的标记（`@@<<` 和 `@@>>`），它将标记之间的内容写入一个名为 `one.cs.fss` 的文件中，用于后续的分析。
 
 
 #### fssc++-analyzer 工具
-
+`fssc++-analyzer` 脚本直接调用 `fssccc-analyzer` 脚本来进行语法分析和静态分析。
 
 
 
