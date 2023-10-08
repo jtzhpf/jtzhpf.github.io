@@ -351,7 +351,7 @@ def _run_clang(fs, clang):
 |-- modules.order
 `-- one.o
 ```
-接下来我们将进入`analyzer/../llvm/tools/clang/tools/scan-build`目录下，来[深入探究一下`fss-build`文件做了哪些工作](#fss-build-工具)。
+接下来我们将进入`analyzer/../llvm/tools/clang/tools/scan-build`目录下，来[深入探究一下`fss-build`文件做了哪些工作](#fss-build-脚本)。
 
 ### merger.py 文件
 
@@ -729,13 +729,44 @@ class TokenRewritter(Formatter):
 
 
 ### Clang 相关代码解析
-#### fss-build 工具
-`fss-build` 是一个 Perl 脚本，用于在构建过程中运行 Clang 静态分析工具。`fss-build` 是在 `scan-build` 的基础上修改而来，在这里我们只用到了其中的部分功能。
+Juxta 所用 Clang 为修改后的版本，其之间的差别见 [https://github.com/jtzhpf/llvm-project-juxta-sosp/blob/juxta-sosp/README.md](https://github.com/jtzhpf/llvm-project-juxta-sosp/blob/juxta-sosp/README.md)。
+
+#### Options.td 文件
+`./llvm/tools/clang/include/clang/Driver/Options.td` 文件定义了clang编译器支持的所有命令行选项。
+
+```TableGen
+def ffs_semantic_out_dir_EQ : Joined<["-"], "ffs-semantic-out-dir=">,
+    Group<f_Group>, Flags<[DriverOption, CC1Option]>,
+    HelpText<"Output directory of fs semantics analysis">;	
+def ffs_semantic_EQ : Joined<["-"], "ffs-semantic=">,
+    Group<f_Group>, Flags<[DriverOption, CC1Option]>,
+    HelpText<"Enable fs semantics analysis">;	
+```
+`Options.td` 文件新增了上面的代码，这两个选项 `ffs_semantic_out_dir_EQ` 和 `ffs_semantic_EQ` 是 Clang 编译器的命令行选项，用于控制文件系统语义分析（Filesystem Semantics Analysis）的行为。下面是对这两个选项的详细解释：
+
+1. `ffs_semantic_out_dir_EQ` 选项：
+   - `ffs_semantic_out_dir_EQ` 是一个带有参数的选项，它的形式是 `-ffs-semantic-out-dir=<directory>`。
+   - `<directory>` 是用户提供的路径，用于指定文件系统语义分析的输出目录。
+   - 这个选项属于 `f_Group` 组，表示它与 `-f` 开头的选项相关联。
+   - 该选项被标记为 `DriverOption` 和 `CC1Option`，表示它既可以在编译器驱动程序中使用，也可以在 Clang 的前端（`-cc1`）中使用。
+   - `HelpText` 字段提供了对该选项用途的描述，它说明了该选项用于指定文件系统语义分析的输出目录。
+
+2. `ffs_semantic_EQ` 选项：
+   - `ffs_semantic_EQ` 也是一个带有参数的选项，它的形式是 `-ffs-semantic=<value>`。
+   - `<value>` 是用户提供的值，用于启用或禁用文件系统语义分析。
+   - 这个选项同样属于 `f_Group` 组，表示它与 `-f` 开头的选项相关联。
+   - 类似地，该选项也被标记为 `DriverOption` 和 `CC1Option`，表示它可以在编译器驱动程序中和 Clang 前端中使用。
+   - `HelpText` 字段提供了对该选项用途的描述，它说明了该选项用于启用或禁用文件系统语义分析。
+
+这两个选项通常用于控制编译器在进行文件系统操作时的语义分析行为。用户可以使用 `ffs_semantic_out_dir_EQ` 选项来指定分析结果的输出目录，同时使用 `ffs_semantic_EQ` 选项来启用或禁用文件系统语义分析。
+
+#### fss-build 脚本
+`fss-build` 是一个 Perl 脚本，位于`./llvm/tools/clang/tools/scan-build/fss-build`，用于在构建过程中运行 Clang 静态分析工具。`fss-build` 是在 `scan-build` 的基础上修改而来，在这里我们只用到了其中的部分功能。
 
 主要流程:
 
 1. 解析命令行选项，包括启用/禁用检查器、输出目录等。
-2. 设置环境变量，将 `CC` 和 `CXX` 重定向到 `fssccc-analyzer` 和 `fssc++-analyzer` wrapper 脚本。
+2. 设置环境变量，将 `CC` 和 `CXX` 重定向到 [`fssccc-analyzer` 和 `fssc++-analyzer` wrapper 脚本](#fssccc-analyzer-与-fssc-analyzer-脚本)。
 3. 调用构建命令，如 `make`、`xcodebuild` 等，在构建过程中运行静态分析。
 4. 收集并处理分析结果。
 
@@ -795,7 +826,7 @@ sub RunBuildCommand {
 
 
 
-重点在`RunBuildCommand`函数，这个函数将 `CC` 和 `CXX` 重定向到 `fssccc-analyzer` 和 `fssc++-analyzer`，并通过执行`system(@$Args)`来运行静态分析，其中`$Args`的内容为
+重点在`RunBuildCommand`函数，这个函数将 `CC` 和 `CXX` 重定向到 [`fssccc-analyzer` 和 `fssc++-analyzer`](#fssccc-analyzer-与-fssc-analyzer-脚本)，并通过执行`system(@$Args)`来运行静态分析，其中`$Args`的内容为
 ```shell
 make CC=/home/juxta/analyzer/../bin/llvm/bin/clang -f Makefile.build CC=/home/juxta/llvm/tools/clang/tools/scan-build/fssccc-analyzer CXX=/home/juxta/llvm/tools/clang/tools/scan-build/fssc++-analyzer
 ```
@@ -803,9 +834,8 @@ make CC=/home/juxta/analyzer/../bin/llvm/bin/clang -f Makefile.build CC=/home/ju
 
 
 
-#### fssccc-analyzer 工具
-
-`fssccc-analyzer`的主要执行流程如下：
+#### fssccc-analyzer 与 fssc++-analyzer 脚本
+`fssccc-analyzer` 脚本位于 `./llvm/tools/clang/tools/scan-build/fssccc-analyzer`，`fssccc-analyzer`的主要执行流程如下：
 
 > 1 获取编译命令行参数，分析出编译选项、链接选项和输入文件\
 > 2 调用系统的编译器/链接器执行编译/链接\
@@ -1083,8 +1113,7 @@ sub Analyze {
 父进程中，函数会从管道中读取 Clang 的标准输出和标准错误，并将它们同时输出到标准错误流和一个临时文件（`$ofile`）中。在处理输出的过程中，它还会检测是否遇到特定的标记（`@@<<` 和 `@@>>`），它将标记之间的内容写入一个名为 `one.cs.fss` 的文件中，用于后续的分析。
 
 
-#### fssc++-analyzer 工具
-`fssc++-analyzer` 脚本直接调用 `fssccc-analyzer` 脚本来进行语法分析和静态分析。
+与 `fssccc-analyzer` 脚本同一目录下的 `fssc++-analyzer` 脚本通过直接调用 `fssccc-analyzer` 脚本来进行语法分析和静态分析。
 
 
 
