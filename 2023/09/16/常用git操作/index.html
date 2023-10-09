@@ -115,6 +115,12 @@
 <p>执行以下命令，将本地分支的历史合并为一次提交：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">git reset --soft HEAD~n<br></code></pre></td></tr></table></figure>
 <p>其中，<code>n</code> 是想要合并的提交次数。这个命令将会将最近的 <code>n</code> 次提交合并为一个暂存区的更改，但不会删除它们。</p>
+<p>reset之后的几个参数：</p>
+<ul>
+<li><code>--mixed</code>：表示不删除工作空间改动过的代码，撤销<code>commit</code>，并且撤销<code>git add .</code>操作，这个为默认参数（<code>git reset --mixed HEAD^</code>和<code>git reset HEAD^</code>操作效果一样）</li>
+<li><code>--soft</code>：表示不删除工作空间改动过的代码，撤销<code>commit</code>，保留<code>git add .</code>操作</li>
+<li><code>--hard</code>：表示删除工作空间改动过的代码，撤销<code>commit</code>，撤销<code>git add .</code>操作，在完成这个操作之后恢复到上一次<code>commit</code>的状态（即有改动的代码没了）</li>
+</ul>
 <p>然后，使用以下命令创建一个新的提交，将这些更改提交到本地仓库： <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">git commit -m &quot;合并多次提交&quot;<br></code></pre></td></tr></table></figure></p>
 <p>最后，执行强制推送到远程仓库：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">git push -f origin &lt;branch_name&gt;<br></code></pre></td></tr></table></figure>
