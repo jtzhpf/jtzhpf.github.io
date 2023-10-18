@@ -760,6 +760,21 @@ def ffs_semantic_EQ : Joined<["-"], "ffs-semantic=">,
 
 这两个选项通常用于控制编译器在进行文件系统操作时的语义分析行为。用户可以使用 `ffs_semantic_out_dir_EQ` 选项来指定分析结果的输出目录，同时使用 `ffs_semantic_EQ` 选项来启用或禁用文件系统语义分析。
 
+<!--
+#### ProgramState.h 文件
+`./llvm/tools/clang/include/clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h` 头文件用于clang静态分析器中的路径敏感状态跟踪。
+
+主要功能包括：
+- 定义了ProgramState类，用于表示分析中的程序状态。包括环境映射(Env)、存储映射(Store)、泛型数据映射(GDM)等，可以绑定值到语句和位置等。
+- 定义了ProgramStateManager类，用于管理ProgramState对象的工厂。提供创建、重用ProgramState的方法。
+- 定义了各种遍历ProgramState历史的迭代器。
+- 提供了访问和操作ProgramState中环境、存储、泛型数据映射等的方法。
+- 提供了各种"assume"方法，在ProgramState上添加约束。
+- 一些辅助类，如ScanReachableSymbols用于访问可达符号。
+- ProgramStateTrait类模板，用于泛型数据映射中类型安全的访问。
+- HistoricalEvent类，记录ProgramState变化事件。
+-->
+
 #### fss-build 脚本
 `fss-build` 是一个 Perl 脚本，位于`./llvm/tools/clang/tools/scan-build/fss-build`，用于在构建过程中运行 Clang 静态分析工具。`fss-build` 是在 `scan-build` 的基础上修改而来，在这里我们只用到了其中的部分功能。
 
