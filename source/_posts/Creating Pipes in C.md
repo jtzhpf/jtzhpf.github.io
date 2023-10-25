@@ -10,7 +10,7 @@ tags:
 #toc: true
 #sticky: 1 # 数字越大置顶优先级越高。数字都需要大于 0。
 #cover: /images/about.jpg # 指定封面图片的 URL
-timeline: article  # 展示在时间线列表中
+timeline: code  # 展示在时间线列表中
 ---
 
 Creating pipelines with the C programming language can be a bit more involved than our simple shell example. To create a simple pipe with C, we make use of the `pipe()` system call. <!--more-->It takes a single argument, which is an array of two integers, and if successful, the array will contain two new file descriptors to be used for the pipeline. After creating a pipe, the process typically spawns a new process (remember the child inherits open file descriptors).
