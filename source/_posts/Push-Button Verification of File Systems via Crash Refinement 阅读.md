@@ -5,7 +5,7 @@ category: CS&Maths
 date: 2023-10-23 09:00:00
 tags: 
   - xv6
-  - Staitc Analysis
+  - Symbolic Execution
   - OSDI
   - OSDI'16
   - 论文
