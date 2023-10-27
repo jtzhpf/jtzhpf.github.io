@@ -9,7 +9,7 @@ tags:
   - Fuzzing
   - SOSP
   - SOSP'15
-  - 论文
+  - Paper
 toc: true
 #sticky: 1 # 数字越大置顶优先级越高。数字都需要大于 0。
 #cover: /images/about.jpg # 指定封面图片的 URL
