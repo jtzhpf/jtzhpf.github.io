@@ -9,7 +9,7 @@ tags:
 toc: true
 #sticky: 1 # 数字越大置顶优先级越高。数字都需要大于 0。
 #cover: /images/about.jpg # 指定封面图片的 URL
-timeline: code  # 展示在时间线列表中
+timeline: paper  # 展示在时间线列表中
 ---
 本文是对综述论文 Fuzzing: a survey[^1], Fuzzing: A Survey for Roadmap[^2] 和 The art, science, and engineering of fuzzing: A survey[^3] 的归纳总结。
 
