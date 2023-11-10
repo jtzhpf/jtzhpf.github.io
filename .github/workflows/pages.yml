@@ -30,7 +30,7 @@ jobs:
       - name: Download Submodules
         run: git submodule update --init --recursive
       - name: Install Dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
       - name: Build
         run: npm run build
       - name: Deploy
