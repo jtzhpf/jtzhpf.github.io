@@ -83,6 +83,11 @@ code {
   padding: 2px 4px;
   overflow-wrap: break-word;
 }
+.mermaid {
+  margin-bottom: 20px;
+  text-align: center;
+  background: #fff;
+}
 .hljs {
   display: block;
 }

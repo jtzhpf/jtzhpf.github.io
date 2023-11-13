@@ -61,7 +61,7 @@
   <link rel="stylesheet" type="text/css" href="/css/post.css" />
   
 
-  <meta name="generator" content="Hexo 7.0.0"></head>
+  <meta name="generator" content="Hexo 6.3.0"></head>
   <body>
     <div class="head">
       <div class="nav">
@@ -99,7 +99,7 @@
       
         <aside class="toc-outer">
           <div class="toc-title">目录</div>
-          <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#section"><span class="post-toc-text"></span></a></li></ol>
+          <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#dynamic-taint-analysis"><span class="post-toc-text">Dynamic Taint Analysis</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#forward-symbolic-execution"><span class="post-toc-text">Forward Symbolic Execution</span></a></li></ol>
           <a href="#" class="toc-top">回到顶部</a>
         </aside>
       
@@ -110,7 +110,13 @@
           </div>
         
         <p>本文详细介绍了动态污点分析（Dynamic Taint Analysis）和前向符号执行（Forward Symbolic Execution）。 <span id="more"></span></p>
-<h2 id="section"></h2>
+<h2 id="dynamic-taint-analysis">Dynamic Taint Analysis</h2>
+<p>Dynamic Taint Analysis的主要思想是标记（或污点）程序中的数据，并跟踪这些标记在程序执行期间的传播。这样可以帮助识别潜在的安全漏洞，尤其是与数据流相关的问题，例如信息泄露、未经授权的数据修改等。</p>
+<h2 id="forward-symbolic-execution">Forward Symbolic Execution</h2>
+Forward Symbolic Execution自动地探索程序的执行路径，以便寻找潜在的错误、漏洞或其他安全问题。该技术的核心思想是以符号形式表示程序的输入，并通过模拟程序执行过程来推导出符号执行路径，从而发现潜在的问题。
+<pre class="mermaid">graph LR;
+    A[Symbolic Execution]-->B[Forward Symbolic Execution];
+    A[Symbolic Execution]-->C[Backward Symbolic Execution];</pre>
 
       </div>
     </div>
@@ -246,6 +252,9 @@
         </div>
       </div>
     </div>
+    
+    
+    <script src="https://cdn.bootcdn.net/ajax/libs/mermaid/10.4.0/mermaid.min.js"></script>
     
     
   
