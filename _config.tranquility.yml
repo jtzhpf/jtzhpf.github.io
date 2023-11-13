@@ -4,6 +4,12 @@ logo: "/images/logo.svg"
 
 mathjax: false # 加载 LateX 数学公式库
 
+mermaid: ## mermaid url https://github.com/knsv/mermaid
+  enable: true  # default false
+  version: "10.4.0" # default v7.1.2
+  options:  # find more api options from https://github.com/knsv/mermaid/blob/master/src/mermaidAPI.js
+    startOnload: true  # default true
+
 favicon: # 配置网页图标
   small: /images/favicon-16x16.png
   medium: /images/favicon-32x32.png
