@@ -92,6 +92,9 @@ gitalk: # gitalk 评论
   # Available values: en | es-ES | fr | ru | zh-CN | zh-TW
   language: zh-CN
 
+utterances: # utterances 评论
+  enable: true
+  
 # see https://github.com/tea3/hexo-related-popular-posts
 related_post:
   enable: true

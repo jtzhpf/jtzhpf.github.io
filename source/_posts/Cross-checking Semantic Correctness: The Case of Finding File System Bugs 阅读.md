@@ -330,6 +330,11 @@ def _run_clang(fs, clang):
 ```
 当执行`./ctrl.py merge ext3`时，传递给`subprocess.Popen`的参数为`['/home/juxta/analyzer/../llvm/tools/clang/tools/scan-build/fss-build', '--use-analyzer=/home/juxta/analyzer/../bin/llvm/bin/clang', '--fss-output-dir=/home/juxta/analyzer/out/ext3/clang-log/fss_output', 'make', 'CC=/home/juxta/analyzer/../bin/llvm/bin/clang', '-f', 'Makefile.build']`。
 
+For convenience, here's the command:
+```shell
+/home/juxta/analyzer/../llvm/tools/clang/tools/scan-build/fss-build --use-analyzer=/home/juxta/analyzer/../bin/llvm/bin/clang --fss-output-dir=/home/juxta/analyzer/out/minix/clang-log/fss_output make CC=/home/juxta/analyzer/../bin/llvm/bin/clang -f Makefile.build
+```
+
 相较于merge之后，`out/ext3`目录下多出来了如下文件。其中`log.stdout`和`log.stderr`是Clang的标准输出和标准错误日志。`make`命令将其以模块的形式编译。
 ```
 .
