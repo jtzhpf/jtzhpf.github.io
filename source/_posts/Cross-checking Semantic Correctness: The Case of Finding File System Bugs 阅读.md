@@ -9,6 +9,7 @@ tags:
   - File System
   - Staitc Analysis
   - Symbolic Execution
+  - Clang
   - SOSP
   - SOSP'15
   - Paper
@@ -334,6 +335,18 @@ For convenience, here's the command:
 ```shell
 /home/juxta/analyzer/../llvm/tools/clang/tools/scan-build/fss-build --use-analyzer=/home/juxta/analyzer/../bin/llvm/bin/clang --fss-output-dir=/home/juxta/analyzer/out/minix/clang-log/fss_output make CC=/home/juxta/analyzer/../bin/llvm/bin/clang -f Makefile.build
 ```
+
+If you want to run the command manually in Terminal, remember to set the environment:
+```shell
+export CLANG='/path/to/juxta/bin/llvm/bin/clang'
+export Clang=$CLANG
+export clang=$CLANG
+export CCC_CC=$CLANG
+export LINUX='/path/to/linux'
+export ROOT='/path/to/juxta/analyzer'
+export FSCK='/path/to/juxta/analyzer/../llvm/tools/clang/tools/scan-build/fss-build'
+```
+And you should run the command under the path `./analyzer/out/specific_fs`.
 
 相较于merge之后，`out/ext3`目录下多出来了如下文件。其中`log.stdout`和`log.stderr`是Clang的标准输出和标准错误日志。`make`命令将其以模块的形式编译。
 ```
@@ -854,7 +867,16 @@ make CC=/home/juxta/analyzer/../bin/llvm/bin/clang -f Makefile.build CC=/home/ju
 ```
 此时的工作目录为`./analyzer/out/具体文件系统目录`。
 
+If we want to run this command, we need to set the environment variable `CCC_ANALYZER_ANALYSIS`:
 
+```shell
+export CCC_ANALYZER_ANALYSIS='-analyzer-checker alpha.unix.PathCondExtract -analyzer-config ipa=inlining -analyzer-config ipa-always-inline-size=3 -analyzer-config max-inlinable-size=50 -analyzer-config max-times-inline-large=32 -analyzer-disable-checker core.CallAndMessage -analyzer-disable-checker core.DivideZero -analyzer-disable-checker core.DynamicTypePropagation -analyzer-disable-checker core.NonNullParamChecker -analyzer-disable-checker core.NullDereference -analyzer-disable-checker core.StackAddressEscape -analyzer-disable-checker core.UndefinedBinaryOperatorResult -analyzer-disable-checker core.VLASize -analyzer-disable-checker core.builtin.BuiltinFunctions -analyzer-disable-checker core.builtin.NoReturnFunctions -analyzer-disable-checker core.uninitialized.ArraySubscript -analyzer-disable-checker core.uninitialized.Assign -analyzer-disable-checker core.uninitialized.Branch -analyzer-disable-checker core.uninitialized.CapturedBlockVariable -analyzer-disable-checker core.uninitialized.UndefReturn -analyzer-disable-checker cplusplus.NewDelete -analyzer-disable-checker deadcode.DeadStores -analyzer-disable-checker security.insecureAPI.UncheckedReturn -analyzer-disable-checker security.insecureAPI.getpw -analyzer-disable-checker security.insecureAPI.gets -analyzer-disable-checker security.insecureAPI.mkstemp -analyzer-disable-checker security.insecureAPI.mktemp -analyzer-disable-checker security.insecureAPI.vfork -analyzer-disable-checker unix.API -analyzer-disable-checker unix.Malloc -analyzer-disable-checker unix.MallocSizeof -analyzer-disable-checker unix.MismatchedDeallocator -analyzer-disable-checker unix.cstring.BadSizeArg -analyzer-disable-checker unix.cstring.NullArg'
+```
+
+事实上起作用的命令为
+```shell
+make -f Makefile.build CC=/home/juxta/llvm/tools/clang/tools/scan-build/fssccc-analyzer
+```
 
 #### fssccc-analyzer 与 fssc++-analyzer 脚本
 `fssccc-analyzer` 脚本位于 `./llvm/tools/clang/tools/scan-build/fssccc-analyzer`，`fssccc-analyzer`的主要执行流程如下：
@@ -1130,12 +1152,23 @@ sub Analyze {
 首先，函数检查 `$Lang` 是否包含 "header"，如果是，说明要处理的文件是头文件，而不是源代码文件。如果 `$Output` 未定义，就退出，否则执行文件拷贝操作。
 如果不是头文件，函数将构建用于执行 Clang 静态代码分析的命令参数。它使用 `GetCCArgs` 函数获取了语法分析的参数（`$SyntaxArgs`）和静态分析的参数（`@CmdArgs`）。
 
-函数通过 `fork` 创建了一个子进程，然后在子进程中执行 Clang 命令，进行语法分析和静态分析。它使用 `pipe` 创建了两个管道，分别用于捕获 Clang 的标准输出和标准错误。然后，子进程将标准输出和标准错误重定向到这两个管道，并执行 Clang 命令。
+函数通过 `fork` 创建了一个子进程，然后在子进程中通过调用`exec $Cmd, @CmdArgs;`来执行 Clang 命令，进行语法分析和静态分析。它使用 `pipe` 创建了两个管道，分别用于捕获 Clang 的标准输出和标准错误。然后，子进程将标准输出和标准错误重定向到这两个管道，并执行 Clang 命令。
 
 父进程中，函数会从管道中读取 Clang 的标准输出和标准错误，并将它们同时输出到标准错误流和一个临时文件（`$ofile`）中。在处理输出的过程中，它还会检测是否遇到特定的标记（`@@<<` 和 `@@>>`），它将标记之间的内容写入一个名为 `one.cs.fss` 的文件中，用于后续的分析。
 
+具体调用clang的命令为
+```shell
+/home/juxta/analyzer/../bin/llvm/bin/clang -cc1 -triple x86_64-unknown-linux-gnu -analyze -disable-free -main-file-name one.c -analyzer-store=region -analyzer-opt-analyze-nested-blocks -analyzer-eagerly-assume -analyzer-checker=core -analyzer-checker=unix -analyzer-checker=deadcode -analyzer-checker=security.insecureAPI.UncheckedReturn -analyzer-checker=security.insecureAPI.getpw -analyzer-checker=security.insecureAPI.gets -analyzer-checker=security.insecureAPI.mktemp -analyzer-checker=security.insecureAPI.mkstemp -analyzer-checker=security.insecureAPI.vfork -analyzer-output plist -w -mrelocation-model static -mthread-model posix -mdisable-fp-elim -relaxed-aliasing -mdisable-tail-calls -fmath-errno -masm-verbose -mconstructor-aliases -fuse-init-array -mcode-model kernel -target-cpu x86-64 -target-feature -sse -target-feature -mmx -target-feature -sse2 -target-feature -3dnow -target-feature -avx -disable-red-zone -momit-leaf-frame-pointer -dwarf-column-info -nostdsysteminc -nobuiltininc -resource-dir /home/juxta/bin/llvm/bin/../lib/clang/3.6.0 -isystem /home/juxta/bin/llvm/bin/../lib/clang/3.6.0/include -include ./include/linux/kconfig.h -D __KERNEL__ -D CONFIG_X86_X32_ABI -D CONFIG_AS_CFI=1 -D CONFIG_AS_CFI_SIGNAL_FRAME=1 -D CONFIG_AS_CFI_SECTIONS=1 -D CONFIG_AS_FXSAVEQ=1 -D CONFIG_AS_SSSE3=1 -D CONFIG_AS_CRC32=1 -D CONFIG_AS_AVX=1 -D CONFIG_AS_AVX2=1 -D MODULE -D KBUILD_STR(s)=#s -D KBUILD_BASENAME=KBUILD_STR(one) -D KBUILD_MODNAME=KBUILD_STR(minix) -I ./arch/x86/include -I arch/x86/include/generated/uapi -I arch/x86/include/generated -I include -I ./arch/x86/include/uapi -I arch/x86/include/generated/uapi -I ./include/uapi -I include/generated/uapi -O2 -Wno-unknown-warning-option -Wno-trigraphs -Wno-format-security -Wno-sign-compare -Wno-unused-variable -Wno-format-invalid-specifier -Wno-gnu -Wno-tautological-compare -Wno-pointer-sign -Wno-initializer-overrides -Wno-unused-value -Wno-format -Wno-unknown-warning-option -Wno-sign-compare -Wno-format-zero-length -Wno-uninitialized -std=gnu89 -fdebug-compilation-dir /home/linux -ferror-limit 19 -fmessage-length 0 -fwrapv -mstackrealign -fobjc-runtime=gcc -fno-common -fdiagnostics-show-option -vectorize-loops -vectorize-slp -analyzer-checker alpha.unix.PathCondExtract -analyzer-config ipa=inlining -analyzer-config ipa-always-inline-size=3 -analyzer-config max-inlinable-size=50 -analyzer-config max-times-inline-large=32 -analyzer-disable-checker core.CallAndMessage -analyzer-disable-checker core.DivideZero -analyzer-disable-checker core.DynamicTypePropagation -analyzer-disable-checker core.NonNullParamChecker -analyzer-disable-checker core.NullDereference -analyzer-disable-checker core.StackAddressEscape -analyzer-disable-checker core.UndefinedBinaryOperatorResult -analyzer-disable-checker core.VLASize -analyzer-disable-checker core.builtin.BuiltinFunctions -analyzer-disable-checker core.builtin.NoReturnFunctions -analyzer-disable-checker core.uninitialized.ArraySubscript -analyzer-disable-checker core.uninitialized.Assign -analyzer-disable-checker core.uninitialized.Branch -analyzer-disable-checker core.uninitialized.CapturedBlockVariable -analyzer-disable-checker core.uninitialized.UndefReturn -analyzer-disable-checker cplusplus.NewDelete -analyzer-disable-checker deadcode.DeadStores -analyzer-disable-checker security.insecureAPI.UncheckedReturn -analyzer-disable-checker security.insecureAPI.getpw -analyzer-disable-checker security.insecureAPI.gets -analyzer-disable-checker security.insecureAPI.mkstemp -analyzer-disable-checker security.insecureAPI.mktemp -analyzer-disable-checker security.insecureAPI.vfork -analyzer-disable-checker unix.API -analyzer-disable-checker unix.Malloc -analyzer-disable-checker unix.MallocSizeof -analyzer-disable-checker unix.MismatchedDeallocator -analyzer-disable-checker unix.cstring.BadSizeArg -analyzer-disable-checker unix.cstring.NullArg -o /home/juxta/analyzer/out/minix/clang-log/fss_output -x c /home/juxta/analyzer/out/minix/one.c
+```
+这段命令需运行在 Linux kernel 目录下。
 
-与 `fssccc-analyzer` 脚本同一目录下的 `fssc++-analyzer` 脚本通过直接调用 `fssccc-analyzer` 脚本来进行语法分析和静态分析。
+如果直接运行这条命令，会出现报错：`zsh: no matches found: KBUILD_STR(s)=#s`。`-DKBUILD_STR(s)=#s`定义了一个预处理器宏 `KBUILD_STR(s)`，并将其展开为 `#s`。在源代码中，`KBUILD_STR(one)`将被展开为 `#one`。这样的宏通常用于将标识符转换为字符串。
+
+不知道为什么这里会出错，但通过perl脚本调用并无问题。我们需要手动来完成这个宏的工作，得到的命令如下所示：
+```shell
+/home/juxta/analyzer/../bin/llvm/bin/clang -cc1 -triple x86_64-unknown-linux-gnu -analyze -disable-free -main-file-name one.c -analyzer-store=region -analyzer-opt-analyze-nested-blocks -analyzer-eagerly-assume -analyzer-checker=core -analyzer-checker=unix -analyzer-checker=deadcode -analyzer-checker=security.insecureAPI.UncheckedReturn -analyzer-checker=security.insecureAPI.getpw -analyzer-checker=security.insecureAPI.gets -analyzer-checker=security.insecureAPI.mktemp -analyzer-checker=security.insecureAPI.mkstemp -analyzer-checker=security.insecureAPI.vfork -analyzer-output plist -w -mrelocation-model static -mthread-model posix -mdisable-fp-elim -relaxed-aliasing -mdisable-tail-calls -fmath-errno -masm-verbose -mconstructor-aliases -fuse-init-array -mcode-model kernel -target-cpu x86-64 -target-feature -sse -target-feature -mmx -target-feature -sse2 -target-feature -3dnow -target-feature -avx -disable-red-zone -momit-leaf-frame-pointer -dwarf-column-info -nostdsysteminc -nobuiltininc -resource-dir /home/juxta/bin/llvm/bin/../lib/clang/3.6.0 -isystem /home/juxta/bin/llvm/bin/../lib/clang/3.6.0/include -include ./include/linux/kconfig.h -D __KERNEL__ -D CONFIG_X86_X32_ABI -D CONFIG_AS_CFI=1 -D CONFIG_AS_CFI_SIGNAL_FRAME=1 -D CONFIG_AS_CFI_SECTIONS=1 -D CONFIG_AS_FXSAVEQ=1 -D CONFIG_AS_SSSE3=1 -D CONFIG_AS_CRC32=1 -D CONFIG_AS_AVX=1 -D CONFIG_AS_AVX2=1 -D MODULE -D KBUILD_BASENAME=#one -D KBUILD_MODNAME=#minix -I ./arch/x86/include -I arch/x86/include/generated/uapi -I arch/x86/include/generated -I include -I ./arch/x86/include/uapi -I arch/x86/include/generated/uapi -I ./include/uapi -I include/generated/uapi -O2 -Wno-unknown-warning-option -Wno-trigraphs -Wno-format-security -Wno-sign-compare -Wno-unused-variable -Wno-format-invalid-specifier -Wno-gnu -Wno-tautological-compare -Wno-pointer-sign -Wno-initializer-overrides -Wno-unused-value -Wno-format -Wno-unknown-warning-option -Wno-sign-compare -Wno-format-zero-length -Wno-uninitialized -std=gnu89 -fdebug-compilation-dir /home/linux -ferror-limit 19 -fmessage-length 0 -fwrapv -mstackrealign -fobjc-runtime=gcc -fno-common -fdiagnostics-show-option -vectorize-loops -vectorize-slp -analyzer-checker alpha.unix.PathCondExtract -analyzer-config ipa=inlining -analyzer-config ipa-always-inline-size=3 -analyzer-config max-inlinable-size=50 -analyzer-config max-times-inline-large=32 -analyzer-disable-checker core.CallAndMessage -analyzer-disable-checker core.DivideZero -analyzer-disable-checker core.DynamicTypePropagation -analyzer-disable-checker core.NonNullParamChecker -analyzer-disable-checker core.NullDereference -analyzer-disable-checker core.StackAddressEscape -analyzer-disable-checker core.UndefinedBinaryOperatorResult -analyzer-disable-checker core.VLASize -analyzer-disable-checker core.builtin.BuiltinFunctions -analyzer-disable-checker core.builtin.NoReturnFunctions -analyzer-disable-checker core.uninitialized.ArraySubscript -analyzer-disable-checker core.uninitialized.Assign -analyzer-disable-checker core.uninitialized.Branch -analyzer-disable-checker core.uninitialized.CapturedBlockVariable -analyzer-disable-checker core.uninitialized.UndefReturn -analyzer-disable-checker cplusplus.NewDelete -analyzer-disable-checker deadcode.DeadStores -analyzer-disable-checker security.insecureAPI.UncheckedReturn -analyzer-disable-checker security.insecureAPI.getpw -analyzer-disable-checker security.insecureAPI.gets -analyzer-disable-checker security.insecureAPI.mkstemp -analyzer-disable-checker security.insecureAPI.mktemp -analyzer-disable-checker security.insecureAPI.vfork -analyzer-disable-checker unix.API -analyzer-disable-checker unix.Malloc -analyzer-disable-checker unix.MallocSizeof -analyzer-disable-checker unix.MismatchedDeallocator -analyzer-disable-checker unix.cstring.BadSizeArg -analyzer-disable-checker unix.cstring.NullArg -o /home/juxta/analyzer/out/minix/clang-log/fss_output -x c /home/juxta/analyzer/out/minix/one.c
+```
+此时可以发现这条命令能正常工作啦！下面我们就可以利用gdb来进行跟踪调试看看 Clang 的 Static Analyzer 到底是如何工作的。
 
 
 

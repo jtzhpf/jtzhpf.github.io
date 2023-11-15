@@ -189,7 +189,7 @@ import Foundation
 
 ```css
 @font-face {
-  font-family: Chunkfive; src: url('Chunkfive.otf');
+  -family: Chunkfive; src: url('Chunkfive.otf');
 }
 
 body, .usertext {

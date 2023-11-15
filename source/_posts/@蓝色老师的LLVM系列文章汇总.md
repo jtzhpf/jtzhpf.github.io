@@ -10,7 +10,7 @@ tags:
 toc: true
 #sticky: 1 # 数字越大置顶优先级越高。数字都需要大于 0。
 #cover: /images/about.jpg # 指定封面图片的 URL
-timeline: code  # 展示在时间线列表中
+timeline: article  # 展示在时间线列表中
 ---
 [@蓝色](https://www.zhihu.com/people/lan-se-52-30)老师个人知乎主页。
 
