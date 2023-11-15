@@ -106,7 +106,7 @@
 }
 .post-excerpt {
   flex: 1;
-  color: #666;
+  color: #333;
 }
 .post-excerpt * {
   margin-top: 0;

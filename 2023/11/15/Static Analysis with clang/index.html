@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf8"/>
+    <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
+    <title>
+      
+        Static Analysis with clang - cited | ZPF.SITE
+      
+    </title>
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    
+      <link rel="apple-touch-icon"
+            sizes="180x180"
+            href="/images/apple-touch-icon.png"/>
+    
+    
+      <link rel="icon"
+            type="image/png"
+            sizes="32x32"
+            href="/images/favicon-32x32.png"/>
+    
+    
+      <link rel="icon"
+            type="image/png"
+            sizes="16x16"
+            href="/images/favicon-16x16.png"/>
+    
+    
+      <link rel="mask-icon"
+            href="/images/logo.svg"
+            color=""/>
+    
+    
+    
+      
+  <style>
+    @font-face {
+        font-family:sourceHanSerif;
+        src: url(/font/regular.ttf);
+        font-weight: regular;
+    }
+  </style>
+
+  <style>
+    @font-face {
+        font-family:sourceHanSerif;
+        src: url(/font/bold.ttf);
+        font-weight: bold;
+    }
+  </style>
+
+
+    
+    <link rel="stylesheet"
+          type="text/css"
+          href='/css/layout.css'/>
+    
+    
+  <link rel="stylesheet" type="text/css" href="/css/post.css" />
+  
+
+  <meta name="generator" content="Hexo 6.3.0"></head>
+  <body>
+    <div class="head">
+      <div class="nav">
+        <a href='/' class="nav-logo">
+          <img alt="logo" height="60px" width="60px" src="/images/logo.svg"/>
+        </a>
+        <input id="navBtn" type="checkbox"/>
+        <div class="nav-menu">
+          
+            
+              <a class="nav-menu-item" href="/CS&Maths">Computer Science & Maths</a>
+            
+              <a class="nav-menu-item" href="/Life">Life</a>
+            
+          
+          
+        </div>
+        <label class="nav-btn" for="navBtn"></label>
+      </div>
+    </div>
+    <div class="body">
+      
+  <article class="post-content">
+    <div class="post-inner--toc">
+      <div class="post-content__head">
+        <div class="post-title">Static Analysis with clang - cited</div>
+        <div class="post-info">
+          
+  <a href="/tags/Clang/" class="post-tag">#Clang</a><a href="/tags/Compiler/" class="post-tag">#Compiler</a><a href="/tags/Static-Analysis/" class="post-tag">#Static Analysis</a>
+
+
+          <span class="post-date">2023-11-15</span>
+        </div>
+      </div>
+      
+        <aside class="toc-outer">
+          <div class="toc-title">目录</div>
+          <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#integrated-with-a-typical-build"><span class="post-toc-text">Integrated with a typical build</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#using-the-gui-tool"><span class="post-toc-text">Using the GUI tool</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#a-small-hitch"><span class="post-toc-text">A small hitch…</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#another-small-hitch"><span class="post-toc-text">Another small hitch…</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#using-a-compilation-database"><span class="post-toc-text">Using a compilation database</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#conclusion"><span class="post-toc-text">Conclusion</span></a></li></ol>
+          <a href="#" class="toc-top">回到顶部</a>
+        </aside>
+      
+      <div class="post-content__body">
+        
+          <div class="post-gallery">
+            
+          </div>
+        
+        <p>The article is cited from <a target="_blank" rel="noopener" href="http://btorpey.github.io/blog/2015/04/27/static-analysis-with-clang/">http://btorpey.github.io/blog/2015/04/27/static-analysis-with-clang/</a>.</p>
+<span id="more"></span>
+<p>I keep singing the praises of clang, and with good reason – the <a target="_blank" rel="noopener" href="http://clang.llvm.org/">clang project</a> has been advancing the state of C/C++ compiler technology on Linux and OS X for quite a while now.</p>
+<p>The modular design of the compiler has also enabled the creation of a set of ancillary tools, including run-time “sanitizers” (which I <a target="_blank" rel="noopener" href="http://btorpey.github.io/blog/2014/03/27/using-clangs-address-sanitizer/">wrote about earlier</a>), as well as pretty-printers, and a tool to automatically upgrade code to C++11.</p>
+<p>Today I want to talk about clang’s static analysis engine, which can do a deep-dive on your code and find problems that are hard for a human to detect, but that are amenable to a brute-force approach that models the run-time behavior of a piece of code, but at compile-time.</p>
+<p>This is very different from dynamic analysis tools, like valgrind and clang’s own sanitizers, which instrument the code at run-time to detect actual errors (e.g., reading uninitialized memory) that happen while the code is running. With dynamic analysis, the only errors that can be detected are in code that is actually executed, so a latent bug that only manifests under unusual conditions<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>, can go un-detected. By contrast, static analysis can potentially find bugs in code that is never (or almost never) actually executed.</p>
+<p>Sounds good, no? Who wouldn’t want to find bugs “automagically”, without even needing to do any testing. (Cause we all know how much programmers love testing ;-)</p>
+<p>For example, running clang’s static analyzer on some sample code turns up warnings similar to the following:</p>
+<ul>
+<li>Value stored to ‘x’ is never read</li>
+<li>The right operand of ‘!=’ is a garbage value</li>
+<li>Potential leak of memory pointed to by ‘x’</li>
+<li>Function call argument is an uninitialized value</li>
+<li>Use of memory after it is freed</li>
+<li>Called C++ object pointer is null</li>
+</ul>
+<p>Some of the above warnings (e.g., value stored is never read) are most likely harmless, and just sloppy coding (perhaps because of copy-paste syndrome, about which I have more to say <a target="_blank" rel="noopener" href="http://btorpey.github.io/blog/2014/09/21/repent/">here</a>). Others (e.g., called pointer is null), might be false positives, given the algorithms the analyzer uses<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>. Or, they could be real bugs that you just haven’t hit yet, because the code is (almost) never executed.</p>
+<p>Those are the really scary bugs, along with the ones where you can “get lucky” most of the time … except when you don’t. The “garbage value” and “unitialized value” warnings fall into that category, and can be very hard to eyeball. Again, dynamic analysis tools like valgrind can help find these bugs, but only if you hit that code in testing.</p>
+<p>So, static analysis <em>is</em> good, but it’s not magic. Static analyzers can only find bugs that they are programmed to find, and they certainly don’t find all bugs. For instance, here’s a bug that clang’s static analysis doesn’t find:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs C"><span class="hljs-type">void</span> <span class="hljs-title function_">func</span><span class="hljs-params">(<span class="hljs-type">char</span>* arg)</span><br>&#123;<br>  <span class="hljs-type">char</span> buf1[<span class="hljs-number">10</span>];<br>  <span class="hljs-type">char</span> buf2[<span class="hljs-number">20</span>];<br><br>  <span class="hljs-built_in">strncpy</span>(buf1, arg, <span class="hljs-keyword">sizeof</span>(buf2));<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>But the fact is that static analysis <em>will</em> find bugs, and it will find bugs that you most likely wouldn’t find on your own, so it’s a a good tool to have in your toolbox. So, let’s take a look at how to do that using clang.</p>
+<p>The first step is to install clang. If you’re on OS X or Ubuntu, you should already have it, but if you’re on RedHat this can be a bit tricky, so see <a target="_blank" rel="noopener" href="http://btorpey.github.io/blog/2015/01/02/building-clang/">my previous post</a> on how to get clang working. (I’ve updated that post to add instructions for installing some of the static analysis tools that don’t normally get installed with clang).</p>
+<p>It turns out that there are three (3) different ways to run clang’s static analyzer on your code, each with its own benefits and drawbacks. We’ll consider each of these in turn:</p>
+<h2 id="integrated-with-a-typical-build">Integrated with a typical build</h2>
+<p>If you use reasonably normal-looking makefiles to build your code, you can get static analysis going with a minimum of fuss. If you’re using cmake to create your makefiles, the same approach will work fine, so long as you’re not overriding the values of CMAKE_C_COMPILER etc. (And, as usual, if you’re using autotools, <a target="_blank" rel="noopener" href="https://twitter.com/timmartin2/status/23365017839599616">you’re on your own;-)</a>.</p>
+<p>In this approach, you <code>export</code> some environment variables to invoke the analyzer instead of the compiler, like the following:</p>
+<table>
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 66%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Value</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>CC</td>
+<td>ccc-analyzer</td>
+<td>C compiler is redirected to clang analyzer (which in turn invokes the compiler, using the value of CCC_CC, below).</td>
+</tr>
+<tr class="even">
+<td>CXX</td>
+<td>c++-analyzer</td>
+<td>Similar to above, but for C++.</td>
+</tr>
+<tr class="odd">
+<td>CCC_CC</td>
+<td>clang</td>
+<td>This environment variable is used by ccc-analyzer to invoke the actual C compiler.</td>
+</tr>
+<tr class="even">
+<td>CCC_CXX</td>
+<td>clang++</td>
+<td>ditto</td>
+</tr>
+<tr class="odd">
+<td>LD</td>
+<td>clang++</td>
+<td>Specifies that the actual compiler should be used for linking.</td>
+</tr>
+<tr class="even">
+<td>CCC_ANALYZER_VERBOSE</td>
+<td>1</td>
+<td>(Optional) Set this flag to get verbose output from the analyzer, including the list of errors checked.</td>
+</tr>
+</tbody>
+</table>
+<p>With those variables set, you should just be able to invoke <code>make</code> to build your project, and Bob’s your uncle.</p>
+<p>One nice thing about this approach is that you get both compiler warnings and analyzer warnings together – first, the analyzer invokes the compiler on the source file, and then performs the static analysis.</p>
+<h2 id="using-the-gui-tool">Using the GUI tool</h2>
+<p>In a similar fashion as ccc-analyzer (above) front-ends make, you can use clang’s <a target="_blank" rel="noopener" href="http://clang-analyzer.llvm.org/scan-build.html">scan-build</a> tool to front-end ccc-analyzer. In addition to invoking the compiler and analyzer, scan-build also collects the analyzer reports, including the control flow that the analyzer used to infer any errors, and presents that using a set of html pages that are written by default to the /tmp directory, and that look like this:</p>
+<p><img src="http://clang-analyzer.llvm.org/images/analyzer_html.png" /></p>
+<p>Personally, I find this fascinating. Not only does the analyzer tell about what it thinks is a problem, but also why it thinks so.</p>
+<p>In the example above, you can see the steps that the analyzer follows to figure out that there is a problem with the code. If you are wondering whether a particular warning is a false positive or not, this presentation can help you figure that out.<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup> It can also sometimes provide unexpected insights into the code that you might not come up with on your own.</p>
+<p>To use this approach, you set your environment variables the same as described above, but instead of running make, you run <code>scan-build -V make</code>. This will run your build and then launch a browser to view the results of the build.</p>
+<h2 id="a-small-hitch">A small hitch…</h2>
+<p>Unfortunately, scan-build (and its scan-view companion) are not installed by default with clang. I’ve updated the build script from my <a target="_blank" rel="noopener" href="http://btorpey.github.io/blog/2015/01/02/building-clang/">earlier post</a> on building clang on RedHat to install these files, but if you want to do it manually, run the following from the source tree you used to build and install clang:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">we need some addl bits that are not normally installed</span><br>cp -p  llvm/tools/clang/tools/scan-build/scan-build     $(which clang)/..<br>cp -p  llvm/tools/clang/tools/scan-build/ccc-analyzer   $(which clang)/..<br>cp -p  llvm/tools/clang/tools/scan-build/c++-analyzer   $(which clang)/..<br>cp -p  llvm/tools/clang/tools/scan-build/sorttable.js   $(which clang)/..<br>cp -p  llvm/tools/clang/tools/scan-build/scanview.css   $(which clang)/..<br>cp -rp llvm/tools/clang/tools/scan-view/*               $(which clang)/..<br></code></pre></td></tr></table></figure>
+<h2 id="another-small-hitch">Another small hitch…</h2>
+<p>In an <a target="_blank" rel="noopener" href="http://btorpey.github.io/blog/2015/03/17/shadow/">earlier post</a>, I talked about how to use the <code>-isystem</code> flag to prevent selected headers from generating warnings. Unfortunately, the <a target="_blank" rel="noopener" href="https://llvm.org/bugs/show_bug.cgi?id=13237#c9">clang analyzer chokes on that flag</a> – so if you’re using it, you will need to apply the patch below to successfully run the analyzer.</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">$ </span><span class="language-bash">svn diff ccc-analyzer</span><br>Index: ccc-analyzer<br>===================================================================<br>--- ccc-analyzer	(revision 234604)<br>+++ ccc-analyzer	(working copy)<br>@@ -354,7 +354,8 @@<br>   &#x27;-iprefix&#x27; =&gt; 1,<br>   &#x27;-iquote&#x27; =&gt; 1,<br>   &#x27;-iwithprefix&#x27; =&gt; 1,<br>-  &#x27;-iwithprefixbefore&#x27; =&gt; 1<br>+  &#x27;-iwithprefixbefore&#x27; =&gt; 1,<br>+  &#x27;-isystem&#x27; =&gt; 1,<br> );<br><br> my %LinkerOptionMap = (<br></code></pre></td></tr></table></figure>
+<h2 id="using-a-compilation-database">Using a compilation database</h2>
+<p>Last but not least, you can also use a “compilation database” to invoke the static analyzer directly. So, what is a compilation database, you ask? This is a <a target="_blank" rel="noopener" href="http://clang.llvm.org/docs/JSONCompilationDatabase.html">simple format</a> introduced by clang that records the actual commands used to generate intermediate build products from source files, along with their parameters.</p>
+<p>The analyzer needs this information to reproduce the environment used by the compiler, including pre-processor definitions and include file search paths.</p>
+<p>If you are using <a target="_blank" rel="noopener" href="http://cmake.org/">cmake</a> to drive your builds, creating a compilation database couldn’t be easier – simply add the <code>-DCMAKE_EXPORT_COMPILE_COMMANDS=ON</code> parameter to the cmake build command, or add the following to your main CMakeLists.txt file:</p>
+<p><code>set(CMAKE_EXPORT_COMPILE_COMMANDS ON)</code></p>
+<p>If you’re not using cmake, you can still create a compilation database using plain old make by front-ending make with <a target="_blank" rel="noopener" href="https://github.com/rizsotto/Bear">Bear</a><sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup>, like so:</p>
+<p><code>bear make</code></p>
+<p>This will use Bear to drive the make process, leaving a <code>compile_commands.json</code> file in the current directory.</p>
+<p>Once you’ve got the compilation database, invoking the analyzer can be done with a command like the following:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs shell">export COMPILE_DB=$(/bin/pwd);<br>grep file compile_commands.json |<br>awk &#x27;&#123; print $2; &#125;&#x27; |<br>sed &#x27;s/\&quot;//g&#x27; |<br>while read FILE; do<br>  (cd $(dirname $&#123;FILE&#125;);<br>   clang-check -analyze -p $&#123;COMPILE_DB&#125; $(basename $&#123;FILE&#125;)<br>  );<br>done<br></code></pre></td></tr></table></figure>
+<p>(There are simpler ways to invoke the analyzer, but the approach shown here will visit each source file in the same order that it was originally built, which can be handy).</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>As we said earlier, static analysis is not magic, and it certainly won’t find all your bugs. But it will probably find some, and the ones it finds are likely to be nasty, so it’s worth a certain amount of trouble.</p>
+<p>Last but not least, this is by no means a complete explanation of clang’s analyzer. Like much of clang, the documentation lags the code, sometimes by a lot, so much of this information was obtained by trial-and-error, and/or by reading the code. So, if you find something interesting, please <a href="mailto:wallstprog@gmail.com">drop me a line</a>, or leave a note in the comments section.</p>
+<div id="footnotes">
+<hr>
+<div id="footnotelist">
+<ol style="list-style:none; padding-left: 0;">
+<li id="fn:0">
+<span style="display: inline-block; vertical-align: top; padding-right: 10px;">0.</span><span style="display: inline-block; vertical-align: top;"><a target="_blank" rel="noopener" href="http://clang.llvm.org/">http://clang.llvm.org/</a></span><a href="#fnref:0" rev="footnote"> ↩︎</a>
+</li>
+<li id="fn:0">
+<span style="display: inline-block; vertical-align: top; padding-right: 10px;">0.</span><span style="display: inline-block; vertical-align: top;"><a target="_blank" rel="noopener" href="http://clang-analyzer.llvm.org/index.html">http://clang-analyzer.llvm.org/index.html</a></span><a href="#fnref:0" rev="footnote"> ↩︎</a>
+</li>
+<li id="fn:0">
+<span style="display: inline-block; vertical-align: top; padding-right: 10px;">0.</span><span style="display: inline-block; vertical-align: top;"><a target="_blank" rel="noopener" href="http://clang.llvm.org/docs/ClangCheck.html">http://clang.llvm.org/docs/ClangCheck.html</a></span><a href="#fnref:0" rev="footnote"> ↩︎</a>
+</li>
+<li id="fn:1">
+<span style="display: inline-block; vertical-align: top; padding-right: 10px;">1.</span><span style="display: inline-block; vertical-align: top;">These are often called “Heisenbugs”, in a nerd-humor pun on the <a target="_blank" rel="noopener" href="http://en.wikipedia.org/wiki/Uncertainty_principle">Heisenberg Uncertainty Principle</a>.</span><a href="#fnref:1" rev="footnote"> ↩︎</a>
+</li>
+<li id="fn:2">
+<span style="display: inline-block; vertical-align: top; padding-right: 10px;">2.</span><span style="display: inline-block; vertical-align: top;">For instance, clang’s analayzer attempts to figure out if a pointer can possibly be NULL by seeing if there is any code that checks for that condition. If there is, then clang complains about any code that dereferences the pointer outside an <code>if (x != NULL)</code> block. This algorithm isn’t perfect, but it’s about the best that can be done, especially since the analyzer only looks at a single file at a time.</span><a href="#fnref:2" rev="footnote"> ↩︎</a>
+</li>
+<li id="fn:3">
+<span style="display: inline-block; vertical-align: top; padding-right: 10px;">3.</span><span style="display: inline-block; vertical-align: top;">At least in my experience, many of the warnings that appear at first to be false positives turn out to be real bugs, especially if you follow through the control flow the analyzer uses.</span><a href="#fnref:3" rev="footnote"> ↩︎</a>
+</li>
+<li id="fn:4">
+<span style="display: inline-block; vertical-align: top; padding-right: 10px;">4.</span><span style="display: inline-block; vertical-align: top;">Building and installing Bear from source is relatively straightforward – just keep in mind that you need python &gt;= 2.7.</span><a href="#fnref:4" rev="footnote"> ↩︎</a>
+</li>
+</ol>
+</div>
+</div>
+
+      </div>
+    </div>
+  </article>
+  <div class="post__foot">
+    
+    <div class="post-nav">
+  
+    <div class="post-nav-item-left"></div>
+  
+  <div class="vhr"></div>
+  
+    <a class="post-nav-item-right" href="/2023/11/15/Using%20clang's%20Address%20Sanitizer%20(without%20clang)/">
+      <div class="text-align">
+        <span class="text-small">下一篇</span>
+        <svg t="1670570876164"
+             class="icon"
+             viewBox="0 0 1024 1024"
+             transform="scale(-1,-1)"
+             width="16"
+             height="16">
+          <path d="M384 512L731.733333 202.666667c17.066667-14.933333 19.2-42.666667 4.266667-59.733334-14.933333-17.066667-42.666667-19.2-59.733333-4.266666l-384 341.333333c-10.666667 8.533333-14.933333 19.2-14.933334 32s4.266667 23.466667 14.933334 32l384 341.333333c8.533333 6.4 19.2 10.666667 27.733333 10.666667 12.8 0 23.466667-4.266667 32-14.933333 14.933333-17.066667 14.933333-44.8-4.266667-59.733334L384 512z" p-id="14596"/>
+        </svg>
+      </div>
+      Using clang's Address Sanitizer (without clang) - cited
+    </a>
+  
+</div>
+
+    
+      <div class="related-post">
+  <div class="related__head">
+  <a href="/tags/Clang/" class="post-tag">#Clang</a><a href="/tags/Compiler/" class="post-tag">#Compiler</a><a href="/tags/Static-Analysis/" class="post-tag">#Static Analysis</a>
+
+</div>
+  <div class="realated__body">
+    
+      <div class="null"><div class="null-item"><div class="null-title"><a href="/2023/11/07/@蓝色老师的LLVM系列文章汇总/" title="@蓝色老师的LLVM系列文章汇总" rel="bookmark">@蓝色老师的LLVM系列文章汇总</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/10/17/Clang AST/" title="Clang AST" rel="bookmark">Clang AST</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/11/15/Using clang's Address Sanitizer (without clang)/" title="Using clang's Address Sanitizer (without clang) - cited" rel="bookmark">Using clang's Address Sanitizer (without clang) - cited</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/06/All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读/" title="All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读" rel="bookmark">All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/10/30/All You Ever Wanted to Know About Dynamic Taint Analysis and Forward Symbolic Execution 阅读/" title="All You Ever Wanted to Know About Dynamic Taint Analysis and Forward Symbolic Execution 阅读" rel="bookmark">All You Ever Wanted to Know About Dynamic Taint Analysis and Forward Symbolic Execution 阅读</a></div></div></div>
+    
+  </div>
+</div>
+
+    
+    
+    
+      <script src="https://utteranc.es/client.js"
+    repo="jtzhpf/jtzhpf.github.io"
+    issue-term="pathname"
+    theme="github-light"
+    crossorigin="anonymous"
+    async>
+</script>
+    
+  </div>
+
+    </div>
+    <div class="foot">
+      <div class="foot-inner">
+        <div class="foot__head">
+          
+            <div class="foot-line">
+              
+                <div class="matts">海</div>
+              
+                <div class="matts">内</div>
+              
+                <div class="matts">存</div>
+              
+                <div class="matts">知</div>
+              
+                <div class="matts">己</div>
+              
+            </div>
+          
+            <div class="foot-line">
+              
+                <div class="matts">天</div>
+              
+                <div class="matts">涯</div>
+              
+                <div class="matts">若</div>
+              
+                <div class="matts">比</div>
+              
+                <div class="matts">邻</div>
+              
+            </div>
+          
+        </div>
+        <div class="foot__body">
+          
+          
+            <div class="foot-item">
+              <div class="foot-item__head">账号</div>
+              <div class="foot-item__body">
+                
+                  <div class="text">
+                    <img alt="link" height="20px" width="20px" src="/images/logo-github.svg"/>
+                    <a class="foot-link" target="_blank" rel="noopener" href="https://github.com/jtzhpf">github</a>
+                  </div>
+                
+              </div>
+            </div>
+          
+          <div class="foot-item">
+            <div class="foot-item__head">联系</div>
+            <div class="foot-item__body">
+              <div class="text">
+                <img alt="link" height="20px" width="20px" src="/images/icon/icon-email.svg"/>
+                <a class="foot-link" href="mailto:jtzhpf@126.com">jtzhpf@126.com</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="copyright">
+          <a href="https://zpf.pages.dev">ZPF.SITE</a> &nbsp;|&nbsp;由&nbsp;<a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>&nbsp;及&nbsp;
+          <svg width="20" height="20" viewBox="0 0 725 725">
+            <path fill-rule="evenodd" fill="rgb(221, 221, 221)" d="M145.870,236.632 L396.955,103.578 L431.292,419.44 L156.600,522.53 L145.870,236.632 Z"/>
+            <path fill-rule="evenodd" fill="rgb(159, 159, 159)" d="M396.955,103.578 L564.345,234.486 L611.558,513.469 L431.292,419.44 L396.955,103.578 Z"/>
+            <path fill-rule="evenodd" fill="rgb(0, 0, 0)" d="M431.292,419.44 L611.558,513.469 L358.327,595.18 L156.600,522.53 L431.292,419.44 Z"/>
+          </svg>
+          <a target="_blank" rel="noopener" href="https://github.com/hooozen/hexo-theme-tranquility">致远</a>&nbsp;驱动
+        </div>
+      </div>
+    </div>
+    
+    
+    <script src="https://cdn.bootcdn.net/ajax/libs/mermaid/10.4.0/mermaid.min.js"></script>
+    
+    
+  
+
+  </body>
+</html>

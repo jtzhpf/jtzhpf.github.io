@@ -90,7 +90,7 @@
         <div class="post-title">Perl Learning Notes</div>
         <div class="post-info">
           
-  <a href="/tags/Perl/" class="post-tag">#Perl</a>
+  <a href="/tags/Perl/" class="post-tag">#Perl</a><a href="/tags/Debug/" class="post-tag">#Debug</a>
 
 
           <span class="post-date">2023-09-24</span>
@@ -108,7 +108,20 @@
 <h3 id="利用-perl-命令">利用 perl 命令</h3>
 <p><code>perl -d xxx.pl xxx.parameter</code></p>
 <blockquote>
-<p>h 帮助 n 下一步next，跳过sub子函数； s 单步调试，可以进入sub子函数；r 跳出子函数调试； p 打印表达式的结果，也可以显示变量的值，比如p $aaa； w 监视表达式。 x 显示变量结果；比p支持的数据类型更多。 V 支持正则表达式方法匹配变量。 c line_num continue到line_num行 b 行号；断点设置。B 行号；断点去除。L；查看断点。 q 退出。</p>
+<p><code>h</code> 帮助<br />
+<code>n</code> 下一步next，跳过sub子函数；在第一次输入n之后，之后可直接按回车键，默认仍是上一次命令<br />
+<code>s</code> 单步调试，可以进入sub子函数<br />
+<code>r</code> 跳出子函数调试<br />
+<code>p</code> 打印表达式的结果，也可以显示变量的值，比如<code>p $aaa</code>, <code>print $_/$line[8]</code>等<br />
+<code>w</code> 监视表达式<br />
+<code>x</code> 显示变量结果；比<code>p</code>支持的数据类型更多<br />
+<code>V</code> 支持正则表达式方法匹配变量<br />
+<code>c line_num</code> continue到line_num行<br />
+<code>b 行号</code>：断点设置<br />
+<code>B 行号</code>：断点去除；<code>B *</code> 表示删除所有断点<br />
+<code>L</code> 查看断点<br />
+<code>R</code> 表示restart，重新开始运行<br />
+<code>q</code> 退出</p>
 </blockquote>
 
       </div>
@@ -154,7 +167,7 @@
     
       <div class="related-post">
   <div class="related__head">
-  <a href="/tags/Perl/" class="post-tag">#Perl</a>
+  <a href="/tags/Perl/" class="post-tag">#Perl</a><a href="/tags/Debug/" class="post-tag">#Debug</a>
 
 </div>
   <div class="realated__body">
