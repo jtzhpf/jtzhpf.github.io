@@ -31,7 +31,7 @@ timeline: article  # 展示在时间线列表中
 
 提出了一个数学严格的可执行文件系统行为规范 SibylFS。
 
-![SibylFS](/SibylFS: formal specification and oracle-based testing for POSIX and real-world file systems 阅读/image1.png)
+![SibylFS](/SibylFS:formal_specification_and_oracle-based_testing_for_POSIX_and_real-world_file_systems阅读/image1.png)
 
 具体来说，SibylFS 有以下关键特征：
 
@@ -47,17 +47,17 @@ timeline: article  # 展示在时间线列表中
 #### 生成测试用例
 实验过程从一组测试脚本开始。这些测试脚本根据它们所针对的libc函数进行组织。大部分测试脚本是由测试生成器自动生成的，但也可以包括手写的测试脚本。这些测试脚本包含了一系列文件系统命令序列，这些命令将由测试执行器通过libc接口来驱动真实的文件系统进行测试。
 
-![](/SibylFS: formal specification and oracle-based testing for POSIX and real-world file systems 阅读/image2.png)
+![](/SibylFS:formal_specification_and_oracle-based_testing_for_POSIX_and_real-world_file_systems阅读/image2.png)
 
 #### 执行测试脚本
 测试执行器是一个工具或程序，用于执行测试脚本中的命令并与真实世界的文件系统进行交互。测试执行器会按照测试脚本的指令逐一执行libc调用，从一个空的文件系统状态开始设置所需的文件系统状态。一个测试脚本可能会包括多达数百次的libc函数调用。追踪文件会交错显示测试脚本中的命令以及来自真实文件系统的响应。这个追踪文件用于后续的分析和比较，以确保文件系统的行为符合预期。
-![](/SibylFS: formal specification and oracle-based testing for POSIX and real-world file systems 阅读/image3.png)
+![](/SibylFS:formal_specification_and_oracle-based_testing_for_POSIX_and_real-world_file_systems阅读/image3.png)
 
 #### 检查追踪
 SibylFS的核心部分是检查器，它基于[Lem语言](https://github.com/rems-project/lem)自动转换为OCaml，并与一个小型的OCaml包装器链接在一起。检查器的任务是检查追踪文件中的操作是否符合特定变种的模型，例如POSIX、Linux、OS X或FreeBSD。它还可以根据各种标志控制进一步的检查参数，例如初始进程是否以root权限运行。
 
 检查的输出是一组已验证的追踪，已验证的追踪包括了符合模型规范的部分，这些部分与原始追踪类似。对于不符合规范的部分，已验证的追踪包括一个错误消息以及（如果可能的话）诊断信息，以帮助识别为何行为不符合规范。
-![](/SibylFS: formal specification and oracle-based testing for POSIX and real-world file systems 阅读/image4.png)
+![](/SibylFS:formal_specification_and_oracle-based_testing_for_POSIX_and_real-world_file_systems阅读/image4.png)
 
 由于每个追踪文件可能包含多个测试调用，因此当单个步骤失败时，检查器会尝试继续检查。在图中，SibylFS在假定返回EEXIST或ENOTEMPTY而不是EPERM的情况下继续检查追踪。
 
@@ -94,7 +94,7 @@ SibylFS的核心部分是检查器，它基于[Lem语言](https://github.com/rem
    Monad是函数式编程中的一个重要概念，它用于管理副作用和状态。在这种上下文中，Monad允许将计算序列化，并处理可能引发的错误。它通常包括两个基本操作：return用于将值包装成Monad，bind用于将一个Monad的值传递给另一个Monad。Monad有助于保持计算的纯洁性。
 
    Combinator是一种函数，它接受一个或多个函数作为参数，并返回一个新的函数。Combinator用于组合和转换其他函数，以创建更复杂的函数。在函数式编程中，Combinator是一种强大的抽象工具，用于构建和组织函数。在文中，提到了 "parallel" Combinator（|||），它用于指定rename函数必须执行的检查。这个Combinator的作用是将多个检查操作并行执行，并在任何一个检查引发错误时返回错误。这意味着这些检查是相互独立的，没有一个检查的错误会优先于其他检查。这种并行结构有助于模型清晰地表示多个检查并确保它们的行为在并行执行时不会产生不一致。
-   ![](/SibylFS: formal specification and oracle-based testing for POSIX and real-world file systems 阅读/image5.png)
+   ![](/SibylFS:formal_specification_and_oracle-based_testing_for_POSIX_and_real-world_file_systems阅读/image5.png)
 
 
    通过使用Monad、Combinator等结构技术，SibylFS模型能够非常精确和清晰地表达系统行为。这使得模型成为现有POSIX标准的有用补充，因为它能够提供数学上严格的描述，并且具备清晰的结构，使得理解和维护模型变得更加容易。

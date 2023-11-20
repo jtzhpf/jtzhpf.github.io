@@ -18,7 +18,7 @@ mathjax: true
 ---
 
 本文提出了 Yggdrasil，Yggdrasil 是一个工具包，可用于编写具有一键验证功能的文件系统。它通过一种称为崩溃细化的新颖正确性定义实现自动化验证，无需手动注释或证明实现代码，并在出现错误时生成反例。崩溃细化适用于完全自动化的 SMT 推理，并使开发人员能够模块化地实现文件系统以进行验证。
-![Yggdrasil的开发流程](/Push-Button Verification of File Systems via Crash Refinement 阅读/image1.png){width=500}
+![Yggdrasil的开发流程](/Push-Button_Verification_of_File_Systems_via_Crash_Refinement阅读/image1.png){width=500}
 <!--more-->
 
 ## Yggdrasil
@@ -40,26 +40,26 @@ Yggdrasil文件系统规范包括三个部分：
 下面均以作者实现的一个小文件系统YminLFS做演示。
 
 #### Abstract data structure
-![](/Push-Button Verification of File Systems via Crash Refinement 阅读/image2.png){width=500}
+![](/Push-Button_Verification_of_File_Systems_via_Crash_Refinement阅读/image2.png){width=500}
 
 抽象数据结构由五个抽象映射描述，包括childmap、parentmap和三个存储inode元数据的映射。其中，childmap将目录inode号和名称映射到子inode号，parentmap将inode号映射回其父目录的inode号。InoT和U64T是64位整数类型，NameT是字符串类型。
 
 `FSSpec`数据结构对YminLFS的逻辑布局没有强制约束。`FSSpec`规范通过`invariant`来防止无效的布局。
-![](/Push-Button Verification of File Systems via Crash Refinement 阅读/image3.png){width=500}
+![](/Push-Button_Verification_of_File_Systems_via_Crash_Refinement阅读/image3.png){width=500}
 
 `invariant`指出父子节点之间有效索引节点号的映射的相互一致。`ForAll`和`Implies`是内置的逻辑运算符。
 
 #### 文件系统操作
 文件系统操作包括只读操作和读写操作。只读操作包括`lookup`和`stat`。
-![](/Push-Button Verification of File Systems via Crash Refinement 阅读/image4.png){width=500}
+![](/Push-Button_Verification_of_File_Systems_via_Crash_Refinement阅读/image4.png){width=500}
 
 修改文件系统的操作更复杂，因为它们涉及更新抽象映射的状态。
-![](/Push-Button Verification of File Systems via Crash Refinement 阅读/image5.png){width=500}
+![](/Push-Button_Verification_of_File_Systems_via_Crash_Refinement阅读/image5.png){width=500}
 
 `InoT()`构造函数返回一个抽象的inode号码，必须是有效的且不在任何目录中。对文件系统的更改被包装在一个事务中，以确保它们是原子的。
 
 #### state equivalence predicate
-![](/Push-Button Verification of File Systems via Crash Refinement 阅读/image6.png){width=500}
+![](/Push-Button_Verification_of_File_Systems_via_Crash_Refinement阅读/image6.png){width=500}
 
 
 ### implementation
@@ -78,7 +78,7 @@ Yggdrasil提供了异步磁盘模型和同步磁盘模型。
 - `d.read (a)`: return a data block at disk address `a`; 
 - `d.flush ()`: flush the disk cache. 
 
-![](/Push-Button Verification of File Systems via Crash Refinement 阅读/image7.png){width=500}
+![](/Push-Button_Verification_of_File_Systems_via_Crash_Refinement阅读/image7.png){width=500}
 
 初始化磁盘创建一个空的根目录文件系统，包括超级块、根目录索引节点和索引节点映射块。初始化后，索引节点映射块只有一个条目，根目录索引节点没有指向数据块。超级块指向索引节点映射块，并存储下一个可用的索引节点和块号。
 
@@ -103,29 +103,29 @@ Consistency invariants约束了磁盘布局的三个组件：超级块$SB$、索
 
 本文提出的Crash Refinement放松了要求，**any** implementation 的状态只需要和 **some** specification 的状态一致即可。
 
-![](/Push-Button Verification of File Systems via Crash Refinement 阅读/image8.png){width=500}
-![](/Push-Button Verification of File Systems via Crash Refinement 阅读/image9.png){width=500}
-![](/Push-Button Verification of File Systems via Crash Refinement 阅读/image10.png){width=500}
-![](/Push-Button Verification of File Systems via Crash Refinement 阅读/image11.png){width=500}
+![](/Push-Button_Verification_of_File_Systems_via_Crash_Refinement阅读/image8.png){width=500}
+![](/Push-Button_Verification_of_File_Systems_via_Crash_Refinement阅读/image9.png){width=500}
+![](/Push-Button_Verification_of_File_Systems_via_Crash_Refinement阅读/image10.png){width=500}
+![](/Push-Button_Verification_of_File_Systems_via_Crash_Refinement阅读/image11.png){width=500}
 **Crash-free equivalence**：如果在没有崩溃的情况下，implementation 和 specification 从等价一致状态开始，执行相同操作后能够到达等价一致状态，则 implementation 和 specification 在无崩溃的情况下等价。
 
-![](/Push-Button Verification of File Systems via Crash Refinement 阅读/image12.png){width=500}
+![](/Push-Button_Verification_of_File_Systems_via_Crash_Refinement阅读/image12.png){width=500}
 **Crash refinement without recovery**：对**任意**的 crash schedule，implementation 在该 crash schedule 下执行后得到的任意状态（不包括恢复），specification 在**某个** crash schedule 下也能得到等价状态，则 implementation 是 specification 的 crash refinement。
 
-![](/Push-Button Verification of File Systems via Crash Refinement 阅读/image13.png){width=500}
-![](/Push-Button Verification of File Systems via Crash Refinement 阅读/image14.png){width=500}
+![](/Push-Button_Verification_of_File_Systems_via_Crash_Refinement阅读/image13.png){width=500}
+![](/Push-Button_Verification_of_File_Systems_via_Crash_Refinement阅读/image14.png){width=500}
 **Recovery idempotence**：恢复函数是幂等的，多次崩溃和重启过程中调用多次该函数，结果状态相同。
 
-![](/Push-Button Verification of File Systems via Crash Refinement 阅读/image15.png){width=500}
+![](/Push-Button_Verification_of_File_Systems_via_Crash_Refinement阅读/image15.png){width=500}
 **Crash refinement with recovery**：对**任意**的 crash schedule，implementation 在该 crash schedule 下执行后得到的任意状态，包括多次执行恢复函数后的任意状态，specification 在**某个** crash schedule 下也能得到等价状态，则 implementation 是 specification 的 crash refinement。
 
-![](/Push-Button Verification of File Systems via Crash Refinement 阅读/image16.png){width=500}
+![](/Push-Button_Verification_of_File_Systems_via_Crash_Refinement阅读/image16.png){width=500}
 **No-op**: 不改变对外可见状态的后台操作。
 
-![](/Push-Button Verification of File Systems via Crash Refinement 阅读/image17.png){width=500}
+![](/Push-Button_Verification_of_File_Systems_via_Crash_Refinement阅读/image17.png){width=500}
 
 ## Yxv6 file system
-![](/Push-Button Verification of File Systems via Crash Refinement 阅读/image18.png){width=500}
+![](/Push-Button_Verification_of_File_Systems_via_Crash_Refinement阅读/image18.png){width=500}
 
 
-![](/Push-Button Verification of File Systems via Crash Refinement 阅读/image19.png){width=500}
+![](/Push-Button_Verification_of_File_Systems_via_Crash_Refinement阅读/image19.png){width=500}

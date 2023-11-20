@@ -45,7 +45,7 @@ int foo(double x, double y)
 ```
 查看AST得到：
 
-![](/Clang AST/image1.png)
+![](/Clang_AST/image1.png)
 
 ### TranslationUnitDecl
 **TranslationUnitDecl**表示**翻译单元声明**，这是AST的根节点，表示整个翻译单元，通常对应于一个源代码文件。`<invalid sloc>`表示无有效的源代码位置信息（此处不需要）。

@@ -21,12 +21,12 @@ timeline: article  # 展示在时间线列表中
 
 研究发现，应用程序的一致性高度依赖于底层文件系统的持久性属性。如果应用程序的正确性依赖于特定的文件系统持久性属性，就会存在崩溃漏洞；在不同的文件系统上运行应用程序可能导致不正确的行为。
 
-![Crash States](/All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读/image1.png)
+![Crash States](/All_File_Systems_Are_Not_Created_Equal:On_the_Complexity_of_Crafting_Crash-Consistent_Applications阅读/image1.png)
 
 ## BOB 
 BOB是一个简单的工具，用于收集文件系统下的块级追踪，并重新排序以探索可能出现的磁盘崩溃状态，用于测试文件系统的持久性属性。它通过运行一个简单的工作负载来测试持久性属性，收集块I/O并重新排序，生成可能的磁盘状态。然后运行文件系统恢复并检查持久性属性是否成立。如果BOB找到一个检查失败的磁盘映像，则知道该属性在文件系统上不成立。
 
-![Persistence Properties](/All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读/image3.png)
+![Persistence Properties](/All_File_Systems_Are_Not_Created_Equal:On_the_Complexity_of_Crafting_Crash-Consistent_Applications阅读/image3.png)
 
 ## ALICE
 本文研究现代应用程序的崩溃一致性协议实现是否正确。为了回答这个问题，研究者们开发了一个名为ALICE的框架，可以系统地研究应用程序级别的崩溃一致性。
@@ -39,11 +39,11 @@ APM将崩溃状态表示为两个逻辑实体：包含数据和文件大小的fi
 
 APM将逻辑操作分解为微操作，以捕捉中间崩溃状态。微操作是对每个逻辑实体执行的最小原子修改。共有五个微操作：write_block, change_file_size, create_dir_entry, delete_dir_entry。APM通过定义将逻辑操作转化为微操作来指定原子性约束。APM通过定义哪些微操作可以在其他微操作之前到达磁盘来指定排序约束。
 
-![Default APM Constraints](/All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读/image2.png)
+![Default APM Constraints](/All_File_Systems_Are_Not_Created_Equal:On_the_Complexity_of_Crafting_Crash-Consistent_Applications阅读/image2.png)
 
 ALICE将系统调用跟踪转换为微操作，并计算它们之间的顺序依赖关系。ALICE通过将所选集合中的微操作顺序应用于初始状态（表示为逻辑实体），构造新的崩溃状态。对于每个崩溃状态，ALICE将逻辑实体转换回实际文件，并将其提供给检查器进行验证。用户提供的检查器验证崩溃状态。
 
-![Overview of ALICE](/All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读/image4.png)
+![Overview of ALICE](/All_File_Systems_Are_Not_Created_Equal:On_the_Complexity_of_Crafting_Crash-Consistent_Applications阅读/image4.png)
 
 ### Finding Application Requirements
 
