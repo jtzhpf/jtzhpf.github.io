@@ -99,7 +99,7 @@
       
         <aside class="toc-outer">
           <div class="toc-title">目录</div>
-          
+          <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#compilerinstance-%E7%B1%BB"><span class="post-toc-text">CompilerInstance 类</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#compilerinstance-%E7%9A%84%E7%BB%93%E6%9E%84"><span class="post-toc-text">CompilerInstance 的结构</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#static-analyzer"><span class="post-toc-text">Static Analyzer</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#clang-%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90%E6%A8%A1%E5%BC%8F"><span class="post-toc-text">Clang 静态分析模式</span></a></li></ol></li></ol>
           <a href="#" class="toc-top">回到顶部</a>
         </aside>
       
@@ -109,7 +109,51 @@
             
           </div>
         
-        
+        <p>这是在阅读 Clang 时遇到不会内容时的随笔，看到哪写到哪，可能不会有任何的结构（Who knows）。</p>
+<p>😘 在此先疯狂鸣谢一波 ChatGPT 和 Claude 😍。</p>
+<span id="more"></span>
+<h2 id="compilerinstance-类">CompilerInstance 类</h2>
+<p>CompilerInstance 是 LLVM/Clang 编译器框架中的一个类，用于管理整个编译过程中的状态和组件。它负责协调和组织编译器的不同部分，包括预处理器、语法分析器、语义分析器等。在编译的不同阶段，CompilerInstance 提供了访问和控制这些组件的方法。</p>
+<h3 id="compilerinstance-的结构">CompilerInstance 的结构</h3>
+<p>CompilerInstance 的具体结构可能会有一些复杂，因为它需要协调各个编译器组件的工作。一般而言，它包含了以下关键成员：</p>
+<ul>
+<li>语法树（AST）： 用于表示源代码结构的树形数据结构。AST 在编译器的语法分析阶段构建，以便更容易进行语义分析和代码生成。</li>
+<li>预处理器（Preprocessor）： 负责对源代码进行预处理，包括宏展开、条件编译、去注释等。预处理器生成预处理后的源代码，供后续的编译阶段使用。</li>
+<li>语义分析器（Sema）： 在 AST 的基础上进行语义分析，执行类型检查、符号解析等操作。语义分析是编译器的重要阶段，它确保程序语义的正确性。</li>
+<li>代码生成器（Code Generator）： 将语义分析阶段得到的中间表示（IR）转换为目标代码。这是编译器的最后阶段。</li>
+<li>源码管理器（SourceManager）： 负责跟踪源代码的位置信息，以便在编译过程中进行错误报告和调试信息生成。</li>
+<li>前端选项（FrontendOptions）： 包含与编译过程相关的各种选项，如编译目标、优化级别等。</li>
+</ul>
+<p>这只是 CompilerInstance 结构的一般概述，具体实现可能更为复杂。</p>
+<h2 id="static-analyzer">Static Analyzer</h2>
+<p>Static Analyzer 的源代码入口主要位于 Clang 代码库的 <code>lib/StaticAnalyzer</code> 目录中。以下是几个关键文件和目录：</p>
+<ul>
+<li><strong><code>lib/StaticAnalyzer/Core</code>：</strong> 包含 Static Analyzer 的核心实现，如路径敏感性分析器、检查器管理器等。</li>
+<li><strong><code>lib/StaticAnalyzer/Checkers</code>：</strong> 包含各种 Checker 的实现，每个 Checker 都有一个对应的目录，其中包含 Checker 的具体实现和规则定义。</li>
+<li><strong><code>lib/StaticAnalyzer/Frontend</code>：</strong> 包含与前端集成相关的代码，处理命令行参数，设置分析配置等。</li>
+<li><strong><code>lib/StaticAnalyzer/PathSensitive</code>：</strong> 包含路径敏感性分析的相关实现。</li>
+<li><strong><code>lib/StaticAnalyzer/Frontend/AnalysisConsumer.cpp</code>：</strong> 这个文件定义了 <code>AnalysisConsumer</code> 类，它是 Static Analyzer 在编译过程中的 AST 消费者，负责驱动整个静态分析过程。</li>
+<li><strong><code>lib/StaticAnalyzer/Core/CheckerManager.cpp</code>：</strong> 这个文件包含 <code>CheckerManager</code> 类的实现，负责管理所有的 Checker。</li>
+<li><strong><code>tools/scan-build</code>：</strong> 该工具用于通过 Clang Static Analyzer 进行静态分析。</li>
+</ul>
+<p>调用情况如图所示： <img src="/Clang阅读随笔/image1.png" alt="Clang Static Analyzer 调用情况" /></p>
+<p>总体而言，<code>AnalysisConsumer.cpp</code> 和 <code>CheckerManager.cpp</code> 可以看作是 Static Analyzer 的源代码入口，它们定义了整个分析过程的驱动和管理逻辑。其他目录则包含了各个组件的具体实现。</p>
+<h3 id="clang-静态分析模式">Clang 静态分析模式</h3>
+<p>在 Clang 的静态分析器（<code>/llvm/tools/clang/lib/StaticAnalyzer/Frontend/AnalysisConsumer.cpp: HandleTranslationUnit()</code>）中，<code>AM_Syntax</code> 和 <code>AM_Path</code> 分别代表不同的分析模式，用于控制静态分析的行为。以下是它们的区别：</p>
+<ol type="1">
+<li><strong><code>AM_Syntax</code>（语法分析模式）：</strong>
+<ul>
+<li><strong>含义：</strong> <code>AM_Syntax</code> 表示语法分析模式，指的是在分析中仅关注语法层面的结构，而不考虑程序的具体路径执行信息。</li>
+<li><strong>行为：</strong> 在 <code>AM_Syntax</code> 模式下，静态分析器主要关注程序的语法结构，执行基本的语法检查和分析，例如识别语法错误、检查变量的声明和使用情况等。这种模式下的分析通常更快，但可能会错过一些路径敏感性的问题。</li>
+</ul></li>
+<li><strong><code>AM_Path</code>（路径敏感分析模式）：</strong>
+<ul>
+<li><strong>含义：</strong> <code>AM_Path</code> 表示路径敏感分析模式，指的是在分析中考虑程序的具体路径执行信息，以检测可能的路径相关问题。</li>
+<li><strong>行为：</strong> 在 <code>AM_Path</code> 模式下，静态分析器会模拟程序的不同执行路径，考虑程序在不同条件下的行为。这种模式下的分析可以发现更多的潜在问题，例如路径上的条件分支错误、空指针解引用等。然而，路径敏感分析通常会增加分析的复杂性和执行时间。</li>
+</ul></li>
+</ol>
+<p>总的来说，区别在于分析是否关注程序的路径执行信息。<code>AM_Syntax</code> 主要关注语法结构，而 <code>AM_Path</code> 则在此基础上考虑了路径敏感性，以更全面地发现潜在问题。</p>
+<p><a href="/2023/08/31/Cross-checking_Semantic_Correctness:The_Case_of_Finding_File_System_Bugs阅读/">Cross-checking Semantic Correctness: The Case of Finding File System Bugs</a> 这篇文章中使用的是<code>AM_Syntax</code>。</p>
 
       </div>
     </div>
@@ -147,7 +191,7 @@
 </div>
   <div class="realated__body">
     
-      <div class="null"><div class="null-item"><div class="null-title"><a href="/2023/11/07/@蓝色老师的LLVM系列文章汇总/" title="@蓝色老师的LLVM系列文章汇总" rel="bookmark">@蓝色老师的LLVM系列文章汇总</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/10/17/Clang_AST/" title="Clang AST" rel="bookmark">Clang AST</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/11/15/Static_Analysis_with_clang/" title="Static Analysis with clang - cited" rel="bookmark">Static Analysis with clang - cited</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/06/All_File_Systems_Are_Not_Created_Equal:On_the_Complexity_of_Crafting_Crash-Consistent_Applications阅读/" title="All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读" rel="bookmark">All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/10/30/All_You_Ever_Wanted_to_Know_About_Dynamic_Taint_Analysis_and_Forward_Symbolic_Execution阅读/" title="All You Ever Wanted to Know About Dynamic Taint Analysis and Forward Symbolic Execution 阅读" rel="bookmark">All You Ever Wanted to Know About Dynamic Taint Analysis and Forward Symbolic Execution 阅读</a></div></div></div>
+      <div class="null"><div class="null-item"><div class="null-title"><a href="/2023/11/07/@蓝色老师的LLVM系列文章汇总/" title="@蓝色老师的LLVM系列文章汇总" rel="bookmark">@蓝色老师的LLVM系列文章汇总</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/10/17/Clang_AST/" title="Clang AST" rel="bookmark">Clang AST</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/11/15/Static_Analysis_with_clang/" title="Static Analysis with clang - cited" rel="bookmark">Static Analysis with clang - cited</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/08/31/leetcode26.删除有序数组中的重复项/" title="leetcode 26. 删除有序数组中的重复项" rel="bookmark">leetcode 26. 删除有序数组中的重复项</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/05/zsh&oh-my-zsh/" title="zsh & oh-my-zsh 常用命令" rel="bookmark">zsh & oh-my-zsh 常用命令</a></div></div></div>
     
   </div>
 </div>

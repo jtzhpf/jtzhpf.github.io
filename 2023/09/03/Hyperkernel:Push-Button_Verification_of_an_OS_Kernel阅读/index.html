@@ -223,14 +223,14 @@ mjx-container[display="true"] + br {
         
         <p>修改xv6的内核接口，构建状态机规范和声明式规范以支持SMT（Satisfiability Modulo Theories）求解器来进行验证。通过有限化内核接口，使用硬件虚拟化简化虚拟内存推理，并在LLVM IR级别工作，以避免对C语义进行建模，从而实现了"一键验证"。 <span id="more"></span></p>
 <p>程序员使用Python编写两种规范来指定系统调用的期望行为：详细的<strong>状态机规范</strong>和更高级的<strong>声明式规范</strong>。两种规范都用Python表达，并使用Z3 SMT求解器进行验证。程序员使用C实现系统调用。验证器将Python规范和C编译成的LLVM IR实现转化为SMT查询，并调用Z3进行验证。验证后的代码与未验证的（可信任的）代码链接，生成最终的内核映像。</p>
-<p><img src="/Hyperkernel:%20Push-Button%20Verification%20of%20an%20OS%20Kernel%20阅读/image1.png" width="550"></p>
+<p><img src="/Hyperkernel:Push-Button_Verification_of_an_OS_Kernel阅读/image1.png" width="550"></p>
 <h2 id="hyperkernel-验证面临的挑战与解决办法">Hyperkernel 验证面临的挑战与解决办法</h2>
 <h3 id="挑战一">挑战一</h3>
 <p>内核接口的设计需要在可用性和自动化验证之间取得平衡。内核需要提供丰富的抽象来保证用户程序的正确性，但接口也必须容易实现并验证。</p>
 <p><strong>解决办法</strong>：设计了有限的内核接口，避免了无界的循环和递归。</p>
 <blockquote>
 <p>在Unix设计中，每个进程都有一个文件描述符表，每个槽位都指向系统范围内的文件表。文件表维护每个条目的引用计数器，以正确管理资源。</p>
-<p><code>dup(oldfd)</code>的 POSIX 语义是“创建<code>oldfd</code>的副本，使用<strong><em>最小</em></strong>未使用的文件描述符作为新描述符”。例如，在进程<code>j</code>中调用<code>dup(0)</code>将返回FD 1，引用文件表条目 4，并将该条目的引用计数增加到 3。 <img src="/Hyperkernel:%20Push-Button%20Verification%20of%20an%20OS%20Kernel%20阅读/image2.png" width="500"> <code>dup</code>接口的POSIX语义是非有限的。因为最小FD需要内核检查每个小于新选择的FD的slot是否已经被占用。因此，分配最小FD需要一个随着FD表大小增长的跟踪，即跟踪长度不能被一个独立于系统参数的小常数所限制。缺乏有限界意味着<code>dup</code>的验证时间会随着FD表的大小增加而增加。</p>
+<p><code>dup(oldfd)</code>的 POSIX 语义是“创建<code>oldfd</code>的副本，使用<strong><em>最小</em></strong>未使用的文件描述符作为新描述符”。例如，在进程<code>j</code>中调用<code>dup(0)</code>将返回FD 1，引用文件表条目 4，并将该条目的引用计数增加到 3。 <img src="/Hyperkernel:Push-Button_Verification_of_an_OS_Kernel阅读/image2.png" width="500"> <code>dup</code>接口的POSIX语义是非有限的。因为最小FD需要内核检查每个小于新选择的FD的slot是否已经被占用。因此，分配最小FD需要一个随着FD表大小增长的跟踪，即跟踪长度不能被一个独立于系统参数的小常数所限制。缺乏有限界意味着<code>dup</code>的验证时间会随着FD表的大小增加而增加。</p>
 <p>Hyperkernel通过将POSIX接口改为<code>dup(oldfd, newfd)</code>来进行有限化处理，这要求<strong>用户空间</strong>选择一个新的FD值。为了实现这个接口，内核只需检查给定的<code>newfd</code>是否未使用。这个检查只需要<code>O(1)</code>，与FD表的大小无关。因此，该接口是有限的，可以进行可扩展的验证，避免了路径爆炸。</p>
 </blockquote>
 <h3 id="挑战二">挑战二</h3>
@@ -279,7 +279,7 @@ mjx-container[display="true"] + br {
 <p>使用SMT求解器的优点是，如果验证失败，它能够生成一个测试用例，有助于定位和修复错误。验证器会生成一个具体的测试用例，包括内核状态和系统调用参数，以描述如何触发错误。如果两者之间存在不一致，验证器会显示违规情况。</p>
 </blockquote>
 <h2 id="验证">验证</h2>
-<p>Hyperkernel的验证主要证明了两个定理： <img src="/Hyperkernel:%20Push-Button%20Verification%20of%20an%20OS%20Kernel%20阅读/image3.png" width="600"></p>
+<p>Hyperkernel的验证主要证明了两个定理： <img src="/Hyperkernel:Push-Button_Verification_of_an_OS_Kernel阅读/image3.png" width="600"></p>
 <h3 id="theorem-1-refinement">Theorem 1: REFINEMENT</h3>
 <p>验证器会对每个陷阱处理程序：</p>
 <ol type="1">
@@ -300,7 +300,7 @@ mjx-container[display="true"] + br {
 </ol>
 <p>在这些情况下，验证器会尝试从 Z3 反例中生成具体的测试用例，以帮助调试问题。例如，如果程序员忘记验证 <code>dup</code> 中的系统调用参数 <code>oldfd</code>，验证器会输出一个堆栈跟踪，以及导致 FD 表中越界访问的具体 <code>oldfd</code> 值。</p>
 <p>另一个例子是，如果程序员忘记在 <code>dup</code> 实现中增加文件表中的引用计数，验证器会突出显示在状态机规范中被违反的子句，并提供一个简化的解释。这个解释描述了在系统调用之前和之后的内核状态以及规范的状态。通常情况下，规范和实现在系统调用之前是等价的，但是在系统调用之后，规范中的计数器已经正确更新，而实现中的计数器保持不变，这破坏了等价性，因此证明失败。</p>
-<p><img src="/Hyperkernel:%20Push-Button%20Verification%20of%20an%20OS%20Kernel%20阅读/image4.png" width="600"></p>
+<p><img src="/Hyperkernel:Push-Button_Verification_of_an_OS_Kernel阅读/image4.png" width="600"></p>
 <p>这个输出表明，在进程PID 32中调用<code>dupfd(1, 0)</code>会触发一个bug。系统调用之前的内核状态是：PID 32是当前运行的进程；它的FD 1指向文件1（引用计数为1）；其他FD和文件表项为空。两个<code>ForAll</code>语句分别突出了系统调用之前和之后的有问题的状态。在调用之前，规范和实现状态是等价的。在系统调用之后，规范中的计数器被正确更新（即文件1的计数器<code>file_nr_fds</code>增加了1）；然而，在实现中计数器保持不变（即<code>@files-&gt;struct.file::refcnt</code>），这破坏了等价函数，因此证明失败。</p>
 <p>文中提到的两个定理在 Z3 无法找到任何反例时成立。 定理1保证已验证的内核实现部分没有低级别错误，例如缓冲区溢出、除零和空指针解引用。此外，它还保证功能正确性，即每个系统调用的实现都满足状态机规范。 定理2保证状态机规范与声明式规范相符。</p>
 <p>需要注意的是，这两个定理并不保证内核初始化、粘合代码或生成的内核二进制的正确性。</p>
@@ -311,8 +311,8 @@ mjx-container[display="true"] + br {
 <li><p><strong>原子性保证：</strong> 即使在单处理器系统中，为了确保陷阱处理程序的原子执行，Hyperkernel 需要处理来自I/O设备的并发问题，如中断和直接内存访问（DMA）。它通过禁用中断来实现原子性，延迟中断处理，直到执行返回用户空间。此外，为了隔离DMA的效果，内核将DMA限制在专用内存区域（称为DMA页面），并将这种隔离实现为在引导时配置的机制。DMA页面被视为易变的，读取DMA页面的内存将返回任意值。</p></li>
 <li><p><strong>内核正确性的定义与验证：</strong> 内核的正确性以状态机refinement的形式定义。Z3验证器通过验证其否定是不可满足的来验证其正确性。如果找到反例，验证器会构建一个测试用例。</p></li>
 </ol>
-<p><img src="/Hyperkernel:%20Push-Button%20Verification%20of%20an%20OS%20Kernel%20阅读/image5.png" width="600"></p>
-<p><img src="/Hyperkernel:%20Push-Button%20Verification%20of%20an%20OS%20Kernel%20阅读/image6.png" width="600"></p>
+<p><img src="/Hyperkernel:Push-Button_Verification_of_an_OS_Kernel阅读/image5.png" width="600"></p>
+<p><img src="/Hyperkernel:Push-Button_Verification_of_an_OS_Kernel阅读/image6.png" width="600"></p>
 <ol start="4" type="1">
 <li><p><strong>LLVM IR 的处理：</strong> 验证器将 LLVM IR 代码作为验证目标，通过符号执行来构建 SMT 表达式。它会处理 LLVM IR 中的未定义行为，并将 LLVM IR 中的指令映射到 SMT 表达式。对于易变内存访问（如 DMA 页面），验证器会生成适当的 SMT 表达式。验证器允许程序员提供内联汇编代码的抽象模型，以简化验证过程。这个模型是被信任而不是验证的，它通常用于模拟特定的硬件行为。</p></li>
 <li><p><strong>编码交叉属性：</strong> 交叉属性是在声明性规范中定义的属性，它们描述了内核资源的管理方式和约束。这些属性通常包括：<br>
@@ -354,7 +354,7 @@ reference-counted shared ownership：共享资源的引用计数必须与引用�
   
   <div class="vhr"></div>
   
-    <a class="post-nav-item-right" href="/2023/08/31/Cross-checking_Semantic_Correctness:The_Case_of_Finding_File_System_Bugs%E9%98%85%E8%AF%BB/">
+    <a class="post-nav-item-right" href="/2023/08/31/icns%E5%88%B6%E4%BD%9C/">
       <div class="text-align">
         <span class="text-small">下一篇</span>
         <svg t="1670570876164"
@@ -366,7 +366,7 @@ reference-counted shared ownership：共享资源的引用计数必须与引用�
           <path d="M384 512L731.733333 202.666667c17.066667-14.933333 19.2-42.666667 4.266667-59.733334-14.933333-17.066667-42.666667-19.2-59.733333-4.266666l-384 341.333333c-10.666667 8.533333-14.933333 19.2-14.933334 32s4.266667 23.466667 14.933334 32l384 341.333333c8.533333 6.4 19.2 10.666667 27.733333 10.666667 12.8 0 23.466667-4.266667 32-14.933333 14.933333-17.066667 14.933333-44.8-4.266667-59.733334L384 512z" p-id="14596"/>
         </svg>
       </div>
-      Cross-checking Semantic Correctness: The Case of Finding File System Bugs 阅读
+      icns 图标制作
     </a>
   
 </div>
@@ -379,7 +379,7 @@ reference-counted shared ownership：共享资源的引用计数必须与引用�
 </div>
   <div class="realated__body">
     
-      <div class="null"><div class="null-item"><div class="null-title"><a href="/2023/08/31/Cross-checking_Semantic_Correctness:The_Case_of_Finding_File_System_Bugs阅读/" title="Cross-checking Semantic Correctness: The Case of Finding File System Bugs 阅读" rel="bookmark">Cross-checking Semantic Correctness: The Case of Finding File System Bugs 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/10/23/Push-Button_Verification_of_File_Systems_via_Crash_Refinement阅读/" title="Push-Button Verification of File Systems via Crash Refinement 阅读" rel="bookmark">Push-Button Verification of File Systems via Crash Refinement 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/18/Scaling_symbolic_evaluation_for_automated_verification_of_systems_code_with_Serval阅读/" title="Scaling symbolic evaluation for automated verification of systems code with Serval 阅读" rel="bookmark">Scaling symbolic evaluation for automated verification of systems code with Serval 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/11/07/@蓝色老师的LLVM系列文章汇总/" title="@蓝色老师的LLVM系列文章汇总" rel="bookmark">@蓝色老师的LLVM系列文章汇总</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/06/All_File_Systems_Are_Not_Created_Equal:On_the_Complexity_of_Crafting_Crash-Consistent_Applications阅读/" title="All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读" rel="bookmark">All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读</a></div></div></div>
+      <div class="null"><div class="null-item"><div class="null-title"><a href="/2023/08/31/Cross-checking_Semantic_Correctness:The_Case_of_Finding_File_System_Bugs阅读/" title="Cross-checking Semantic Correctness: The Case of Finding File System Bugs 阅读" rel="bookmark">Cross-checking Semantic Correctness: The Case of Finding File System Bugs 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/10/23/Push-Button_Verification_of_File_Systems_via_Crash_Refinement阅读/" title="Push-Button Verification of File Systems via Crash Refinement 阅读" rel="bookmark">Push-Button Verification of File Systems via Crash Refinement 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/18/Scaling_symbolic_evaluation_for_automated_verification_of_systems_code_with_Serval阅读/" title="Scaling symbolic evaluation for automated verification of systems code with Serval 阅读" rel="bookmark">Scaling symbolic evaluation for automated verification of systems code with Serval 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/08/31/leetcode26.删除有序数组中的重复项/" title="leetcode 26. 删除有序数组中的重复项" rel="bookmark">leetcode 26. 删除有序数组中的重复项</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/05/zsh&oh-my-zsh/" title="zsh & oh-my-zsh 常用命令" rel="bookmark">zsh & oh-my-zsh 常用命令</a></div></div></div>
     
   </div>
 </div>
