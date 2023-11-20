@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf8"/>
+    <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
+    <title>
+      
+        Scaling symbolic evaluation for automated verification of systems code with Serval 阅读 | ZPF.SITE
+      
+    </title>
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    
+      <link rel="apple-touch-icon"
+            sizes="180x180"
+            href="/images/apple-touch-icon.png"/>
+    
+    
+      <link rel="icon"
+            type="image/png"
+            sizes="32x32"
+            href="/images/favicon-32x32.png"/>
+    
+    
+      <link rel="icon"
+            type="image/png"
+            sizes="16x16"
+            href="/images/favicon-16x16.png"/>
+    
+    
+      <link rel="mask-icon"
+            href="/images/logo.svg"
+            color=""/>
+    
+    
+    
+      
+  <style>
+    @font-face {
+        font-family:sourceHanSerif;
+        src: url(/font/regular.ttf);
+        font-weight: regular;
+    }
+  </style>
+
+  <style>
+    @font-face {
+        font-family:sourceHanSerif;
+        src: url(/font/bold.ttf);
+        font-weight: bold;
+    }
+  </style>
+
+
+    
+    <link rel="stylesheet"
+          type="text/css"
+          href='/css/layout.css'/>
+    
+    
+  <link rel="stylesheet" type="text/css" href="/css/post.css" />
+  
+
+  <meta name="generator" content="Hexo 6.3.0"><style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style></head>
+  <body>
+    <div class="head">
+      <div class="nav">
+        <a href='/' class="nav-logo">
+          <img alt="logo" height="60px" width="60px" src="/images/logo.svg"/>
+        </a>
+        <input id="navBtn" type="checkbox"/>
+        <div class="nav-menu">
+          
+            
+              <a class="nav-menu-item" href="/CS&Maths">Computer Science & Maths</a>
+            
+              <a class="nav-menu-item" href="/Life">Life</a>
+            
+          
+          
+        </div>
+        <label class="nav-btn" for="navBtn"></label>
+      </div>
+    </div>
+    <div class="body">
+      
+  <article class="post-content">
+    <div class="post-inner--toc">
+      <div class="post-content__head">
+        <div class="post-title">Scaling symbolic evaluation for automated verification of systems code with Serval 阅读</div>
+        <div class="post-info">
+          
+  <a href="/tags/Paper/" class="post-tag">#Paper</a><a href="/tags/Symbolic-Execution/" class="post-tag">#Symbolic Execution</a><a href="/tags/Staitc-Analysis/" class="post-tag">#Staitc Analysis</a><a href="/tags/SOSP/" class="post-tag">#SOSP</a><a href="/tags/SOSP-19/" class="post-tag">#SOSP'19</a>
+
+
+          <span class="post-date">2023-09-18</span>
+        </div>
+      </div>
+      
+        <aside class="toc-outer">
+          <div class="toc-title">目录</div>
+          <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%B8%B8%E8%A7%81%E9%AA%8C%E8%AF%81%E6%8A%80%E6%9C%AF"><span class="post-toc-text">常见验证技术</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#interactive-verification"><span class="post-toc-text">Interactive verification</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#auto-active-verification"><span class="post-toc-text">Auto-active verification</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#push-button-verification"><span class="post-toc-text">Push-button verification</span></a></li></ol></li></ol>
+          <a href="#" class="toc-top">回到顶部</a>
+        </aside>
+      
+      <div class="post-content__body">
+        
+          <div class="post-gallery">
+            
+          </div>
+        
+        <p>这篇论文介绍了一个名为Serval的框架，用于通过符号执行来对系统代码进行可扩展的自动化验证。</p>
+<p>Serval的核心思想是将开发人员使用Rosette编写指令集解释器并转化为自动化验证器，从而实现系统软件的验证。这一框架通过符号性能分析和优化来识别和修复验证性能瓶颈。作者通过将Serval应用于现有的系统和未经验证的系统中，展示了其在找到系统错误和提高验证效率方面的有效性。 <span id="more"></span></p>
+<h2 id="常见验证技术">常见验证技术</h2>
+<h3 id="interactive-verification">Interactive verification</h3>
+<p>交互式验证是一种传统的验证方法，它使用交互式定理证明器来验证系统软件的正确性。这种方法的特点是需要开发人员或验证工程师的手动干预，他们使用定理证明器构建针对实现与规范之间正确性的证明。</p>
+<p>交互式验证依赖于定理证明器，这些证明器提供了强大的逻辑工具，用于手动构建正确性证明，如使用Boyer-Moore定理证明器验证KIT内核，使用Isabelle/HOL定理证明器验证seL4微内核，CertiKOS借助于已验证的C编译器CompCert来直接推理汇编代码、利用Coq定理证明器验证整个内核等。</p>
+<p>交互式验证可以用于验证复杂数据结构的属性和整个系统的正确性。例如，FSCQ文件系统中的树序列就是通过交互式验证实现的。这种方法可以表达复杂的性质，但需要大量工作量，人力和时间成本较高。</p>
+<h3 id="auto-active-verification">Auto-active verification</h3>
+<p>自动主动验证是一种不同于交互式验证的验证方法。在这种方法中，开发人员需要在代码上添加注解，以指导验证工具进行验证。这些注解描述了代码的预期行为，例如函数的前置条件、后置条件、循环不变式等。注解的质量对于验证的成功至关重要。然后，验证工具会将带有注解的代码转化为验证条件，并调用约束求解器来检查其有效性。</p>
+<p>相对于交互式验证，自动主动验证减轻了开发人员的证明负担。开发人员不需要手动构建复杂的证明，而是提供注解来指导验证过程，例如ExpressOS中的安全不变性验证、Verve OS中的类型安全性验证。</p>
+<p>Ironclad这一项目的验证从应用程序代码验证到底层操作系统内核。开发人员需要编写高级规范、实现、注解，这些都用Dafny定理证明器来证明。一旦高级规范和注解准备好，验证过程将通过使用不可信的编译器将高级规范和注解转换为低级规范。低级规范是针对底层机器代码的，通常是汇编语言的形式，由 Boogie 验证器进行验证。Boogie 是一个自动验证工具，用于检查低级规范是否满足高级规范。Boogie 生成证明条件，并使用 SMT 求解器进行验证。如果验证通过，那么就意味着实现满足了高级规范中指定的性质。最后，代码在Verve上运行。</p>
+<p>Komodo 是一个经过验证的安全监控器（security monitor），用于管理和保护软件隔离环境（enclaves）。Komodo 验证的一个重要方面是功能正确性和非干扰性属性，它确保 Komodo 完全按照其规范执行，并且不受外部干扰（如操作系统）。这是通过验证 Komodo 的实现与规范之间的一致性来实现的。Komodo 的验证使用了两种不同的工具来支持验证。规范的验证和Ironclad一样使用 Dafny。而 Komodo 的实现是使用 Vale 以ARM组件的结构化形式编写的，使Komodo能够在裸硬件上运行。</p>
+<h3 id="push-button-verification">Push-button verification</h3>
+<p>Push-button verification 将开发人员的精力集中在系统的接口设计、规范和实现上。这意味着开发人员可以更专注于构建系统的结构和功能，而不必深入研究证明。</p>
+<p>开发者设计有限的接口，不能包含无限循环等难以验证的结构。自动验证器使用符号执行生成约束并调用约束求解器检查这些约束的有效性来实现验证。求解器的任务是确定是否存在一组输入或状态，满足系统规范和约束。如果找到满足约束的解决方案，系统被认为是通过验证的。使用这种方法验证的有Yggdrasil文件系统、Hyperkernel等。缺点在于只能验证有限的属性和系统。</p>
+
+      </div>
+    </div>
+  </article>
+  <div class="post__foot">
+    
+    <div class="post-nav">
+  
+    <a class="post-nav-item-left" href="/2023/09/24/Perl_Learning_Notes/">
+      <div class="text-align">
+        <svg t="1670570876164"
+             class="icon"
+             viewBox="0 0 1024 1024"
+             width="16"
+             height="16">
+          <path d="M384 512L731.733333 202.666667c17.066667-14.933333 19.2-42.666667 4.266667-59.733334-14.933333-17.066667-42.666667-19.2-59.733333-4.266666l-384 341.333333c-10.666667 8.533333-14.933333 19.2-14.933334 32s4.266667 23.466667 14.933334 32l384 341.333333c8.533333 6.4 19.2 10.666667 27.733333 10.666667 12.8 0 23.466667-4.266667 32-14.933333 14.933333-17.066667 14.933333-44.8-4.266667-59.733334L384 512z" p-id="14596"/>
+        </svg>
+        <span class="text-small">上一篇</span>
+      </div>
+      <div>Perl Learning Notes</div>
+    </a>
+  
+  <div class="vhr"></div>
+  
+    <a class="post-nav-item-right" href="/2023/09/16/%E5%B8%B8%E7%94%A8git%E6%93%8D%E4%BD%9C/">
+      <div class="text-align">
+        <span class="text-small">下一篇</span>
+        <svg t="1670570876164"
+             class="icon"
+             viewBox="0 0 1024 1024"
+             transform="scale(-1,-1)"
+             width="16"
+             height="16">
+          <path d="M384 512L731.733333 202.666667c17.066667-14.933333 19.2-42.666667 4.266667-59.733334-14.933333-17.066667-42.666667-19.2-59.733333-4.266666l-384 341.333333c-10.666667 8.533333-14.933333 19.2-14.933334 32s4.266667 23.466667 14.933334 32l384 341.333333c8.533333 6.4 19.2 10.666667 27.733333 10.666667 12.8 0 23.466667-4.266667 32-14.933333 14.933333-17.066667 14.933333-44.8-4.266667-59.733334L384 512z" p-id="14596"/>
+        </svg>
+      </div>
+      常用git操作
+    </a>
+  
+</div>
+
+    
+      <div class="related-post">
+  <div class="related__head">
+  <a href="/tags/Paper/" class="post-tag">#Paper</a><a href="/tags/Symbolic-Execution/" class="post-tag">#Symbolic Execution</a><a href="/tags/Staitc-Analysis/" class="post-tag">#Staitc Analysis</a><a href="/tags/SOSP/" class="post-tag">#SOSP</a><a href="/tags/SOSP-19/" class="post-tag">#SOSP'19</a>
+
+</div>
+  <div class="realated__body">
+    
+      <div class="null"><div class="null-item"><div class="null-title"><a href="/2023/08/31/Cross-checking_Semantic_Correctness:The_Case_of_Finding_File_System_Bugs阅读/" title="Cross-checking Semantic Correctness: The Case of Finding File System Bugs 阅读" rel="bookmark">Cross-checking Semantic Correctness: The Case of Finding File System Bugs 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/03/Hyperkernel:Push-Button_Verification_of_an_OS_Kernel阅读/" title="Hyperkernel: Push-Button Verification of an OS Kernel 阅读" rel="bookmark">Hyperkernel: Push-Button Verification of an OS Kernel 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/10/23/Push-Button_Verification_of_File_Systems_via_Crash_Refinement阅读/" title="Push-Button Verification of File Systems via Crash Refinement 阅读" rel="bookmark">Push-Button Verification of File Systems via Crash Refinement 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/11/07/@蓝色老师的LLVM系列文章汇总/" title="@蓝色老师的LLVM系列文章汇总" rel="bookmark">@蓝色老师的LLVM系列文章汇总</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/06/All_File_Systems_Are_Not_Created_Equal:On_the_Complexity_of_Crafting_Crash-Consistent_Applications阅读/" title="All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读" rel="bookmark">All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读</a></div></div></div>
+    
+  </div>
+</div>
+
+    
+    
+    
+      <script src="https://utteranc.es/client.js"
+    repo="jtzhpf/jtzhpf.github.io"
+    issue-term="pathname"
+    theme="github-light"
+    crossorigin="anonymous"
+    async>
+</script>
+    
+  </div>
+
+    </div>
+    <div class="foot">
+      <div class="foot-inner">
+        <div class="foot__head">
+          
+            <div class="foot-line">
+              
+                <div class="matts">海</div>
+              
+                <div class="matts">内</div>
+              
+                <div class="matts">存</div>
+              
+                <div class="matts">知</div>
+              
+                <div class="matts">己</div>
+              
+            </div>
+          
+            <div class="foot-line">
+              
+                <div class="matts">天</div>
+              
+                <div class="matts">涯</div>
+              
+                <div class="matts">若</div>
+              
+                <div class="matts">比</div>
+              
+                <div class="matts">邻</div>
+              
+            </div>
+          
+        </div>
+        <div class="foot__body">
+          
+          
+            <div class="foot-item">
+              <div class="foot-item__head">账号</div>
+              <div class="foot-item__body">
+                
+                  <div class="text">
+                    <img alt="link" height="20px" width="20px" src="/images/logo-github.svg"/>
+                    <a class="foot-link" target="_blank" rel="noopener" href="https://github.com/jtzhpf">github</a>
+                  </div>
+                
+              </div>
+            </div>
+          
+          <div class="foot-item">
+            <div class="foot-item__head">联系</div>
+            <div class="foot-item__body">
+              <div class="text">
+                <img alt="link" height="20px" width="20px" src="/images/icon/icon-email.svg"/>
+                <a class="foot-link" href="mailto:jtzhpf@126.com">jtzhpf@126.com</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="copyright">
+          <a href="https://zpf.pages.dev">ZPF.SITE</a> &nbsp;|&nbsp;由&nbsp;<a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>&nbsp;及&nbsp;
+          <svg width="20" height="20" viewBox="0 0 725 725">
+            <path fill-rule="evenodd" fill="rgb(221, 221, 221)" d="M145.870,236.632 L396.955,103.578 L431.292,419.44 L156.600,522.53 L145.870,236.632 Z"/>
+            <path fill-rule="evenodd" fill="rgb(159, 159, 159)" d="M396.955,103.578 L564.345,234.486 L611.558,513.469 L431.292,419.44 L396.955,103.578 Z"/>
+            <path fill-rule="evenodd" fill="rgb(0, 0, 0)" d="M431.292,419.44 L611.558,513.469 L358.327,595.18 L156.600,522.53 L431.292,419.44 Z"/>
+          </svg>
+          <a target="_blank" rel="noopener" href="https://github.com/hooozen/hexo-theme-tranquility">致远</a>&nbsp;驱动
+        </div>
+      </div>
+    </div>
+    
+    
+    <script src="https://cdn.bootcdn.net/ajax/libs/mermaid/10.4.0/mermaid.min.js"></script>
+    
+    
+  
+
+  </body>
+</html>

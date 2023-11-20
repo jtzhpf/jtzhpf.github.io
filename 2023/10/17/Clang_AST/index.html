@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf8"/>
+    <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
+    <title>
+      
+        Clang AST | ZPF.SITE
+      
+    </title>
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    
+      <link rel="apple-touch-icon"
+            sizes="180x180"
+            href="/images/apple-touch-icon.png"/>
+    
+    
+      <link rel="icon"
+            type="image/png"
+            sizes="32x32"
+            href="/images/favicon-32x32.png"/>
+    
+    
+      <link rel="icon"
+            type="image/png"
+            sizes="16x16"
+            href="/images/favicon-16x16.png"/>
+    
+    
+      <link rel="mask-icon"
+            href="/images/logo.svg"
+            color=""/>
+    
+    
+    
+      
+  <style>
+    @font-face {
+        font-family:sourceHanSerif;
+        src: url(/font/regular.ttf);
+        font-weight: regular;
+    }
+  </style>
+
+  <style>
+    @font-face {
+        font-family:sourceHanSerif;
+        src: url(/font/bold.ttf);
+        font-weight: bold;
+    }
+  </style>
+
+
+    
+    <link rel="stylesheet"
+          type="text/css"
+          href='/css/layout.css'/>
+    
+    
+  <link rel="stylesheet" type="text/css" href="/css/post.css" />
+  
+
+  <meta name="generator" content="Hexo 6.3.0"></head>
+  <body>
+    <div class="head">
+      <div class="nav">
+        <a href='/' class="nav-logo">
+          <img alt="logo" height="60px" width="60px" src="/images/logo.svg"/>
+        </a>
+        <input id="navBtn" type="checkbox"/>
+        <div class="nav-menu">
+          
+            
+              <a class="nav-menu-item" href="/CS&Maths">Computer Science & Maths</a>
+            
+              <a class="nav-menu-item" href="/Life">Life</a>
+            
+          
+          
+        </div>
+        <label class="nav-btn" for="navBtn"></label>
+      </div>
+    </div>
+    <div class="body">
+      
+  <article class="post-content">
+    <div class="post-inner--toc">
+      <div class="post-content__head">
+        <div class="post-title">Clang AST</div>
+        <div class="post-info">
+          
+  <a href="/tags/LLVM/" class="post-tag">#LLVM</a><a href="/tags/Clang/" class="post-tag">#Clang</a><a href="/tags/Compiler/" class="post-tag">#Compiler</a>
+
+
+          <span class="post-date">2023-10-17</span>
+        </div>
+      </div>
+      
+        <aside class="toc-outer">
+          <div class="toc-title">目录</div>
+          <ol class="post-toc"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#translationunitdecl"><span class="post-toc-text">TranslationUnitDecl</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#typedefdecl"><span class="post-toc-text">TypedefDecl</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#functiondecl"><span class="post-toc-text">FunctionDecl</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#parmvardecl"><span class="post-toc-text">ParmVarDecl</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#compoundstmt"><span class="post-toc-text">CompoundStmt</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#declstmt"><span class="post-toc-text">DeclStmt</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#ifstmt"><span class="post-toc-text">IfStmt</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#returnstmt"><span class="post-toc-text">ReturnStmt</span></a></li></ol>
+          <a href="#" class="toc-top">回到顶部</a>
+        </aside>
+      
+      <div class="post-content__body">
+        
+          <div class="post-gallery">
+            
+          </div>
+        
+        <span id="more"></span>
+<p><a target="_blank" rel="noopener" href="https://clang.llvm.org/docs/IntroductionToTheClangAST.html">Clang AST官网简介</a></p>
+<p>查看AST的命令 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">clang -Xclang -ast-dump -fsyntax-only filename<br></code></pre></td></tr></table></figure></p>
+<p>现在有一个cpp文件<code>source.cpp</code>如下所示： <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">//file name: source.cpp</span><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">foo</span><span class="hljs-params">(<span class="hljs-type">double</span> x, <span class="hljs-type">double</span> y)</span></span><br><span class="hljs-function"></span>&#123;<br>  <span class="hljs-type">double</span> result = (x / <span class="hljs-number">777</span>);<br>  <br>  <span class="hljs-type">int</span> ans;<br>  <br>  <span class="hljs-keyword">if</span>( result &gt; <span class="hljs-number">1</span> )<br>  &#123;<br>    ans = <span class="hljs-number">111</span>;<br>  &#125;<br>  <span class="hljs-keyword">else</span><br>  &#123;<br>    ans = <span class="hljs-number">222</span>;<br>  &#125;<br>  <br>  <span class="hljs-keyword">return</span> ans;<br>&#125;<br></code></pre></td></tr></table></figure> 查看AST得到：</p>
+<p><img src="/Clang%20AST/image1.png" /></p>
+<h3 id="translationunitdecl">TranslationUnitDecl</h3>
+<p><strong>TranslationUnitDecl</strong>表示<strong>翻译单元声明</strong>，这是AST的根节点，表示整个翻译单元，通常对应于一个源代码文件。<code>&lt;invalid sloc&gt;</code>表示无有效的源代码位置信息（此处不需要）。</p>
+<h3 id="typedefdecl">TypedefDecl</h3>
+<p><strong>TypedefDecl</strong>表示<strong>类型定义声明</strong>，这些节点表示了类型别名的声明，通常用于为某种类型分配一个更易于使用的名称。<code>implicit</code>表示这些类型别名是隐式的，即它们不是由程序员显式定义的，而是由编译器自动生成的。</p>
+<p>在这里，<strong>TypedefDecl</strong>有三个子节点，分别表示以下三个类型别名的声明：</p>
+<ul>
+<li><code>__int128_t</code>：这个别名是对名为 <code>__int128</code> 的类型的声明。</li>
+<li><code>__uint128_t</code>：这个别名是对名为 <code>unsigned __int128</code> 的类型的声明。</li>
+<li><code>__builtin_va_list</code>：这个别名是对名为 <code>__va_list_tag [1]</code> 的类型的声明。</li>
+</ul>
+<h3 id="functiondecl">FunctionDecl</h3>
+<p><strong>FunctionDecl</strong>表示<strong>函数声明</strong>，也是每个函数的根节点。该函数只有2个子节点，分别是<code>ParmVarDecl</code>与<code>CompoundStmt</code>，前者代表参数，后者代表函数体。</p>
+<p><code>0x2bc8dd0</code> 是该节点的唯一标识符（通常是编译器生成的内部标识符）。</p>
+<p><code>&lt;source.cpp:2:1, line:18:1&gt;</code> 表示该函数声明出现在源代码文件<code>source.cpp</code>中，从第2行的第1列到第18行的第1列。</p>
+<p><code>line:2:5</code> 指示该函数声明在源代码中的位置，具体地说，是在第2行第5列。</p>
+<p><code>foo</code> 是函数的名称。</p>
+<p><code>'int (double, double)'</code> 表示该函数的返回类型为 <code>int</code>，并且有两个参数，两个参数的类型都是 <code>double</code>。</p>
+<h3 id="parmvardecl">ParmVarDecl</h3>
+<p><strong>ParmVarDecl</strong>表示<strong>参数变量声明</strong>，即函数的输入参数。</p>
+<p><code>&lt;col:9, col:16&gt;</code> 和 <code>&lt;col:19, col:26&gt;</code> 分别表示它们在源代码中的位置范围，具体地说，第一个参数<code>x</code>在第9列到第16列之间，第二个参数<code>y</code>在第19列到第26列之间。</p>
+<p><code>col:16</code>和<code>col:26</code>表示它们的声明位置。</p>
+<p><code>used</code>表示这些参数在函数中被使用。</p>
+<h3 id="compoundstmt">CompoundStmt</h3>
+<p><strong>CompoundStmt</strong>表示<strong>复合语句条目</strong>，表示一段由大括号围起来的代码段。</p>
+<p><code>&lt;line:3:1, line:18:1&gt;</code>表示该复合语句整体的起始位置与末位置。起始位置是3行1列，末尾位置是18行1列。</p>
+<h3 id="declstmt">DeclStmt</h3>
+<p><strong>DeclStmt</strong>表示<strong>声明语句</strong>。 这是函数 <code>foo</code> 内部的一部分抽象语法树（AST），表示一个变量的声明和初始化。</p>
+<ul>
+<li><code>VarDecl</code>（变量声明）:
+<ul>
+<li>这个节点表示一个变量的声明。</li>
+<li><code>result</code> 是变量的名称。</li>
+<li><code>'double'</code> 表示该变量的类型为 <code>double</code>。</li>
+<li><code>cinit</code> 表示这是一个带有初始值的变量声明。</li>
+</ul></li>
+<li><code>ParenExpr</code>（括号表达式）:
+<ul>
+<li>这个节点表示一个带有括号的表达式，通常用于明确运算符优先级。</li>
+</ul></li>
+<li><code>BinaryOperator</code>（二元运算符）:
+<ul>
+<li>这个节点表示一个二元运算，用于执行除法运算。</li>
+</ul></li>
+<li><code>ImplicitCastExpr</code>（隐式类型转换表达式）:
+<ul>
+<li>这个节点表示隐式的类型转换，用于将表达式的类型转换为所需的类型。</li>
+<li>此处将左值 <code>result</code>（从 <code>0x38bae90</code> 节点引用）转换为右值。</li>
+</ul></li>
+<li><code>DeclRefExpr</code>（声明引用表达式）:
+<ul>
+<li><code>ParmVar 0x38bac90 'x' 'double'</code> 表示它引用了一个名为 <code>x</code> 的 <code>double</code> 类型的参数。</li>
+</ul></li>
+<li><code>IntegerLiteral</code>（整数字面量）:
+<ul>
+<li>这个节点表示一个整数字面量。</li>
+<li><code>'int'</code> 表示这个字面量的类型为 <code>int</code>。</li>
+<li><code>777</code> 是这个整数字面量的值。</li>
+</ul></li>
+</ul>
+<p>综合起来，这部分AST表示了一个名为 <code>result</code> 的 <code>double</code> 类型的变量声明，它的初始值是 <code>x</code> 除以整数字面量 <code>777</code> 的结果。</p>
+<p><code>LValueToRValue</code> 是一个 C/C++ 中的隐式类型转换，它将左值（Lvalue）转换为右值（Rvalue）。这种转换的存在是为了确保程序在合适的上下文中使用变量，同时也是为了维护类型的一致性。以下是一些情况，你可能需要进行 <code>LValueToRValue</code> 的转换：</p>
+<ol type="1">
+<li><p><strong>赋值操作</strong>：当你将一个左值赋值给一个右值时，编译器需要进行 <code>LValueToRValue</code> 的转换。这是因为左值表示内存位置，而右值表示值，赋值操作需要获取左值的值以进行赋值。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-type">int</span> x = <span class="hljs-number">5</span>; <span class="hljs-comment">// 5 是右值，但 x 是左值，所以需要 LValueToRValue 转换</span><br></code></pre></td></tr></table></figure></li>
+<li><p><strong>函数调用</strong>：当你将一个左值作为参数传递给函数时，也会发生 <code>LValueToRValue</code> 转换。函数参数通常期望右值，因此左值会在函数调用时被转换为右值。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-type">int</span> value = <span class="hljs-number">10</span>;<br><span class="hljs-built_in">someFunction</span>(value); <span class="hljs-comment">// value 是左值，但 someFunction 期望右值参数</span><br></code></pre></td></tr></table></figure></li>
+<li><p><strong>表达式计算</strong>：在某些表达式中，需要将左值的值提取出来以进行计算。这也会触发 <code>LValueToRValue</code> 转换。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-type">int</span> a = <span class="hljs-number">5</span>;<br><span class="hljs-type">int</span> b = a + <span class="hljs-number">3</span>; <span class="hljs-comment">// a 是左值，但在表达式中需要它的值，因此发生 LValueToRValue 转换</span><br></code></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="ifstmt">IfStmt</h3>
+<p><strong>IfStmt</strong>表示<strong>条件语句</strong>，此处包含一个条件表达式和两个条件成立时执行的代码块。</p>
+<ul>
+<li><code>IfStmt</code>（条件语句）：
+<ul>
+<li><code>BinaryOperator</code> 表示条件表达式，它计算一个条件是否为真。</li>
+<li><code>CompoundStmt</code> 包含了两个代码块，分别表示条件成立和条件不成立时执行的代码。</li>
+</ul></li>
+<li><code>BinaryOperator</code>（二元运算符）：
+<ul>
+<li><code>'_Bool'</code> 表示该表达式的结果类型为布尔值。</li>
+<li><code>'&gt;'</code> 是条件判断符号，表示大于。</li>
+<li><code>ImplicitCastExpr</code> 是一个隐式类型转换表达式，它将左值 <code>result</code>（从 <code>0x38bae90</code> 节点引用）转换为右值。</li>
+<li><code>IntegerLiteral</code> 表示整数字面量 "1"。</li>
+</ul></li>
+<li><code>CompoundStmt</code>（代码块）：
+<ul>
+<li><p><code>0x38fbf50</code> 和 <code>0x38fbfe0</code> 分别表示两个代码块的唯一标识符。</p></li>
+<li><p><code>&lt;line:9:3, line:11:3&gt;</code> 和 <code>&lt;line:13:3, line:15:3&gt;</code> 表示这两个代码块的位置范围。</p></li>
+<li><p>第一个 <code>CompoundStmt</code> 包含一个 <code>BinaryOperator</code>，表示条件成立时执行的代码。</p></li>
+<li><p><code>BinaryOperator</code> 此时表示赋值操作，将变量 <code>ans</code> 的值设置为整数 <code>111</code>。</p></li>
+<li><p>第二个 <code>CompoundStmt</code> 包含一个 <code>BinaryOperator</code>，表示条件不成立时执行的代码。</p></li>
+<li><p><code>BinaryOperator</code> 此时表示另一个赋值操作，将变量 <code>ans</code> 的值设置为整数 <code>222</code>。</p></li>
+</ul></li>
+</ul>
+<h3 id="returnstmt">ReturnStmt</h3>
+<p><strong>ReturnStmt</strong>表示<strong>返回语句</strong>。</p>
+<ul>
+<li><code>ImplicitCastExpr</code>（隐式类型转换表达式）：
+<ul>
+<li><code>0x38fc058</code> 是隐式类型转换表达式的唯一标识符。</li>
+<li><code>&lt;col:10&gt;</code> 表示这个表达式的位置，即在第10列。</li>
+<li><code>int</code> 表示这个表达式的结果类型为整数。</li>
+<li><code>&lt;LValueToRValue&gt;</code> 表示这是一个从左值到右值的隐式类型转换。</li>
+</ul></li>
+<li><code>DeclRefExpr</code>（声明引用表达式）：
+<ul>
+<li><code>0x38fc030</code> 是声明引用表达式的唯一标识符。</li>
+<li><code>&lt;col:10&gt;</code> 表示这个表达式的位置，即在第10列。</li>
+<li><code>'int'</code> 表示这个引用的类型为整数。</li>
+<li><code>lvalue</code> 表示这是一个左值。</li>
+<li><code>Var 0x38fbdd0 'ans' 'int'</code> 表示这个引用指向名为 <code>ans</code> 的整数变量。</li>
+</ul></li>
+</ul>
+
+      </div>
+    </div>
+  </article>
+  <div class="post__foot">
+    
+    <div class="post-nav">
+  
+    <a class="post-nav-item-left" href="/2023/10/23/Push-Button_Verification_of_File_Systems_via_Crash_Refinement%E9%98%85%E8%AF%BB/">
+      <div class="text-align">
+        <svg t="1670570876164"
+             class="icon"
+             viewBox="0 0 1024 1024"
+             width="16"
+             height="16">
+          <path d="M384 512L731.733333 202.666667c17.066667-14.933333 19.2-42.666667 4.266667-59.733334-14.933333-17.066667-42.666667-19.2-59.733333-4.266666l-384 341.333333c-10.666667 8.533333-14.933333 19.2-14.933334 32s4.266667 23.466667 14.933334 32l384 341.333333c8.533333 6.4 19.2 10.666667 27.733333 10.666667 12.8 0 23.466667-4.266667 32-14.933333 14.933333-17.066667 14.933333-44.8-4.266667-59.733334L384 512z" p-id="14596"/>
+        </svg>
+        <span class="text-small">上一篇</span>
+      </div>
+      <div>Push-Button Verification of File Systems via Crash Refinement 阅读</div>
+    </a>
+  
+  <div class="vhr"></div>
+  
+    <a class="post-nav-item-right" href="/2023/09/26/Creating_Pipes_in_C/">
+      <div class="text-align">
+        <span class="text-small">下一篇</span>
+        <svg t="1670570876164"
+             class="icon"
+             viewBox="0 0 1024 1024"
+             transform="scale(-1,-1)"
+             width="16"
+             height="16">
+          <path d="M384 512L731.733333 202.666667c17.066667-14.933333 19.2-42.666667 4.266667-59.733334-14.933333-17.066667-42.666667-19.2-59.733333-4.266666l-384 341.333333c-10.666667 8.533333-14.933333 19.2-14.933334 32s4.266667 23.466667 14.933334 32l384 341.333333c8.533333 6.4 19.2 10.666667 27.733333 10.666667 12.8 0 23.466667-4.266667 32-14.933333 14.933333-17.066667 14.933333-44.8-4.266667-59.733334L384 512z" p-id="14596"/>
+        </svg>
+      </div>
+      Creating Pipes in C
+    </a>
+  
+</div>
+
+    
+      <div class="related-post">
+  <div class="related__head">
+  <a href="/tags/LLVM/" class="post-tag">#LLVM</a><a href="/tags/Clang/" class="post-tag">#Clang</a><a href="/tags/Compiler/" class="post-tag">#Compiler</a>
+
+</div>
+  <div class="realated__body">
+    
+      <div class="null"><div class="null-item"><div class="null-title"><a href="/2023/11/07/@蓝色老师的LLVM系列文章汇总/" title="@蓝色老师的LLVM系列文章汇总" rel="bookmark">@蓝色老师的LLVM系列文章汇总</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/11/20/Clang阅读随笔/" title="Clang 阅读随笔" rel="bookmark">Clang 阅读随笔</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/11/15/Static_Analysis_with_clang/" title="Static Analysis with clang - cited" rel="bookmark">Static Analysis with clang - cited</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/06/All_File_Systems_Are_Not_Created_Equal:On_the_Complexity_of_Crafting_Crash-Consistent_Applications阅读/" title="All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读" rel="bookmark">All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/10/30/All_You_Ever_Wanted_to_Know_About_Dynamic_Taint_Analysis_and_Forward_Symbolic_Execution阅读/" title="All You Ever Wanted to Know About Dynamic Taint Analysis and Forward Symbolic Execution 阅读" rel="bookmark">All You Ever Wanted to Know About Dynamic Taint Analysis and Forward Symbolic Execution 阅读</a></div></div></div>
+    
+  </div>
+</div>
+
+    
+    
+    
+      <script src="https://utteranc.es/client.js"
+    repo="jtzhpf/jtzhpf.github.io"
+    issue-term="pathname"
+    theme="github-light"
+    crossorigin="anonymous"
+    async>
+</script>
+    
+  </div>
+
+    </div>
+    <div class="foot">
+      <div class="foot-inner">
+        <div class="foot__head">
+          
+            <div class="foot-line">
+              
+                <div class="matts">海</div>
+              
+                <div class="matts">内</div>
+              
+                <div class="matts">存</div>
+              
+                <div class="matts">知</div>
+              
+                <div class="matts">己</div>
+              
+            </div>
+          
+            <div class="foot-line">
+              
+                <div class="matts">天</div>
+              
+                <div class="matts">涯</div>
+              
+                <div class="matts">若</div>
+              
+                <div class="matts">比</div>
+              
+                <div class="matts">邻</div>
+              
+            </div>
+          
+        </div>
+        <div class="foot__body">
+          
+          
+            <div class="foot-item">
+              <div class="foot-item__head">账号</div>
+              <div class="foot-item__body">
+                
+                  <div class="text">
+                    <img alt="link" height="20px" width="20px" src="/images/logo-github.svg"/>
+                    <a class="foot-link" target="_blank" rel="noopener" href="https://github.com/jtzhpf">github</a>
+                  </div>
+                
+              </div>
+            </div>
+          
+          <div class="foot-item">
+            <div class="foot-item__head">联系</div>
+            <div class="foot-item__body">
+              <div class="text">
+                <img alt="link" height="20px" width="20px" src="/images/icon/icon-email.svg"/>
+                <a class="foot-link" href="mailto:jtzhpf@126.com">jtzhpf@126.com</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="copyright">
+          <a href="https://zpf.pages.dev">ZPF.SITE</a> &nbsp;|&nbsp;由&nbsp;<a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>&nbsp;及&nbsp;
+          <svg width="20" height="20" viewBox="0 0 725 725">
+            <path fill-rule="evenodd" fill="rgb(221, 221, 221)" d="M145.870,236.632 L396.955,103.578 L431.292,419.44 L156.600,522.53 L145.870,236.632 Z"/>
+            <path fill-rule="evenodd" fill="rgb(159, 159, 159)" d="M396.955,103.578 L564.345,234.486 L611.558,513.469 L431.292,419.44 L396.955,103.578 Z"/>
+            <path fill-rule="evenodd" fill="rgb(0, 0, 0)" d="M431.292,419.44 L611.558,513.469 L358.327,595.18 L156.600,522.53 L431.292,419.44 Z"/>
+          </svg>
+          <a target="_blank" rel="noopener" href="https://github.com/hooozen/hexo-theme-tranquility">致远</a>&nbsp;驱动
+        </div>
+      </div>
+    </div>
+    
+    
+    <script src="https://cdn.bootcdn.net/ajax/libs/mermaid/10.4.0/mermaid.min.js"></script>
+    
+    
+  
+
+  </body>
+</html>

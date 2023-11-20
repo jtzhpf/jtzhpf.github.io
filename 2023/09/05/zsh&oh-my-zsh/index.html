@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf8"/>
+    <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
+    <title>
+      
+        zsh & oh-my-zsh 常用命令 | ZPF.SITE
+      
+    </title>
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    
+      <link rel="apple-touch-icon"
+            sizes="180x180"
+            href="/images/apple-touch-icon.png"/>
+    
+    
+      <link rel="icon"
+            type="image/png"
+            sizes="32x32"
+            href="/images/favicon-32x32.png"/>
+    
+    
+      <link rel="icon"
+            type="image/png"
+            sizes="16x16"
+            href="/images/favicon-16x16.png"/>
+    
+    
+      <link rel="mask-icon"
+            href="/images/logo.svg"
+            color=""/>
+    
+    
+    
+      
+  <style>
+    @font-face {
+        font-family:sourceHanSerif;
+        src: url(/font/regular.ttf);
+        font-weight: regular;
+    }
+  </style>
+
+  <style>
+    @font-face {
+        font-family:sourceHanSerif;
+        src: url(/font/bold.ttf);
+        font-weight: bold;
+    }
+  </style>
+
+
+    
+    <link rel="stylesheet"
+          type="text/css"
+          href='/css/layout.css'/>
+    
+    
+  <link rel="stylesheet" type="text/css" href="/css/post.css" />
+  
+
+  <meta name="generator" content="Hexo 6.3.0"></head>
+  <body>
+    <div class="head">
+      <div class="nav">
+        <a href='/' class="nav-logo">
+          <img alt="logo" height="60px" width="60px" src="/images/logo.svg"/>
+        </a>
+        <input id="navBtn" type="checkbox"/>
+        <div class="nav-menu">
+          
+            
+              <a class="nav-menu-item" href="/CS&Maths">Computer Science & Maths</a>
+            
+              <a class="nav-menu-item" href="/Life">Life</a>
+            
+          
+          
+        </div>
+        <label class="nav-btn" for="navBtn"></label>
+      </div>
+    </div>
+    <div class="body">
+      
+  <article class="post-content">
+    <div class="post-inner--toc">
+      <div class="post-content__head">
+        <div class="post-title">zsh & oh-my-zsh 常用命令</div>
+        <div class="post-info">
+          
+  <a href="/tags/Linux/" class="post-tag">#Linux</a><a href="/tags/shell/" class="post-tag">#shell</a>
+
+
+          <span class="post-date">2023-09-05</span>
+        </div>
+      </div>
+      
+        <aside class="toc-outer">
+          <div class="toc-title">目录</div>
+          <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#zsh"><span class="post-toc-text">zsh</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%AE%89%E8%A3%85-oh-my-zsh"><span class="post-toc-text">安装 oh my zsh</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#curl-%E5%AE%89%E8%A3%85"><span class="post-toc-text">curl 安装</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#wget-%E5%AE%89%E8%A3%85"><span class="post-toc-text">wget 安装</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%B8%B8%E7%94%A8%E7%9A%84-oh-my-zsh-%E6%8F%92%E4%BB%B6"><span class="post-toc-text">常用的 oh my zsh 插件</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#git"><span class="post-toc-text">git</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#z"><span class="post-toc-text">z</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#zsh-autosuggestions"><span class="post-toc-text">zsh-autosuggestions</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#zsh-syntax-highlighting"><span class="post-toc-text">zsh-syntax-highlighting</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#sudo"><span class="post-toc-text">sudo</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E8%A7%A3%E5%86%B3-zsh-%E5%9C%A8-git-%E7%9B%AE%E5%BD%95%E4%B8%8B%E5%8F%98%E5%BE%97%E5%8D%A1%E9%A1%BF%E7%9A%84%E9%97%AE%E9%A2%98"><span class="post-toc-text">解决 zsh 在 git 目录下变得卡顿的问题</span></a></li></ol>
+          <a href="#" class="toc-top">回到顶部</a>
+        </aside>
+      
+      <div class="post-content__body">
+        
+          <div class="post-gallery">
+            
+          </div>
+        
+        <p>鉴于经常需要配置环境，在此记录一下 zsh &amp; oh-my-zsh 的常用命令。 <span id="more"></span></p>
+<h2 id="zsh">zsh</h2>
+<p>zsh 是一款强大的虚拟终端，既是一个系统的虚拟终端，也可以作为一个脚本语言的交互解析器。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">打开终端，在终端上输入:</span> <br>zsh --version<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">这个命令来查看我们的电脑上是否安装了 zsh</span> <br></code></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">查看系统当前 shell</span><br>cat /etc/shells <br></code></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">修改当前用户 shell，注销后生效</span><br>chsh -s /bin/zsh<br></code></pre></td></tr></table></figure>
+<h2 id="安装-oh-my-zsh">安装 oh my zsh</h2>
+<p>可以通过 curl 或 wget 两种方式来安装，用一条命令即可安装。</p>
+<h3 id="curl-安装">curl 安装</h3>
+<p>GitHub： <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">sh -c &quot;$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)&quot;<br></code></pre></td></tr></table></figure> Gitee ( 国内镜像 )： <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">sh -c &quot;$(curl -fsSL https://gitee.com/mirrors/oh-my-zsh/raw/master/tools/install.sh)&quot;<br></code></pre></td></tr></table></figure></p>
+<h3 id="wget-安装">wget 安装</h3>
+<p>GitHub： <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">sh -c &quot;$(wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)&quot;<br></code></pre></td></tr></table></figure> Gitee ( 国内镜像 )： <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">sh -c &quot;$(wget -O- https://gitee.com/pocmon/mirrors/raw/master/tools/install.sh)&quot;<br></code></pre></td></tr></table></figure></p>
+<h2 id="常用的-oh-my-zsh-插件">常用的 oh my zsh 插件</h2>
+<p>打开<code>~/.zshrc</code>文件找到<code>plugins = (git)</code>，这里是我们已经启用了那些插件</p>
+<p>如果想要启用某个插件，装好之后直接修改<code>plugins = (插件A 插件B 插件C)</code></p>
+<h3 id="git">git</h3>
+<p>这个是装好 oh-my-zsh 就默认已经开启的</p>
+<h3 id="z">z</h3>
+<p>这个是 oh-my-zsh 默认就装好的，需要自己开启。还有一个 autojump 插件和 z 功能差不多，autojump需要自己装</p>
+<p>如果 z 插件历史记录太多，并且有一些不是自己想要的，可以用<code>z -x 不要的路径</code>删除</p>
+<h3 id="zsh-autosuggestions">zsh-autosuggestions</h3>
+<p>会记录你之前输入过的所有命令，并且自动匹配你可能想要输入命令，然后按<code>tab</code>补全</p>
+<p>安装方法：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">git clone https://github.com/zsh-users/zsh-autosuggestions $&#123;ZSH_CUSTOM:-~/.oh-my-zsh/custom&#125;/plugins/zsh-autosuggestions<br></code></pre></td></tr></table></figure>
+<h3 id="zsh-syntax-highlighting">zsh-syntax-highlighting</h3>
+<p>命令太多，有时候记不住，等输入完了才知道命令输错了，这个插件直接在输入过程中就会提示你，当前命令是否正确，错误红色，正确绿色</p>
+<p>安装方法：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $&#123;ZSH_CUSTOM:-~/.oh-my-zsh/custom&#125;/plugins/zsh-syntax-highlighting<br></code></pre></td></tr></table></figure>
+<h3 id="sudo">sudo</h3>
+<p>偶尔输入某个命令，提示没有权限，需要加<code>sudo</code>，这个时候按两下<code>ESC</code>，就会在命令行头部加上<code>sudo</code></p>
+<h2 id="解决-zsh-在-git-目录下变得卡顿的问题">解决 zsh 在 git 目录下变得卡顿的问题</h2>
+<p>在目录下通过设置标识关闭 dirty 检查： <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">git config --add oh-my-zsh.hide-dirty 1<br></code></pre></td></tr></table></figure></p>
+<p>若需要打开，则： <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">git config --add oh-my-zsh.hide-dirty 0<br></code></pre></td></tr></table></figure></p>
+
+      </div>
+    </div>
+  </article>
+  <div class="post__foot">
+    
+    <div class="post-nav">
+  
+    <a class="post-nav-item-left" href="/2023/09/06/All_File_Systems_Are_Not_Created_Equal:On_the_Complexity_of_Crafting_Crash-Consistent_Applications%E9%98%85%E8%AF%BB/">
+      <div class="text-align">
+        <svg t="1670570876164"
+             class="icon"
+             viewBox="0 0 1024 1024"
+             width="16"
+             height="16">
+          <path d="M384 512L731.733333 202.666667c17.066667-14.933333 19.2-42.666667 4.266667-59.733334-14.933333-17.066667-42.666667-19.2-59.733333-4.266666l-384 341.333333c-10.666667 8.533333-14.933333 19.2-14.933334 32s4.266667 23.466667 14.933334 32l384 341.333333c8.533333 6.4 19.2 10.666667 27.733333 10.666667 12.8 0 23.466667-4.266667 32-14.933333 14.933333-17.066667 14.933333-44.8-4.266667-59.733334L384 512z" p-id="14596"/>
+        </svg>
+        <span class="text-small">上一篇</span>
+      </div>
+      <div>All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读</div>
+    </a>
+  
+  <div class="vhr"></div>
+  
+    <a class="post-nav-item-right" href="/2023/09/03/Hyperkernel:Push-Button_Verification_of_an_OS_Kernel%E9%98%85%E8%AF%BB/">
+      <div class="text-align">
+        <span class="text-small">下一篇</span>
+        <svg t="1670570876164"
+             class="icon"
+             viewBox="0 0 1024 1024"
+             transform="scale(-1,-1)"
+             width="16"
+             height="16">
+          <path d="M384 512L731.733333 202.666667c17.066667-14.933333 19.2-42.666667 4.266667-59.733334-14.933333-17.066667-42.666667-19.2-59.733333-4.266666l-384 341.333333c-10.666667 8.533333-14.933333 19.2-14.933334 32s4.266667 23.466667 14.933334 32l384 341.333333c8.533333 6.4 19.2 10.666667 27.733333 10.666667 12.8 0 23.466667-4.266667 32-14.933333 14.933333-17.066667 14.933333-44.8-4.266667-59.733334L384 512z" p-id="14596"/>
+        </svg>
+      </div>
+      Hyperkernel: Push-Button Verification of an OS Kernel 阅读
+    </a>
+  
+</div>
+
+    
+      <div class="related-post">
+  <div class="related__head">
+  <a href="/tags/Linux/" class="post-tag">#Linux</a><a href="/tags/shell/" class="post-tag">#shell</a>
+
+</div>
+  <div class="realated__body">
+    
+      <div class="null"><div class="null-item"><div class="null-title"><a href="/2023/09/06/All_File_Systems_Are_Not_Created_Equal:On_the_Complexity_of_Crafting_Crash-Consistent_Applications阅读/" title="All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读" rel="bookmark">All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/26/Creating_Pipes_in_C/" title="Creating Pipes in C" rel="bookmark">Creating Pipes in C</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/08/31/Cross-checking_Semantic_Correctness:The_Case_of_Finding_File_System_Bugs阅读/" title="Cross-checking Semantic Correctness: The Case of Finding File System Bugs 阅读" rel="bookmark">Cross-checking Semantic Correctness: The Case of Finding File System Bugs 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/11/07/@蓝色老师的LLVM系列文章汇总/" title="@蓝色老师的LLVM系列文章汇总" rel="bookmark">@蓝色老师的LLVM系列文章汇总</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/10/30/All_You_Ever_Wanted_to_Know_About_Dynamic_Taint_Analysis_and_Forward_Symbolic_Execution阅读/" title="All You Ever Wanted to Know About Dynamic Taint Analysis and Forward Symbolic Execution 阅读" rel="bookmark">All You Ever Wanted to Know About Dynamic Taint Analysis and Forward Symbolic Execution 阅读</a></div></div></div>
+    
+  </div>
+</div>
+
+    
+    
+    
+      <script src="https://utteranc.es/client.js"
+    repo="jtzhpf/jtzhpf.github.io"
+    issue-term="pathname"
+    theme="github-light"
+    crossorigin="anonymous"
+    async>
+</script>
+    
+  </div>
+
+    </div>
+    <div class="foot">
+      <div class="foot-inner">
+        <div class="foot__head">
+          
+            <div class="foot-line">
+              
+                <div class="matts">海</div>
+              
+                <div class="matts">内</div>
+              
+                <div class="matts">存</div>
+              
+                <div class="matts">知</div>
+              
+                <div class="matts">己</div>
+              
+            </div>
+          
+            <div class="foot-line">
+              
+                <div class="matts">天</div>
+              
+                <div class="matts">涯</div>
+              
+                <div class="matts">若</div>
+              
+                <div class="matts">比</div>
+              
+                <div class="matts">邻</div>
+              
+            </div>
+          
+        </div>
+        <div class="foot__body">
+          
+          
+            <div class="foot-item">
+              <div class="foot-item__head">账号</div>
+              <div class="foot-item__body">
+                
+                  <div class="text">
+                    <img alt="link" height="20px" width="20px" src="/images/logo-github.svg"/>
+                    <a class="foot-link" target="_blank" rel="noopener" href="https://github.com/jtzhpf">github</a>
+                  </div>
+                
+              </div>
+            </div>
+          
+          <div class="foot-item">
+            <div class="foot-item__head">联系</div>
+            <div class="foot-item__body">
+              <div class="text">
+                <img alt="link" height="20px" width="20px" src="/images/icon/icon-email.svg"/>
+                <a class="foot-link" href="mailto:jtzhpf@126.com">jtzhpf@126.com</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="copyright">
+          <a href="https://zpf.pages.dev">ZPF.SITE</a> &nbsp;|&nbsp;由&nbsp;<a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>&nbsp;及&nbsp;
+          <svg width="20" height="20" viewBox="0 0 725 725">
+            <path fill-rule="evenodd" fill="rgb(221, 221, 221)" d="M145.870,236.632 L396.955,103.578 L431.292,419.44 L156.600,522.53 L145.870,236.632 Z"/>
+            <path fill-rule="evenodd" fill="rgb(159, 159, 159)" d="M396.955,103.578 L564.345,234.486 L611.558,513.469 L431.292,419.44 L396.955,103.578 Z"/>
+            <path fill-rule="evenodd" fill="rgb(0, 0, 0)" d="M431.292,419.44 L611.558,513.469 L358.327,595.18 L156.600,522.53 L431.292,419.44 Z"/>
+          </svg>
+          <a target="_blank" rel="noopener" href="https://github.com/hooozen/hexo-theme-tranquility">致远</a>&nbsp;驱动
+        </div>
+      </div>
+    </div>
+    
+    
+    <script src="https://cdn.bootcdn.net/ajax/libs/mermaid/10.4.0/mermaid.min.js"></script>
+    
+    
+  
+
+  </body>
+</html>
