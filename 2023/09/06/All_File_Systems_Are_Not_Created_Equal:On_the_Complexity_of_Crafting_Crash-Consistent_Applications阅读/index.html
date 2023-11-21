@@ -99,7 +99,7 @@
       
         <aside class="toc-outer">
           <div class="toc-title">目录</div>
-          <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#bob"><span class="post-toc-text">BOB</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#alice"><span class="post-toc-text">ALICE</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#finding-application-requirements"><span class="post-toc-text">Finding Application Requirements</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E6%B5%8B%E8%AF%95%E8%B7%A8%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E7%9A%84%E5%8E%9F%E5%AD%90%E6%80%A7"><span class="post-toc-text">测试跨系统调用的原子性</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E6%B5%8B%E8%AF%95%E5%8D%95%E4%B8%AA%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E7%9A%84%E5%8E%9F%E5%AD%90%E6%80%A7"><span class="post-toc-text">测试单个系统调用的原子性</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E6%B5%8B%E8%AF%95%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E9%97%B4%E7%9A%84%E9%A1%BA%E5%BA%8F%E4%BE%9D%E8%B5%96%E6%80%A7"><span class="post-toc-text">测试系统调用间的顺序依赖性</span></a></li></ol></li></ol></li></ol>
+          <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#bob"><span class="post-toc-text">BOB</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#alice"><span class="post-toc-text">ALICE</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#finding-application-requirements"><span class="post-toc-text">Finding Application Requirements</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%B5%8B%E8%AF%95%E8%B7%A8%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E7%9A%84%E5%8E%9F%E5%AD%90%E6%80%A7"><span class="post-toc-text">测试跨系统调用的原子性</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%B5%8B%E8%AF%95%E5%8D%95%E4%B8%AA%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E7%9A%84%E5%8E%9F%E5%AD%90%E6%80%A7"><span class="post-toc-text">测试单个系统调用的原子性</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%B5%8B%E8%AF%95%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E9%97%B4%E7%9A%84%E9%A1%BA%E5%BA%8F%E4%BE%9D%E8%B5%96%E6%80%A7"><span class="post-toc-text">测试系统调用间的顺序依赖性</span></a></li></ol></li></ol></li></ol>
           <a href="#" class="toc-top">回到顶部</a>
         </aside>
       
@@ -114,12 +114,12 @@
 <figure>
 <img src="/All_File_Systems_Are_Not_Created_Equal:On_the_Complexity_of_Crafting_Crash-Consistent_Applications阅读/image1.png" alt="" /><figcaption>Crash States</figcaption>
 </figure>
-<h2 id="bob">BOB</h2>
+<h1 id="bob">BOB</h1>
 <p>BOB是一个简单的工具，用于收集文件系统下的块级追踪，并重新排序以探索可能出现的磁盘崩溃状态，用于测试文件系统的持久性属性。它通过运行一个简单的工作负载来测试持久性属性，收集块I/O并重新排序，生成可能的磁盘状态。然后运行文件系统恢复并检查持久性属性是否成立。如果BOB找到一个检查失败的磁盘映像，则知道该属性在文件系统上不成立。</p>
 <figure>
 <img src="/All_File_Systems_Are_Not_Created_Equal:On_the_Complexity_of_Crafting_Crash-Consistent_Applications阅读/image3.png" alt="" /><figcaption>Persistence Properties</figcaption>
 </figure>
-<h2 id="alice">ALICE</h2>
+<h1 id="alice">ALICE</h1>
 <p>本文研究现代应用程序的崩溃一致性协议实现是否正确。为了回答这个问题，研究者们开发了一个名为ALICE的框架，可以系统地研究应用程序级别的崩溃一致性。</p>
 <p>ALICE将应用工作负载中的系统调用跟踪转换为逻辑操作。逻辑操作将当前读写偏移量、文件描述符等细节抽象化，并将一组大量的系统调用和其他产生I/O行为转换为一小组文件系统操作。逻辑操作还将每个涉及的文件或目录关联到一个概念上的inode。</p>
 <p>APM（Abstract Persistence Models）规定了文件系统中逻辑操作的原子性和顺序的所有限制，从而定义了可能的崩溃状态。</p>
@@ -132,12 +132,12 @@
 <figure>
 <img src="/All_File_Systems_Are_Not_Created_Equal:On_the_Complexity_of_Crafting_Crash-Consistent_Applications阅读/image4.png" alt="" /><figcaption>Overview of ALICE</figcaption>
 </figure>
-<h3 id="finding-application-requirements">Finding Application Requirements</h3>
-<h4 id="测试跨系统调用的原子性">测试跨系统调用的原子性</h4>
+<h2 id="finding-application-requirements">Finding Application Requirements</h2>
+<h3 id="测试跨系统调用的原子性">测试跨系统调用的原子性</h3>
 <p>它通过构建每个前缀（即前X个系统调用，1&lt;X&lt;N）应用的崩溃状态来实现。如果在这些崩溃状态中发现应用程序不变量被违反，则表示开始了一个原子组。(apply prefix of operations)</p>
-<h4 id="测试单个系统调用的原子性">测试单个系统调用的原子性</h4>
+<h3 id="测试单个系统调用的原子性">测试单个系统调用的原子性</h3>
 <p>通过将所有先前的系统调用应用于崩溃状态，并生成对应于系统调用不同中间状态的崩溃状态，检查是否违反应用程序不变量。 (apply prefix + partial operation)</p>
-<h4 id="测试系统调用间的顺序依赖性">测试系统调用间的顺序依赖性</h4>
+<h3 id="测试系统调用间的顺序依赖性">测试系统调用间的顺序依赖性</h3>
 <p>协议要求系统调用A必须在B之前进行持久化时，可以使用ALICE来测试这个属性。</p>
 <p>ALICE从开始应用每个系统调用，直到达到B，但不包括A。这样可以检查A是否必须在B之前持久化。 如果B已应用但A没有，并且在这种情况下应用程序不变性被违反，表示存在A必须在B之前进行持久化的顺序依赖性。</p>
 

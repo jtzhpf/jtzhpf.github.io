@@ -99,7 +99,7 @@
       
         <aside class="toc-outer">
           <div class="toc-title">目录</div>
-          <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%8F%92%E6%A1%A9%E7%A4%BA%E4%BE%8B%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90"><span class="post-toc-text">插桩示例代码分析</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%9C%A8%E7%BC%96%E8%AF%91%E9%98%B6%E6%AE%B5%E6%8F%92%E6%A1%A9"><span class="post-toc-text">在编译阶段插桩</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%9C%A8%E9%93%BE%E6%8E%A5%E9%98%B6%E6%AE%B5%E6%8F%92%E6%A1%A9"><span class="post-toc-text">在链接阶段插桩</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%9C%A8%E6%89%A7%E8%A1%8C%E9%98%B6%E6%AE%B5%E6%8F%92%E6%A1%A9"><span class="post-toc-text">在执行阶段插桩</span></a></li></ol>
+          <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E6%8F%92%E6%A1%A9%E7%A4%BA%E4%BE%8B%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90"><span class="post-toc-text">插桩示例代码分析</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E5%9C%A8%E7%BC%96%E8%AF%91%E9%98%B6%E6%AE%B5%E6%8F%92%E6%A1%A9"><span class="post-toc-text">在编译阶段插桩</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E5%9C%A8%E9%93%BE%E6%8E%A5%E9%98%B6%E6%AE%B5%E6%8F%92%E6%A1%A9"><span class="post-toc-text">在链接阶段插桩</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E5%9C%A8%E6%89%A7%E8%A1%8C%E9%98%B6%E6%AE%B5%E6%8F%92%E6%A1%A9"><span class="post-toc-text">在执行阶段插桩</span></a></li></ol>
           <a href="#" class="toc-top">回到顶部</a>
         </aside>
       
@@ -110,7 +110,7 @@
           </div>
         
         <p>本文以Linux下调用库函数的一个例子来演示一下插桩技术。 <span id="more"></span></p>
-<h2 id="插桩示例代码分析">插桩示例代码分析</h2>
+<h1 id="插桩示例代码分析">插桩示例代码分析</h1>
 <p>示例代码很简单： <figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs stata">.<br>├── <span class="hljs-keyword">app</span>.c<br>└── lib<br>    ├── rd3.<span class="hljs-keyword">h</span><br>    └── librd3.<span class="hljs-keyword">so</span><br></code></pre></td></tr></table></figure> <code>librd3.so</code>是一个动态库，其源代码<code>librd3.c</code>如下所示： <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">rd3_func</span><span class="hljs-params">(<span class="hljs-type">int</span> a, <span class="hljs-type">int</span> b)</span> &#123;<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;hello, world\n&quot;</span>);<br>    <span class="hljs-keyword">return</span> a + b;<br>&#125;<br></code></pre></td></tr></table></figure> 通过<code>$ gcc -shared -o librd3.so librd3.c</code>可以获得<code>librd3.so</code>。 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// lib/rd3.h</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">ifndef</span> _RD3_H_</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> _RD3_H_</span><br><span class="hljs-keyword">extern</span> <span class="hljs-type">int</span> <span class="hljs-title function_">rd3_func</span><span class="hljs-params">(<span class="hljs-type">int</span>, <span class="hljs-type">int</span>)</span>;<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br></code></pre></td></tr></table></figure> 在应用程序<code>app.c</code>中，调用了动态库中的这个函数：</p>
 <p><img src="/浅尝插桩技术/image1.png" width="500" /></p>
 <p><code>app.c</code>代码如下： <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdlib.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;rd3.h&quot;</span></span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">(<span class="hljs-type">int</span> argc, <span class="hljs-type">char</span> *argv[])</span><br>&#123;<br>    <span class="hljs-type">int</span> result = rd3_func(<span class="hljs-number">1</span>, <span class="hljs-number">1</span>);<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;result = %d \n&quot;</span>, result);<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure> 编译：</p>
@@ -122,7 +122,7 @@
 <li><code>-Wl,--rpath=./lib</code>：这个选项用于设置运行时库路径。<code>-Wl</code> 用于将选项传递给链接器，而 <code>--rpath=./lib</code> 指示链接器在运行时搜索库时查找位于当前目录下的 <code>lib</code> 子目录。</li>
 </ul>
 <p>执行程序得到输出： <figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">hello</span>, world<br><span class="hljs-attribute">result</span> = <span class="hljs-number">2</span><br></code></pre></td></tr></table></figure></p>
-<h2 id="在编译阶段插桩">在编译阶段插桩</h2>
+<h1 id="在编译阶段插桩">在编译阶段插桩</h1>
 <p>对函数进行插桩，基本要求是：不应该对原来的文件(<code>app.c</code>)进行额外的修改。</p>
 <p>由于<code>app.c</code>文件中，已经<code>include "rd3.h"</code>了，并且调用了其中的<code>rd3_func(int, int)</code>函数。</p>
 <p>所以我们需要新建一个假的 <code>rd3.h</code> 提供给<code>app.c</code>，并且要把函数<code>rd3_func(int, int)</code>重导向到一个包装函数，然后在包装函数中去调用真正的目标函数，如下图所示：</p>
@@ -136,7 +136,7 @@
 <p>所以在编译指令中，第一个选项就是 <code>-I./</code>，表示在当前目录下搜寻头文件。</p>
 <p>另外，由于在<code>rd3_wrap.c</code>文件中，使用<code>#include "lib/rd3.h"</code>来包含库中的头文件，因此在编译指令中，就不需要指定到<code>lib</code> 目录下去查找头文件了。</p>
 <p>编译得到可执行程序<code>app</code>，执行一下： <figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs livecodeserver"><span class="hljs-keyword">before</span> call rd3_func. <span class="hljs-built_in">do</span> something... <br>hello, world<br><span class="hljs-keyword">after</span> call rd3_func. <span class="hljs-built_in">do</span> something... <br><span class="hljs-built_in">result</span> = <span class="hljs-number">2</span><br></code></pre></td></tr></table></figure></p>
-<h2 id="在链接阶段插桩">在链接阶段插桩</h2>
+<h1 id="在链接阶段插桩">在链接阶段插桩</h1>
 <p>GNU 的链接器功能是非常强大的，它提供了一个选项：<code>--wrap f</code>，可以在链接阶段进行插桩。</p>
 <p>这个选项的作用是：告诉链接器，遇到<code>f</code>符号时解析成<code>__wrap_f</code>，在遇到<code>__real_f</code>符号时解析成<code>f</code>，正好是一对！</p>
 <p>我们就可以利用这个属性，新建一个文件<code>rd3_wrap.c</code>，并且定义一个函数<code>__wrap_rd3_func(int, int)</code>，在这个函数中去调用<code>__real_rd3_func</code>函数。</p>
@@ -153,7 +153,7 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">$ </span><span class="language-bash">gcc -I./lib -L./lib -Wl,--rpath=./lib -Wl,--wrap,rd3_func -o app app.c rd3_wrap.c -lrd3</span><br></code></pre></td></tr></table></figure>
 <p>注意：这里的头文件搜索路径仍然设置为<code>-I./lib</code>，是因为<code>app.c</code>中<code>include</code>了这个头文件。</p>
 <p>得到可执行程序<code>app</code>，执行，得到的结果与先前一致。</p>
-<h2 id="在执行阶段插桩">在执行阶段插桩</h2>
+<h1 id="在执行阶段插桩">在执行阶段插桩</h1>
 <p>在编译阶段插桩，新建的文件<code>rd3_wrap.c</code>是与<code>app.c</code>一起编译的，其中的包装函数名是<code>wrap_rd3_func</code>。</p>
 <p><code>app.c</code>中通过一个宏定义实现函数的"重导向"：<code>rd3_func -&gt; wrap_rd3_func</code>。</p>
 <p>我们还可以直接"霸王硬上弓"：在新建的文件<code>rd3_wrap.c</code>中，直接定义<code>rd3_func</code>函数。</p>

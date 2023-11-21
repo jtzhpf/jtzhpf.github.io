@@ -99,7 +99,7 @@
       
         <aside class="toc-outer">
           <div class="toc-title">目录</div>
-          <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#compilerinstance-%E7%B1%BB"><span class="post-toc-text">CompilerInstance 类</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#compilerinstance-%E7%9A%84%E7%BB%93%E6%9E%84"><span class="post-toc-text">CompilerInstance 的结构</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#static-analyzer"><span class="post-toc-text">Static Analyzer</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#clang-%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90%E6%A8%A1%E5%BC%8F"><span class="post-toc-text">Clang 静态分析模式</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#control-flow-graph"><span class="post-toc-text">Control Flow Graph</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%9E%84%E9%80%A0basic-blocks"><span class="post-toc-text">构造Basic Blocks</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%9E%84%E9%80%A0cfg"><span class="post-toc-text">构造CFG</span></a></li></ol></li></ol>
+          <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#compilerinstance-%E7%B1%BB"><span class="post-toc-text">CompilerInstance 类</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#compilerinstance-%E7%9A%84%E7%BB%93%E6%9E%84"><span class="post-toc-text">CompilerInstance 的结构</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#static-analyzer"><span class="post-toc-text">Static Analyzer</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#clang-%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90%E6%A8%A1%E5%BC%8F"><span class="post-toc-text">Clang 静态分析模式</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#control-flow-graph"><span class="post-toc-text">Control Flow Graph</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%9E%84%E9%80%A0basic-blocks"><span class="post-toc-text">构造Basic Blocks</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%9E%84%E9%80%A0cfg"><span class="post-toc-text">构造CFG</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#static-analyzer-checker"><span class="post-toc-text">Static Analyzer Checker</span></a></li></ol>
           <a href="#" class="toc-top">回到顶部</a>
         </aside>
       
@@ -112,9 +112,9 @@
         <p>这是在阅读 Clang 时遇到不会内容时的随笔，看到哪写到哪，可能不会有任何的结构（Who knows）。</p>
 <p>😘 在此先疯狂鸣谢一波 ChatGPT 和 Claude 😍。</p>
 <span id="more"></span>
-<h2 id="compilerinstance-类">CompilerInstance 类</h2>
+<h1 id="compilerinstance-类">CompilerInstance 类</h1>
 <p>CompilerInstance 是 LLVM/Clang 编译器框架中的一个类，用于管理整个编译过程中的状态和组件。它负责协调和组织编译器的不同部分，包括预处理器、语法分析器、语义分析器等。在编译的不同阶段，CompilerInstance 提供了访问和控制这些组件的方法。</p>
-<h3 id="compilerinstance-的结构">CompilerInstance 的结构</h3>
+<h2 id="compilerinstance-的结构">CompilerInstance 的结构</h2>
 <p>CompilerInstance 的具体结构可能会有一些复杂，因为它需要协调各个编译器组件的工作。一般而言，它包含了以下关键成员：</p>
 <ul>
 <li>语法树（AST）： 用于表示源代码结构的树形数据结构。AST 在编译器的语法分析阶段构建，以便更容易进行语义分析和代码生成。</li>
@@ -125,7 +125,7 @@
 <li>前端选项（FrontendOptions）： 包含与编译过程相关的各种选项，如编译目标、优化级别等。</li>
 </ul>
 <p>这只是 CompilerInstance 结构的一般概述，具体实现可能更为复杂。</p>
-<h2 id="static-analyzer">Static Analyzer</h2>
+<h1 id="static-analyzer">Static Analyzer</h1>
 <p>Static Analyzer 的源代码入口主要位于 Clang 代码库的 <code>lib/StaticAnalyzer</code> 目录中。以下是几个关键文件和目录：</p>
 <ul>
 <li><strong><code>lib/StaticAnalyzer/Core</code>：</strong> 包含 Static Analyzer 的核心实现，如路径敏感性分析器、检查器管理器等。</li>
@@ -138,7 +138,7 @@
 </ul>
 <p>调用情况如图所示： <img src="/Clang阅读随笔/image1.png" alt="Clang Static Analyzer 调用情况" /></p>
 <p>总体而言，<code>AnalysisConsumer.cpp</code> 和 <code>CheckerManager.cpp</code> 可以看作是 Static Analyzer 的源代码入口，它们定义了整个分析过程的驱动和管理逻辑。其他目录则包含了各个组件的具体实现。</p>
-<h3 id="clang-静态分析模式">Clang 静态分析模式</h3>
+<h2 id="clang-静态分析模式">Clang 静态分析模式</h2>
 <p>在 Clang 的静态分析器（<code>/llvm/tools/clang/lib/StaticAnalyzer/Frontend/AnalysisConsumer.cpp: HandleTranslationUnit()</code>）中，<code>AM_Syntax</code> 和 <code>AM_Path</code> 分别代表不同的分析模式，用于控制静态分析的行为。以下是它们的区别：</p>
 <ol type="1">
 <li><strong><code>AM_Syntax</code>（语法分析模式）：</strong>
@@ -154,13 +154,13 @@
 </ol>
 <p>总的来说，区别在于分析是否关注程序的路径执行信息。<code>AM_Syntax</code> 主要关注语法结构，而 <code>AM_Path</code> 则在此基础上考虑了路径敏感性，以更全面地发现潜在问题。</p>
 <p><a href="/2023/08/31/Cross-checking_Semantic_Correctness:The_Case_of_Finding_File_System_Bugs阅读/">Cross-checking Semantic Correctness: The Case of Finding File System Bugs</a> 这篇文章中使用的是<code>AM_Syntax</code>。</p>
-<h2 id="control-flow-graph">Control Flow Graph</h2>
+<h1 id="control-flow-graph">Control Flow Graph</h1>
 <p>控制流图（control-flow graph）简称CFG，是计算机科学中的表示法，利用数学中图的表示方式，标示计算机程序执行过程中所经过的所有路径。</p>
 <p>节点表示基本块（basic block），边表示控制流的流向。Basic Block是CFG的主体。</p>
 <blockquote>
 <p>Basic Block：一个最长的语句序列，并保证入口只能在最开始指令且出口只能在最后一个指令。</p>
 </blockquote>
-<h3 id="构造basic-blocks">构造Basic Blocks</h3>
+<h2 id="构造basic-blocks">构造Basic Blocks</h2>
 <ul>
 <li>Input：程序P的三地址码序列</li>
 <li>Output：程序P的basic blocks</li>
@@ -189,7 +189,7 @@
 <li>因为上述特点，基本块中的程式，只要执行了第一行，后面的程式码就会依序执行，每一行程式都会执行一次。</li>
 </ul></li>
 </ul>
-<h3 id="构造cfg">构造CFG</h3>
+<h2 id="构造cfg">构造CFG</h2>
 <p>添加边，在以下两种情况下：</p>
 <ul>
 <li>无条件跳转：一条无条件跳转语句会创建一个有向边，将当前基本块的出口指向目标基本块的入口。</li>
@@ -232,6 +232,8 @@
 
     style entry fill:#98FB98,stroke:#4CAF50,stroke-width:2px;
     style exit fill:#98FB98,stroke:#4CAF50,stroke-width:2px;</pre>
+<h1 id="static-analyzer-checker">Static Analyzer Checker</h1>
+<p><code>clang -cc1 -analyzer-checker-help</code> 命令可以查看 Clang 所支持的所有的 Static Analyzer Checker。单个 Checker 是 Static Analyzer 在代码中执行的单个分析单元。每个分析都针对特定类型的错误，静态分析器允许选择符合需求的任意一部分检查器。</p>
 
       </div>
     </div>

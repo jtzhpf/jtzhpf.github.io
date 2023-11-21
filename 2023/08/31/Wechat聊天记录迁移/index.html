@@ -99,7 +99,7 @@
       
         <aside class="toc-outer">
           <div class="toc-title">目录</div>
-          <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%89%BE%E5%88%B0%E5%A4%87%E4%BB%BD%E6%96%87%E4%BB%B6%E5%A4%B9"><span class="post-toc-text">找到备份文件夹</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%88%9B%E5%BB%BA%E8%BD%AF%E8%BF%9E%E6%8E%A5"><span class="post-toc-text">创建软连接</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%87%8D%E6%96%B0%E7%AD%BE%E5%90%8D%E5%BE%AE%E4%BF%A1"><span class="post-toc-text">重新签名微信</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%9B%B4%E6%96%B0%E5%BE%AE%E4%BF%A1"><span class="post-toc-text">更新微信</span></a></li></ol>
+          <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E6%89%BE%E5%88%B0%E5%A4%87%E4%BB%BD%E6%96%87%E4%BB%B6%E5%A4%B9"><span class="post-toc-text">找到备份文件夹</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E5%88%9B%E5%BB%BA%E8%BD%AF%E8%BF%9E%E6%8E%A5"><span class="post-toc-text">创建软连接</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E9%87%8D%E6%96%B0%E7%AD%BE%E5%90%8D%E5%BE%AE%E4%BF%A1"><span class="post-toc-text">重新签名微信</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E6%9B%B4%E6%96%B0%E5%BE%AE%E4%BF%A1"><span class="post-toc-text">更新微信</span></a></li></ol>
           <a href="#" class="toc-top">回到顶部</a>
         </aside>
       
@@ -110,16 +110,16 @@
           </div>
         
         <p>释放Mac微信备份占用的存储空间 <span id="more"></span></p>
-<h2 id="找到备份文件夹">找到备份文件夹</h2>
+<h1 id="找到备份文件夹">找到备份文件夹</h1>
 <p>进入访达，按下<code>command+shift+i</code>显示隐藏文件夹，然后点击菜单栏上的「前往」，点击「前往文件夹」。</p>
 <p>将下面内容输入进去。记住更改里面的用户名。 <figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs awk"><span class="hljs-regexp">/Users/</span>这里改为你的用户名<span class="hljs-regexp">/Library/</span>Containers<span class="hljs-regexp">/com.tencent.xinWeChat/</span>Data<span class="hljs-regexp">/Library/</span>Application Support<span class="hljs-regexp">/com.tencent.xinWeChat/</span><span class="hljs-number">2.0</span>b4.<span class="hljs-number">0.9</span><span class="hljs-regexp">/Backup/</span><br></code></pre></td></tr></table></figure></p>
 <p><code>command+c</code>复制里面的32位字符的文件夹，<code>command+shift+v</code>移动文件夹到移动硬盘的任意文件夹中。</p>
-<h2 id="创建软连接">创建软连接</h2>
+<h1 id="创建软连接">创建软连接</h1>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">ln -s 移动硬盘里的32位字符文件夹地址 /Users/用户名/Library/Containers/com.tencent.xinWeChat/Data/Library/Application\ Support/com.tencent.xinWeChat/2.0b4.0.9/Backup<br></code></pre></td></tr></table></figure>
-<h2 id="重新签名微信">重新签名微信</h2>
+<h1 id="重新签名微信">重新签名微信</h1>
 <p>退出微信，在终端app中输入下面的内容并回车。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo codesign --sign - --force --deep /Applications/WeChat.app<br></code></pre></td></tr></table></figure>
-<h2 id="更新微信">更新微信</h2>
+<h1 id="更新微信">更新微信</h1>
 <p>更新了微信客户端之后需要重复上述操作。</p>
 
       </div>
