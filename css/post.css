@@ -111,7 +111,7 @@
 .post-inner--toc,
 .post-inner--toc--toc {
   max-width: 800px;
-  padding-right: 230px;
+  padding-right: 245px;
 }
 .post-inner--toc .post-content__body,
 .post-inner--toc--toc .post-content__body {
@@ -286,8 +286,8 @@
 }
 @media screen and (max-width: 1023px) {
   .body {
-    padding-left: 30px;
-    padding-right: 30px;
+    padding-left: 15px;
+    padding-right: 15px;
   }
   .post-gallery {
     grid-template-columns: 1fr 1fr;

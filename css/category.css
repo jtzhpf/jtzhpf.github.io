@@ -137,8 +137,8 @@
 }
 @media screen and (max-width: 1023px) {
   .wall-category .tag-page-title {
-    padding-left: 30px;
-    padding-right: 30px;
+    padding-left: 15px;
+    padding-right: 15px;
   }
   .wall-category .post-list {
     padding: 0 10px;
