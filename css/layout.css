@@ -102,7 +102,6 @@ code {
 }
 h1 {
   display: block;
-  font-size: 1.5em;
   margin-block-start: 1em;
   margin-block-end: 0.67em;
   margin-inline-start: 0px;
@@ -597,7 +596,7 @@ mjx-container {
   flex-wrap: wrap;
 }
 .foot-item__head {
-  font-size: 24px;
+  font-size: 1.5em;
   margin: 10px 0;
 }
 .foot-link {
