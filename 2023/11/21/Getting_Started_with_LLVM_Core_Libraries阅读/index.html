@@ -5,7 +5,7 @@
     <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
     <title>
       
-        读研生活随笔 | ZPF.SITE
+        Getting Started with LLVM Core Libraries 阅读 | ZPF.SITE
       
     </title>
     <meta name="description" content=""/>
@@ -61,7 +61,119 @@
   <link rel="stylesheet" type="text/css" href="/css/post.css" />
   
 
-  <meta name="generator" content="Hexo 6.3.0"></head>
+  <meta name="generator" content="Hexo 6.3.0"><style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style></head>
   <body>
     <div class="head">
       <div class="nav">
@@ -87,10 +199,10 @@
   <article class="post-content">
     <div class="post-inner--toc">
       <div class="post-content__head">
-        <div class="post-title">读研生活随笔</div>
+        <div class="post-title">Getting Started with LLVM Core Libraries 阅读</div>
         <div class="post-info">
           
-  <a href="/tags/Life/" class="post-tag">#Life</a>
+  <a href="/tags/LLVM/" class="post-tag">#LLVM</a><a href="/tags/Clang/" class="post-tag">#Clang</a><a href="/tags/Compiler/" class="post-tag">#Compiler</a><a href="/tags/Symbolic-Execution/" class="post-tag">#Symbolic Execution</a><a href="/tags/Staitc-Analysis/" class="post-tag">#Staitc Analysis</a><a href="/tags/Book/" class="post-tag">#Book</a>
 
 
           <span class="post-date">2023-11-21</span>
@@ -99,7 +211,7 @@
       
         <aside class="toc-outer">
           <div class="toc-title">目录</div>
-          <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%B9%B411%E6%9C%8821%E6%97%A5"><span class="post-toc-text">2023年11月21日</span></a></li></ol>
+          <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#forward-dataflow-analysis"><span class="post-toc-text">Forward Dataflow Analysis</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#symbolic-execution"><span class="post-toc-text">Symbolic Execution</span></a></li></ol>
           <a href="#" class="toc-top">回到顶部</a>
         </aside>
       
@@ -109,13 +221,21 @@
             
           </div>
         
-        <p>😊 随便记录一下读研的生活（以及分享一下每天吃到的🍉）。 <span id="more"></span></p>
-<h2 id="年11月21日">2023年11月21日</h2>
-<p>最近几天心态好很多了。之前看不懂 Clang 心态疯狂爆炸😭，于是连着看了一个月的论文，搞得现在好几篇论文要整理😷。</p>
-<p>现在看起来虽然依旧很吃力，但是配好 VScode 的 Debug 工具后总算比之前好一点，多少能抓住点头绪了。</p>
-<p>但是对编译/程序分析的知识点的缺乏还是有点让人恼火😫，只能一边看一边补了。</p>
-<p>现在想想自己当时还挺勇的，怎么就敢选这个方向的哈哈哈。</p>
-<p>前两天听到师兄讲他现在心态变好很多，只要学到新东西每天就很开心，觉得他说的挺对的，希望我也能每天开心嘻嘻。</p>
+        <p>这本书是在找 Static Analyzer 时意外发现的，其余部分暂时不打算理睬，先重点关注 Static Analyzer 部分。</p>
+<span id="more"></span>
+<hr>
+<h2 id="forward-dataflow-analysis">Forward Dataflow Analysis</h2>
+<figure>
+<img src="/Getting_Started_with_LLVM_Core_Libraries阅读/image1.png" alt=""><figcaption>Forward Dataflow Analysis 的过程以及可能出现的 False Positive 的情况</figcaption>
+</figure>
+<h2 id="symbolic-execution">Symbolic Execution</h2>
+<figure>
+<img src="/Getting_Started_with_LLVM_Core_Libraries阅读/image2.png" alt=""><figcaption>利用 Symbolic Execution 对上述例子进行分析</figcaption>
+</figure>
+<p><img src="/Getting_Started_with_LLVM_Core_Libraries阅读/image3.png"></p>
+<figure>
+<img src="/Getting_Started_with_LLVM_Core_Libraries阅读/image4.png" alt=""><figcaption>Symbolic Execution 相较于 Forward Dataflow Analysis，其同样合并了部分节点，但不能合并的又没有强行合并</figcaption>
+</figure>
 
       </div>
     </div>
@@ -124,11 +244,23 @@
     
     <div class="post-nav">
   
-    <div class="post-nav-item-left"></div>
+    <a class="post-nav-item-left" href="/2023/11/21/%E8%AF%BB%E7%A0%94%E7%94%9F%E6%B4%BB%E9%9A%8F%E7%AC%94/">
+      <div class="text-align">
+        <svg t="1670570876164"
+             class="icon"
+             viewBox="0 0 1024 1024"
+             width="16"
+             height="16">
+          <path d="M384 512L731.733333 202.666667c17.066667-14.933333 19.2-42.666667 4.266667-59.733334-14.933333-17.066667-42.666667-19.2-59.733333-4.266666l-384 341.333333c-10.666667 8.533333-14.933333 19.2-14.933334 32s4.266667 23.466667 14.933334 32l384 341.333333c8.533333 6.4 19.2 10.666667 27.733333 10.666667 12.8 0 23.466667-4.266667 32-14.933333 14.933333-17.066667 14.933333-44.8-4.266667-59.733334L384 512z" p-id="14596"/>
+        </svg>
+        <span class="text-small">上一篇</span>
+      </div>
+      <div>读研生活随笔</div>
+    </a>
   
   <div class="vhr"></div>
   
-    <a class="post-nav-item-right" href="/2023/11/21/Getting_Started_with_LLVM_Core_Libraries%E9%98%85%E8%AF%BB/">
+    <a class="post-nav-item-right" href="/2023/11/20/Clang%E9%98%85%E8%AF%BB%E9%9A%8F%E7%AC%94/">
       <div class="text-align">
         <span class="text-small">下一篇</span>
         <svg t="1670570876164"
@@ -140,7 +272,7 @@
           <path d="M384 512L731.733333 202.666667c17.066667-14.933333 19.2-42.666667 4.266667-59.733334-14.933333-17.066667-42.666667-19.2-59.733333-4.266666l-384 341.333333c-10.666667 8.533333-14.933333 19.2-14.933334 32s4.266667 23.466667 14.933334 32l384 341.333333c8.533333 6.4 19.2 10.666667 27.733333 10.666667 12.8 0 23.466667-4.266667 32-14.933333 14.933333-17.066667 14.933333-44.8-4.266667-59.733334L384 512z" p-id="14596"/>
         </svg>
       </div>
-      Getting Started with LLVM Core Libraries 阅读
+      Clang 阅读随笔
     </a>
   
 </div>
@@ -148,12 +280,12 @@
     
       <div class="related-post">
   <div class="related__head">
-  <a href="/tags/Life/" class="post-tag">#Life</a>
+  <a href="/tags/LLVM/" class="post-tag">#LLVM</a><a href="/tags/Clang/" class="post-tag">#Clang</a><a href="/tags/Compiler/" class="post-tag">#Compiler</a><a href="/tags/Symbolic-Execution/" class="post-tag">#Symbolic Execution</a><a href="/tags/Staitc-Analysis/" class="post-tag">#Staitc Analysis</a><a href="/tags/Book/" class="post-tag">#Book</a>
 
 </div>
   <div class="realated__body">
     
-      <div class="null"><div class="null-item"><div class="null-title"><a href="/2023/08/31/Wechat聊天记录迁移/" title="将Mac微信聊天记录备份到移动硬盘" rel="bookmark">将Mac微信聊天记录备份到移动硬盘</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/08/31/icns制作/" title="icns 图标制作" rel="bookmark">icns 图标制作</a></div></div></div>
+      <div class="null"><div class="null-item"><div class="null-title"><a href="/2023/11/07/@蓝色老师的LLVM系列文章汇总/" title="@蓝色老师的LLVM系列文章汇总" rel="bookmark">@蓝色老师的LLVM系列文章汇总</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/10/17/Clang_AST/" title="Clang AST" rel="bookmark">Clang AST</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/11/20/Clang阅读随笔/" title="Clang 阅读随笔" rel="bookmark">Clang 阅读随笔</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/06/All_File_Systems_Are_Not_Created_Equal:On_the_Complexity_of_Crafting_Crash-Consistent_Applications阅读/" title="All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读" rel="bookmark">All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/10/30/All_You_Ever_Wanted_to_Know_About_Dynamic_Taint_Analysis_and_Forward_Symbolic_Execution阅读/" title="All You Ever Wanted to Know About Dynamic Taint Analysis and Forward Symbolic Execution 阅读" rel="bookmark">All You Ever Wanted to Know About Dynamic Taint Analysis and Forward Symbolic Execution 阅读</a></div></div></div>
     
   </div>
 </div>
