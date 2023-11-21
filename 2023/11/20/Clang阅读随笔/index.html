@@ -99,7 +99,7 @@
       
         <aside class="toc-outer">
           <div class="toc-title">目录</div>
-          <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#compilerinstance-%E7%B1%BB"><span class="post-toc-text">CompilerInstance 类</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#compilerinstance-%E7%9A%84%E7%BB%93%E6%9E%84"><span class="post-toc-text">CompilerInstance 的结构</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#static-analyzer"><span class="post-toc-text">Static Analyzer</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#clang-%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90%E6%A8%A1%E5%BC%8F"><span class="post-toc-text">Clang 静态分析模式</span></a></li></ol></li></ol>
+          <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#compilerinstance-%E7%B1%BB"><span class="post-toc-text">CompilerInstance 类</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#compilerinstance-%E7%9A%84%E7%BB%93%E6%9E%84"><span class="post-toc-text">CompilerInstance 的结构</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#static-analyzer"><span class="post-toc-text">Static Analyzer</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#clang-%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90%E6%A8%A1%E5%BC%8F"><span class="post-toc-text">Clang 静态分析模式</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#control-flow-graph"><span class="post-toc-text">Control Flow Graph</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%9E%84%E9%80%A0basic-blocks"><span class="post-toc-text">构造Basic Blocks</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%9E%84%E9%80%A0cfg"><span class="post-toc-text">构造CFG</span></a></li></ol></li></ol>
           <a href="#" class="toc-top">回到顶部</a>
         </aside>
       
@@ -154,6 +154,85 @@
 </ol>
 <p>总的来说，区别在于分析是否关注程序的路径执行信息。<code>AM_Syntax</code> 主要关注语法结构，而 <code>AM_Path</code> 则在此基础上考虑了路径敏感性，以更全面地发现潜在问题。</p>
 <p><a href="/2023/08/31/Cross-checking_Semantic_Correctness:The_Case_of_Finding_File_System_Bugs阅读/">Cross-checking Semantic Correctness: The Case of Finding File System Bugs</a> 这篇文章中使用的是<code>AM_Syntax</code>。</p>
+<h2 id="control-flow-graph">Control Flow Graph</h2>
+<p>控制流图（control-flow graph）简称CFG，是计算机科学中的表示法，利用数学中图的表示方式，标示计算机程序执行过程中所经过的所有路径。</p>
+<p>节点表示基本块（basic block），边表示控制流的流向。Basic Block是CFG的主体。</p>
+<blockquote>
+<p>Basic Block：一个最长的语句序列，并保证入口只能在最开始指令且出口只能在最后一个指令。</p>
+</blockquote>
+<h3 id="构造basic-blocks">构造Basic Blocks</h3>
+<ul>
+<li>Input：程序P的三地址码序列</li>
+<li>Output：程序P的basic blocks</li>
+<li>算法
+<ul>
+<li>确定leaders（每个basic block的头）
+<ul>
+<li>序列中的第一个指令</li>
+<li>跳转指令的目标指令</li>
+<li>跳转指令的下一条指令</li>
+<li>return指令</li>
+</ul></li>
+<li>每个Basic Block包含其leader至下一个leader前的所有语句</li>
+</ul></li>
+<li>算法的另一种阐释
+<ul>
+<li>初始语句作为第一个基本块的入口</li>
+<li>遇到标号类语句，结束当前基本块，标号作为新基本块的入口（标号不在当前基本块中，而是划到下一个基本块）</li>
+<li>遇到转移类语句时，结束当前当前基本块，转移语句作为当前基本块的结尾</li>
+<li>当给引用类型变量赋值时，结束基本块，作为出口</li>
+</ul></li>
+<li>基本块有以下特点：
+<ul>
+<li>单一入口点，其他程式中，没有任何一个分支指令的目标在这段程式基本块之内（基本块的第一行除外）。</li>
+<li>单一结束点，这段程式一定要执行完最后一行才会执行其他基本块的程式。</li>
+<li>因为上述特点，基本块中的程式，只要执行了第一行，后面的程式码就会依序执行，每一行程式都会执行一次。</li>
+</ul></li>
+</ul>
+<h3 id="构造cfg">构造CFG</h3>
+<p>添加边，在以下两种情况下：</p>
+<ul>
+<li>无条件跳转：一条无条件跳转语句会创建一个有向边，将当前基本块的出口指向目标基本块的入口。</li>
+<li>条件跳转：创建两条有向边，分别表示条件为真和条件为假时的目标基本块。</li>
+</ul>
+<p>在构建控制流图（CFG）时，通常会引入两个特殊的节点，即entry节点和exit节点，以更好地表示程序的整体控制流。这两个节点不对应具体的代码块，而是代表程序的入口和出口。</p>
+<ul>
+<li>entry节点： entry节点表示程序的起始点。它没有对应的代码，而是作为整个控制流图的入口。从entry节点开始，程序的执行流程进入其他基本块。</li>
+<li>exit节点： exit节点表示程序的结束点。类似地，它也没有对应的代码，而是作为整个控制流图的出口。程序的执行流程可能从不同的基本块经过，最终都会汇聚到exit节点。</li>
+</ul>
+<p><strong>示例：</strong></p>
+<p>考虑以下伪代码：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs markdown"><span class="hljs-bullet">1.</span>  if condition<br><span class="hljs-bullet">2.</span>    statement1<br><span class="hljs-bullet">3.</span>  else<br><span class="hljs-bullet">4.</span>    statement2<br><span class="hljs-bullet">5.</span>  endif<br><span class="hljs-bullet">6.</span>  statement3<br></code></pre></td></tr></table></figure>
+<p>构建CFG的步骤：</p>
+<ol type="1">
+<li><p>划分基本块：</p>
+<ul>
+<li>基本块1: Line. 1</li>
+<li>基本块2: Line. 2 - 3</li>
+<li>基本块3: Line. 4</li>
+<li>基本块4: Line. 5 - 6</li>
+</ul>
+<p><code>else</code> 为转移类语句，<code>endif</code> 为标号类语句。</p></li>
+<li><p>构建基本块间的控制流关系：</p>
+<ul>
+<li>从基本块1到基本块2，因为有条件跳转语句。</li>
+<li>从基本块1到基本块3，因为有条件跳转语句。</li>
+<li>从基本块2到基本块4，因为是顺序执行。</li>
+<li>从基本块3到基本块4，因为是顺序执行。</li>
+</ul></li>
+<li><p>建立CFG：</p></li>
+</ol>
+<pre class="mermaid">  graph TD
+  
+    entry --> 1[<div style="text-align:left;">1.  if condition</div>]
+    1 --> 2[<div style="text-align:left;">2.    statement1<br>3.  else</div>]
+    1 --> 3[<div style="text-align:left;">4.    statement2</div>]
+    2 --> 4[<div style="text-align:left;">5.  endif<br>6.  statement3</div>]
+    3 --> 4
+    4 --> exit
+
+    style entry fill:#98FB98,stroke:#4CAF50,stroke-width:2px;
+    style exit fill:#98FB98,stroke:#4CAF50,stroke-width:2px;</pre>
 
       </div>
     </div>
@@ -191,7 +270,7 @@
 </div>
   <div class="realated__body">
     
-      <div class="null"><div class="null-item"><div class="null-title"><a href="/2023/11/07/@蓝色老师的LLVM系列文章汇总/" title="@蓝色老师的LLVM系列文章汇总" rel="bookmark">@蓝色老师的LLVM系列文章汇总</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/10/17/Clang_AST/" title="Clang AST" rel="bookmark">Clang AST</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/11/15/Static_Analysis_with_clang/" title="Static Analysis with clang - cited" rel="bookmark">Static Analysis with clang - cited</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/08/31/leetcode26.删除有序数组中的重复项/" title="leetcode 26. 删除有序数组中的重复项" rel="bookmark">leetcode 26. 删除有序数组中的重复项</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/05/zsh&oh-my-zsh/" title="zsh & oh-my-zsh 常用命令" rel="bookmark">zsh & oh-my-zsh 常用命令</a></div></div></div>
+      <div class="null"><div class="null-item"><div class="null-title"><a href="/2023/11/07/@蓝色老师的LLVM系列文章汇总/" title="@蓝色老师的LLVM系列文章汇总" rel="bookmark">@蓝色老师的LLVM系列文章汇总</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/10/17/Clang_AST/" title="Clang AST" rel="bookmark">Clang AST</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/11/15/Static_Analysis_with_clang/" title="Static Analysis with clang - cited" rel="bookmark">Static Analysis with clang - cited</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/06/All_File_Systems_Are_Not_Created_Equal:On_the_Complexity_of_Crafting_Crash-Consistent_Applications阅读/" title="All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读" rel="bookmark">All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/10/30/All_You_Ever_Wanted_to_Know_About_Dynamic_Taint_Analysis_and_Forward_Symbolic_Execution阅读/" title="All You Ever Wanted to Know About Dynamic Taint Analysis and Forward Symbolic Execution 阅读" rel="bookmark">All You Ever Wanted to Know About Dynamic Taint Analysis and Forward Symbolic Execution 阅读</a></div></div></div>
     
   </div>
 </div>
