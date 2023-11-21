@@ -65,3 +65,90 @@ Static Analyzer 的源代码入口主要位于 Clang 代码库的 `lib/StaticAna
 
 [Cross-checking Semantic Correctness: The Case of Finding File System Bugs](/2023/08/31/Cross-checking_Semantic_Correctness:The_Case_of_Finding_File_System_Bugs阅读/) 这篇文章中使用的是`AM_Syntax`。
 
+## Control Flow Graph
+控制流图（control-flow graph）简称CFG，是计算机科学中的表示法，利用数学中图的表示方式，标示计算机程序执行过程中所经过的所有路径。
+
+节点表示基本块（basic block），边表示控制流的流向。Basic Block是CFG的主体。
+
+> Basic Block：一个最长的语句序列，并保证入口只能在最开始指令且出口只能在最后一个指令。
+
+### 构造Basic Blocks
+
+- Input：程序P的三地址码序列
+- Output：程序P的basic blocks
+- 算法
+  - 确定leaders（每个basic block的头）
+    - 序列中的第一个指令
+    - 跳转指令的目标指令
+    - 跳转指令的下一条指令
+    - return指令
+  - 每个Basic Block包含其leader至下一个leader前的所有语句
+- 算法的另一种阐释
+  - 初始语句作为第一个基本块的入口
+  - 遇到标号类语句，结束当前基本块，标号作为新基本块的入口（标号不在当前基本块中，而是划到下一个基本块）
+  - 遇到转移类语句时，结束当前当前基本块，转移语句作为当前基本块的结尾
+  - 当给引用类型变量赋值时，结束基本块，作为出口
+- 基本块有以下特点：
+  - 单一入口点，其他程式中，没有任何一个分支指令的目标在这段程式基本块之内（基本块的第一行除外）。
+  - 单一结束点，这段程式一定要执行完最后一行才会执行其他基本块的程式。
+  - 因为上述特点，基本块中的程式，只要执行了第一行，后面的程式码就会依序执行，每一行程式都会执行一次。
+
+### 构造CFG
+
+添加边，在以下两种情况下：
+
+- 无条件跳转：一条无条件跳转语句会创建一个有向边，将当前基本块的出口指向目标基本块的入口。
+- 条件跳转：创建两条有向边，分别表示条件为真和条件为假时的目标基本块。
+  
+
+在构建控制流图（CFG）时，通常会引入两个特殊的节点，即entry节点和exit节点，以更好地表示程序的整体控制流。这两个节点不对应具体的代码块，而是代表程序的入口和出口。
+
+- entry节点： entry节点表示程序的起始点。它没有对应的代码，而是作为整个控制流图的入口。从entry节点开始，程序的执行流程进入其他基本块。
+- exit节点： exit节点表示程序的结束点。类似地，它也没有对应的代码，而是作为整个控制流图的出口。程序的执行流程可能从不同的基本块经过，最终都会汇聚到exit节点。
+
+
+**示例：**
+
+考虑以下伪代码：
+
+```
+1.  if condition
+2.    statement1
+3.  else
+4.    statement2
+5.  endif
+6.  statement3
+```
+
+
+1. 划分基本块：
+
+   - 基本块1: Line. 1
+   - 基本块2: Line. 2 - 3
+   - 基本块3: Line. 4
+   - 基本块4: Line. 5 - 6
+  
+    `else` 为转移类语句，`endif` 为标号类语句。
+2. 构建基本块间的控制流关系：
+
+   - 从基本块1到基本块2，因为有条件跳转语句。
+   - 从基本块1到基本块3，因为有条件跳转语句。
+   - 从基本块2到基本块4，因为是顺序执行。
+   - 从基本块3到基本块4，因为是顺序执行。
+
+3. 建立CFG：
+
+  ```mermaid
+  graph TD
+  
+    entry --> 1[<div style="text-align:left;">1.  if condition</div>]
+    1 --> 2[<div style="text-align:left;">2.    statement1<br>3.  else</div>]
+    1 --> 3[<div style="text-align:left;">4.    statement2</div>]
+    2 --> 4[<div style="text-align:left;">5.  endif<br>6.  statement3</div>]
+    3 --> 4
+    4 --> exit
+
+    style entry fill:#98FB98,stroke:#4CAF50,stroke-width:2px;
+    style exit fill:#98FB98,stroke:#4CAF50,stroke-width:2px;
+
+  ```
