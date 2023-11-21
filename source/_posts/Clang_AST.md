@@ -47,10 +47,10 @@ int foo(double x, double y)
 
 ![](/Clang_AST/image1.png)
 
-### TranslationUnitDecl
+## TranslationUnitDecl
 **TranslationUnitDecl**表示**翻译单元声明**，这是AST的根节点，表示整个翻译单元，通常对应于一个源代码文件。`<invalid sloc>`表示无有效的源代码位置信息（此处不需要）。
 
-### TypedefDecl
+## TypedefDecl
 **TypedefDecl**表示**类型定义声明**，这些节点表示了类型别名的声明，通常用于为某种类型分配一个更易于使用的名称。`implicit`表示这些类型别名是隐式的，即它们不是由程序员显式定义的，而是由编译器自动生成的。
 
 在这里，**TypedefDecl**有三个子节点，分别表示以下三个类型别名的声明：
@@ -59,7 +59,7 @@ int foo(double x, double y)
 - `__uint128_t`：这个别名是对名为 `unsigned __int128` 的类型的声明。
 - `__builtin_va_list`：这个别名是对名为 `__va_list_tag [1]` 的类型的声明。
 
-### FunctionDecl
+## FunctionDecl
 **FunctionDecl**表示**函数声明**，也是每个函数的根节点。该函数只有2个子节点，分别是`ParmVarDecl`与`CompoundStmt`，前者代表参数，后者代表函数体。
 
 `0x2bc8dd0` 是该节点的唯一标识符（通常是编译器生成的内部标识符）。
@@ -72,7 +72,7 @@ int foo(double x, double y)
 
 `'int (double, double)'` 表示该函数的返回类型为 `int`，并且有两个参数，两个参数的类型都是 `double`。
 
-### ParmVarDecl
+## ParmVarDecl
 **ParmVarDecl**表示**参数变量声明**，即函数的输入参数。
 
 `<col:9, col:16>` 和 `<col:19, col:26>` 分别表示它们在源代码中的位置范围，具体地说，第一个参数`x`在第9列到第16列之间，第二个参数`y`在第19列到第26列之间。
@@ -81,12 +81,12 @@ int foo(double x, double y)
 
 `used`表示这些参数在函数中被使用。
 
-### CompoundStmt
+## CompoundStmt
 **CompoundStmt**表示**复合语句条目**，表示一段由大括号围起来的代码段。
 
 `<line:3:1, line:18:1>`表示该复合语句整体的起始位置与末位置。起始位置是3行1列，末尾位置是18行1列。
 
-### DeclStmt
+## DeclStmt
 **DeclStmt**表示**声明语句**。
 这是函数 `foo` 内部的一部分抽象语法树（AST），表示一个变量的声明和初始化。
 
@@ -138,7 +138,7 @@ int foo(double x, double y)
    int b = a + 3; // a 是左值，但在表达式中需要它的值，因此发生 LValueToRValue 转换
    ```
 
-### IfStmt
+## IfStmt
 
 **IfStmt**表示**条件语句**，此处包含一个条件表达式和两个条件成立时执行的代码块。
 
@@ -162,7 +162,7 @@ int foo(double x, double y)
   - 第二个 `CompoundStmt` 包含一个 `BinaryOperator`，表示条件不成立时执行的代码。
   - `BinaryOperator` 此时表示另一个赋值操作，将变量 `ans` 的值设置为整数 `222`。
 
-### ReturnStmt
+## ReturnStmt
 **ReturnStmt**表示**返回语句**。
 
 - `ImplicitCastExpr`（隐式类型转换表达式）：

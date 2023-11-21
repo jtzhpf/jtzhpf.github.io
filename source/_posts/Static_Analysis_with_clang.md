@@ -57,7 +57,7 @@ The first step is to install clang. If you’re on OS X or Ubuntu, you should al
 
 It turns out that there are three (3) different ways to run clang’s static analyzer on your code, each with its own benefits and drawbacks. We’ll consider each of these in turn:
 
-## Integrated with a typical build
+# Integrated with a typical build
 
 If you use reasonably normal-looking makefiles to build your code, you can get static analysis going with a minimum of fuss. If you’re using cmake to create your makefiles, the same approach will work fine, so long as you’re not overriding the values of CMAKE_C_COMPILER etc. (And, as usual, if you’re using autotools, [you’re on your own;-)](https://twitter.com/timmartin2/status/23365017839599616).
 
@@ -78,7 +78,7 @@ One nice thing about this approach is that you get both compiler warnings and an
 
 
 
-## Using the GUI tool
+# Using the GUI tool
 
 In a similar fashion as ccc-analyzer (above) front-ends make, you can use clang’s [scan-build](http://clang-analyzer.llvm.org/scan-build.html) tool to front-end ccc-analyzer. In addition to invoking the compiler and analyzer, scan-build also collects the analyzer reports, including the control flow that the analyzer used to infer any errors, and presents that using a set of html pages that are written by default to the /tmp directory, and that look like this:
 
@@ -91,7 +91,7 @@ In the example above, you can see the steps that the analyzer follows to figure 
 
 To use this approach, you set your environment variables the same as described above, but instead of running make, you run `scan-build -V make`. This will run your build and then launch a browser to view the results of the build.
 
-## A small hitch…
+# A small hitch…
 
 Unfortunately, scan-build (and its scan-view companion) are not installed by default with clang. I’ve updated the build script from my [earlier post](http://btorpey.github.io/blog/2015/01/02/building-clang/) on building clang on RedHat to install these files, but if you want to do it manually, run the following from the source tree you used to build and install clang:
 
@@ -105,7 +105,7 @@ cp -p  llvm/tools/clang/tools/scan-build/scanview.css   $(which clang)/..
 cp -rp llvm/tools/clang/tools/scan-view/*               $(which clang)/..
 ```
 
-## Another small hitch…
+# Another small hitch…
 
 In an [earlier post](http://btorpey.github.io/blog/2015/03/17/shadow/), I talked about how to use the `-isystem` flag to prevent selected headers from generating warnings. Unfortunately, the [clang analyzer chokes on that flag](https://llvm.org/bugs/show_bug.cgi?id=13237#c9) – so if you’re using it, you will need to apply the patch below to successfully run the analyzer.
 
@@ -127,7 +127,7 @@ Index: ccc-analyzer
  my %LinkerOptionMap = (
 ```
 
-## Using a compilation database
+# Using a compilation database
 
 Last but not least, you can also use a “compilation database” to invoke the static analyzer directly. So, what is a compilation database, you ask? This is a [simple format](http://clang.llvm.org/docs/JSONCompilationDatabase.html) introduced by clang that records the actual commands used to generate intermediate build products from source files, along with their parameters.
 
@@ -159,7 +159,7 @@ done
 
 (There are simpler ways to invoke the analyzer, but the approach shown here will visit each source file in the same order that it was originally built, which can be handy).
 
-## Conclusion
+# Conclusion
 
 As we said earlier, static analysis is not magic, and it certainly won’t find all your bugs. But it will probably find some, and the ones it finds are likely to be nasty, so it’s worth a certain amount of trouble.
 

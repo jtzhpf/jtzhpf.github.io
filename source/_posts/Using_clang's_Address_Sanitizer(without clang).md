@@ -27,25 +27,25 @@ So, I was very interested in learning about a similar technology that promised t
 
 That helps to solve the two big problems that I was having with valgrind: its slowness, and the difficulty of excluding third-party libraries from the analysis.
 
-## Asan with clang
+# Asan with clang
 
 Since I was already building the application using clang for its excellent diagnostics and static analysis features, I thought it would be relatively straightforward to introduce the Asan feature into the build. Turns out there is a bump in that road: clang’s version of Asan is supplied only as a static library that is linked into the main executable. And while it should be possible to re-jigger things to make it work as a shared library, that would turn into a bit of science project. That, and the fact that the wiki page discussing it (https://github.com/google/sanitizers/wiki/AddressSanitizerAsDso) didn’t sound particularly encouraging (“however the devil is in the detail” – uhh, thanks, no).
 
 Rats! However, the wiki page did mention that there was a version of Asan that worked with gcc, and that version apparently did support deployment as a shared object. So, I decided to give that a try…
 
-## Asan with gcc
+# Asan with gcc
 
 It turns out that the gcc developers haven’t been sitting still – in fact, it looks like there is a bit of a healthy rivalry between the clang and gcc folks, and that’s a good thing for you and me. Starting with version 4.8 of the gcc collection, Asan is available with gcc as well.[^2]
 
 Getting the latest gcc version (4.8.2 as of this writing), building and installing it was relatively straight-forward. By default, the source build installs into /usr/local, so it can co-exist nicely with the native gcc for the platform (in the case of Red Hat/CentOS 6.5, that is the relatively ancient gcc 4.4 branch).
 
-## Building with Asan
+# Building with Asan
 
 Including support for Asan in your build is pretty simple – just include the `-fsanitize=address` flag in both the compile and link step. (Note that this means you need to invoke the linker via the compiler driver, rather than directly. In practice, this means that the executable you specify for the link step should be g++ (or gcc), not ld).
 
 While not strictly required, it’s also a very good idea to include the `-fno-omit-frame-pointer` flag in the compile step. This will prevent the compiler from optimizing away the frame pointer (ebp) register. While disabling any optimization might seem like a bad idea, in this case the performance benefit is likely minimal at best[^3], but the inability to get accurate stack frames is a show-stopper.
 
-## Running with Asan
+# Running with Asan
 
 If you’re checking an executable that you build yourself, the prior steps are all you need – libasan.so will get linked into your executable by virtue of the `-fsanitize=address flag`.
 
@@ -55,7 +55,7 @@ In my case, though, the goal was to be able to instrument code running in the JV
 
 And that’s it!
 
-## Tailoring Asan
+# Tailoring Asan
 
 There are a bunch of options available to tailor the way Asan works: at compile-time you can supply a “blacklist” of functions that Asan should NOT instrument, and at run-time you can further customize Asan using the `ASAN_OPTIONS` environment variable, which is discussed [here](https://github.com/google/sanitizers/wiki/AddressSanitizerFlags).
 
@@ -98,14 +98,14 @@ Don’t worry – it turns out that is a bogus warning related to running Asan a
 
 
 
-## Conclusion
+# Conclusion
 
 So, how did this all turn out? Well, it’s pretty early in the process, but Asan has already caught a memory corruption problem that would have been extremely difficult to track down otherwise. (Short version is that due to some unintended name collissions between shared libraries, we were trying to put 10 pounds of bologna in a 5 pound sack. Or, as one of my colleagues more accurately pointed out, 8 pounds of bologna in a 4 pound sack ;-)
 
 valgrind is still an extremely valuable tool, especially because of its convenience and versatility; but in certain edge cases Asan can bring things to the table, like speed and selectivity, that make it the better choice.
 
 
-## Postscript
+# Postscript
 
 - Before closing there are a few more things I want to mention about Asan in comparison to valgrind:
 

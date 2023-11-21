@@ -21,7 +21,7 @@ mathjax: true
 ![Yggdrasil的开发流程](/Push-Button_Verification_of_File_Systems_via_Crash_Refinement阅读/image1.png){width=500}
 <!--more-->
 
-## Yggdrasil
+# Yggdrasil
 程序员需要编写 specification, implementation 和 consistency invariant (**all in python language**)。
 
 验证器会生成反例来可视化 implementation 或 consistency invariant 中的 bug。
@@ -30,7 +30,7 @@ Yggdrasil 可以进行优化并重新验证代码以提高运行时性能。
 
 验证通过后，Yggdrasil 会生成C代码，通过C编译器编译和链接生成可执行文件系统和[fsck检查器](https://en.wikipedia.org/wiki/Fsck)。
 
-### specification
+## specification
 Yggdrasil文件系统规范包括三个部分：
 
 - 表示逻辑布局的抽象数据结构（Abstract data structure）
@@ -39,7 +39,7 @@ Yggdrasil文件系统规范包括三个部分：
 
 下面均以作者实现的一个小文件系统YminLFS做演示。
 
-#### Abstract data structure
+### Abstract data structure
 ![](/Push-Button_Verification_of_File_Systems_via_Crash_Refinement阅读/image2.png){width=500}
 
 抽象数据结构由五个抽象映射描述，包括childmap、parentmap和三个存储inode元数据的映射。其中，childmap将目录inode号和名称映射到子inode号，parentmap将inode号映射回其父目录的inode号。InoT和U64T是64位整数类型，NameT是字符串类型。
@@ -49,7 +49,7 @@ Yggdrasil文件系统规范包括三个部分：
 
 `invariant`指出父子节点之间有效索引节点号的映射的相互一致。`ForAll`和`Implies`是内置的逻辑运算符。
 
-#### 文件系统操作
+### 文件系统操作
 文件系统操作包括只读操作和读写操作。只读操作包括`lookup`和`stat`。
 ![](/Push-Button_Verification_of_File_Systems_via_Crash_Refinement阅读/image4.png){width=500}
 
@@ -58,18 +58,18 @@ Yggdrasil文件系统规范包括三个部分：
 
 `InoT()`构造函数返回一个抽象的inode号码，必须是有效的且不在任何目录中。对文件系统的更改被包装在一个事务中，以确保它们是原子的。
 
-#### state equivalence predicate
+### state equivalence predicate
 ![](/Push-Button_Verification_of_File_Systems_via_Crash_Refinement阅读/image6.png){width=500}
 
 
-### implementation
+## implementation
 在Yggdrasil中实现文件系统需要
 
 - 选择磁盘模型
 - 编写每个操作的代码
 - 编写磁盘布局的consistency invariants 
 
-#### 磁盘模型
+### 磁盘模型
 Yggdrasil提供了异步磁盘模型和同步磁盘模型。
 
 异步磁盘模型具有无限制的易失性缓存（volatile cache），并允许任意重排序。其接口包括以下操作：
@@ -92,12 +92,12 @@ Yggdrasil提供了异步磁盘模型和同步磁盘模型。
 
 为了保证系统崩溃时数据的完整性，`mknod`必须发出`flush`操作。如果在最后两次写操作之间没有`flush`操作，磁盘可能会重新排序这些写操作。如果系统在重新排序的写操作之间崩溃，超级块将指向$b_6$中的垃圾数据，导致YminLFS状态损坏。在每次写操作之后插入了`flush`操作，共5个可解决这个问题。
 
-#### Consistency invariants
+### Consistency invariants
 Consistency invariants是文件系统实现的一种约束条件，用于确定磁盘状态是否对应于有效的文件系统映像。Yggdrasil使用Consistency invariants进行验证和运行时检查，以确保文件系统的正确性。验证时，Yggdrasil检查初始文件系统状态是否满足Consistency invariants，并将其作为每个操作的前置条件和后置条件进行检查。此外，Yggdrasil还可以生成类似于fsck的检查器，用于检查文件系统的完整性。
 
 Consistency invariants约束了磁盘布局的三个组件：超级块$SB$、索引节点映射块 $M$ 和根目录数据块$D$。超级块约束要求下一个可用的索引节点号码$i$大于1，下一个可用的块号码$b$大于$2$，指向$M$的指针既为正数又小于$b$。索引节点映射约束确保$M$将范围$(0, i)$内的每个索引节点号码映射到范围$(0, b)$内的块号码。最后，根目录约束要求$D$将文件名映射到范围$(0,i)$内的索引节点号码。
 
-## Crash Refinement
+# Crash Refinement
 
 基于传统的状态机的证明强调步步互锁，要求 implementation 和 specification 始终保持一致，这个要求 is too strong to satisfy，因为文件系统在实际的读写时可能会出现乱序的情况（类似的CPU的指令重拍），此外还有崩溃、恢复等情况（~~**这俩和too strong有啥关系？**~~）。
 
@@ -124,7 +124,7 @@ Consistency invariants约束了磁盘布局的三个组件：超级块$SB$、索
 
 ![](/Push-Button_Verification_of_File_Systems_via_Crash_Refinement阅读/image17.png){width=500}
 
-## Yxv6 file system
+# Yxv6 file system
 ![](/Push-Button_Verification_of_File_Systems_via_Crash_Refinement阅读/image18.png){width=500}
 
 

@@ -15,7 +15,7 @@ timeline: code  # 展示在时间线列表中
 鉴于经常需要配置环境，在此记录一下 zsh & oh-my-zsh 的常用命令。
 <!--more-->
 
-## zsh
+# zsh
 
 zsh 是一款强大的虚拟终端，既是一个系统的虚拟终端，也可以作为一个脚本语言的交互解析器。
 
@@ -36,11 +36,11 @@ cat /etc/shells
 chsh -s /bin/zsh
 ```
 
-## 安装 oh my zsh
+# 安装 oh my zsh
 
 可以通过 curl 或 wget 两种方式来安装，用一条命令即可安装。
 
-### curl 安装
+## curl 安装
 
 GitHub：
 ```shell
@@ -51,7 +51,7 @@ Gitee ( 国内镜像 )：
 sh -c "$(curl -fsSL https://gitee.com/mirrors/oh-my-zsh/raw/master/tools/install.sh)"
 ```
 
-### wget 安装
+## wget 安装
 
 GitHub：
 ```shell
@@ -62,23 +62,23 @@ Gitee ( 国内镜像 )：
 sh -c "$(wget -O- https://gitee.com/pocmon/mirrors/raw/master/tools/install.sh)"
 ```
 
-## 常用的 oh my zsh 插件
+# 常用的 oh my zsh 插件
 
 打开`~/.zshrc`文件找到`plugins = (git)`，这里是我们已经启用了那些插件
 
 如果想要启用某个插件，装好之后直接修改`plugins = (插件A 插件B 插件C)`
 
-### git
+## git
 
 这个是装好 oh-my-zsh 就默认已经开启的
 
-### z
+## z
 
 这个是 oh-my-zsh 默认就装好的，需要自己开启。还有一个 autojump 插件和 z 功能差不多，autojump需要自己装
 
 如果 z 插件历史记录太多，并且有一些不是自己想要的，可以用`z -x 不要的路径`删除
 
-### zsh-autosuggestions
+## zsh-autosuggestions
 
 会记录你之前输入过的所有命令，并且自动匹配你可能想要输入命令，然后按`tab`补全
 
@@ -88,7 +88,7 @@ sh -c "$(wget -O- https://gitee.com/pocmon/mirrors/raw/master/tools/install.sh)"
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 ```
 
-### zsh-syntax-highlighting
+## zsh-syntax-highlighting
 
 命令太多，有时候记不住，等输入完了才知道命令输错了，这个插件直接在输入过程中就会提示你，当前命令是否正确，错误红色，正确绿色
 
@@ -98,11 +98,11 @@ git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-m
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 ```
 
-### sudo
+## sudo
 
 偶尔输入某个命令，提示没有权限，需要加`sudo`，这个时候按两下`ESC`，就会在命令行头部加上`sudo`
 
-## 解决 zsh 在 git 目录下变得卡顿的问题
+# 解决 zsh 在 git 目录下变得卡顿的问题
 
 在目录下通过设置标识关闭 dirty 检查：
 ```shell

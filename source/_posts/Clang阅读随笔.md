@@ -18,10 +18,10 @@ timeline: article  # 展示在时间线列表中
 
 <!--more-->
 
-## CompilerInstance 类
+# CompilerInstance 类
 CompilerInstance 是 LLVM/Clang 编译器框架中的一个类，用于管理整个编译过程中的状态和组件。它负责协调和组织编译器的不同部分，包括预处理器、语法分析器、语义分析器等。在编译的不同阶段，CompilerInstance 提供了访问和控制这些组件的方法。
 
-### CompilerInstance 的结构
+## CompilerInstance 的结构
 CompilerInstance 的具体结构可能会有一些复杂，因为它需要协调各个编译器组件的工作。一般而言，它包含了以下关键成员：
 
 - 语法树（AST）： 用于表示源代码结构的树形数据结构。AST 在编译器的语法分析阶段构建，以便更容易进行语义分析和代码生成。
@@ -33,7 +33,7 @@ CompilerInstance 的具体结构可能会有一些复杂，因为它需要协调
 
 这只是 CompilerInstance 结构的一般概述，具体实现可能更为复杂。
 
-## Static Analyzer
+# Static Analyzer
 
 Static Analyzer 的源代码入口主要位于 Clang 代码库的 `lib/StaticAnalyzer` 目录中。以下是几个关键文件和目录：
 
@@ -50,7 +50,7 @@ Static Analyzer 的源代码入口主要位于 Clang 代码库的 `lib/StaticAna
 
 总体而言，`AnalysisConsumer.cpp` 和 `CheckerManager.cpp` 可以看作是 Static Analyzer 的源代码入口，它们定义了整个分析过程的驱动和管理逻辑。其他目录则包含了各个组件的具体实现。
 
-### Clang 静态分析模式
+## Clang 静态分析模式
 在 Clang 的静态分析器（`/llvm/tools/clang/lib/StaticAnalyzer/Frontend/AnalysisConsumer.cpp: HandleTranslationUnit()`）中，`AM_Syntax` 和 `AM_Path` 分别代表不同的分析模式，用于控制静态分析的行为。以下是它们的区别：
 
 1. **`AM_Syntax`（语法分析模式）：**
@@ -65,14 +65,14 @@ Static Analyzer 的源代码入口主要位于 Clang 代码库的 `lib/StaticAna
 
 [Cross-checking Semantic Correctness: The Case of Finding File System Bugs](/2023/08/31/Cross-checking_Semantic_Correctness:The_Case_of_Finding_File_System_Bugs阅读/) 这篇文章中使用的是`AM_Syntax`。
 
-## Control Flow Graph
+# Control Flow Graph
 控制流图（control-flow graph）简称CFG，是计算机科学中的表示法，利用数学中图的表示方式，标示计算机程序执行过程中所经过的所有路径。
 
 节点表示基本块（basic block），边表示控制流的流向。Basic Block是CFG的主体。
 
 > Basic Block：一个最长的语句序列，并保证入口只能在最开始指令且出口只能在最后一个指令。
 
-### 构造Basic Blocks
+## 构造Basic Blocks
 
 - Input：程序P的三地址码序列
 - Output：程序P的basic blocks
@@ -93,7 +93,7 @@ Static Analyzer 的源代码入口主要位于 Clang 代码库的 `lib/StaticAna
   - 单一结束点，这段程式一定要执行完最后一行才会执行其他基本块的程式。
   - 因为上述特点，基本块中的程式，只要执行了第一行，后面的程式码就会依序执行，每一行程式都会执行一次。
 
-### 构造CFG
+## 构造CFG
 
 添加边，在以下两种情况下：
 
@@ -152,3 +152,7 @@ Static Analyzer 的源代码入口主要位于 Clang 代码库的 `lib/StaticAna
     style exit fill:#98FB98,stroke:#4CAF50,stroke-width:2px;
 
   ```
+
+# Static Analyzer Checker
+`clang -cc1 -analyzer-checker-help` 命令可以查看 Clang 所支持的所有的 Static Analyzer Checker。单个 Checker 是 Static Analyzer 在代码中执行的单个分析单元。每个分析都针对特定类型的错误，静态分析器允许选择符合需求的任意一部分检查器。
+

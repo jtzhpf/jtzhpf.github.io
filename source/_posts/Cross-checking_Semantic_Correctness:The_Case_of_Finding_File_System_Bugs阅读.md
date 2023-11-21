@@ -22,7 +22,7 @@ timeline: article  # 展示在时间线列表中
 主要思路是统计多个文件系统的实现，计算具体文件系统与多个文件系统总体之间的差异性（直方图/信息熵），从而窥探出其文件系统的具体实现在语义上的差异。
 <!--more-->
 
-## 设计
+# 设计
 ![Overview](/Cross-checking_Semantic_Correctness:The_Case_of_Finding_File_System_Bugs阅读/image1.png)
 
 1. To enable comparison, the source code of each file system is merged into one large file. This allows interprocedural analysis within a file system.
@@ -37,7 +37,7 @@ timeline: article  # 展示在时间线列表中
   
 6. Bug reports are ranked to prioritize investigation of likely true positives. Metrics include histogram distance and entropy values.
 
-## 实现
+# 实现
 
 需要构建8个检查器：
 
@@ -50,24 +50,24 @@ timeline: article  # 展示在时间线列表中
 7. 推断锁语义：推断每个路径所持有和释放的锁，跟踪受锁保护的字段。
 8. 推断外部API语义：基于调用参数和返回值检查的频率分布，找出用法有明显差异的文件系统。
 
-## 问题
+# 问题
 
 1. 依赖于大量实现相同功能的模块
 
-## 实验复现
-### 实验环境
+# 实验复现
+## 实验环境
 - docker ubuntu 14.04
 - gcc 4.8
 - g++ 4.8
 
-### 复现步骤
+## 复现步骤
 
-#### 下载 juxta
+### 下载 juxta
 ```shell
 git clone https://github.com/sslab-gatech/juxta.git
 ```
 
-#### 下载并测试 Linux
+### 下载并测试 Linux
 ```shell
 git clone https://github.com/torvalds/linux.git
 cd linux
@@ -77,14 +77,14 @@ make; make clean
 cd ../juxta
 ```
 
-#### 编译 clang
+### 编译 clang
 在编译 clang 之前在 juxta 的 `Makefile` 中增加`COMPILER := -DCMAKE_CXX_COMPILER=g++-4.8 -DCMAKE_C_COMPILER=gcc-4.8`，并且将其添加到 cmake 的参数中。
 ```shell
 make clang-full       # first time only
 make clang            # from the next
 ```
 
-#### 构建 path database
+### 构建 path database
 合并文件系统代码
 ```shell
 cd analyzer
@@ -103,7 +103,7 @@ cd analyzer
 ./ctrl.py pickle_all  # for all file systems
 ```
 
-#### code checker
+### code checker
 ```shell
 ./ckrtn.py            # Return code checker
 ./ckstore.py          # Side-effect checker
@@ -115,12 +115,12 @@ cd analyzer
 ./spec.py             # Spec. generator
 ```
 
-#### get sorted results of checker output
+### get sorted results of checker output
 ```shell
 ./catcklog.sh [checker output dir]
 ```
-## 代码分析
-### 目录结构
+# 代码分析
+## 目录结构
 ```
 .
 |-- LICENSE
@@ -194,7 +194,7 @@ analyzer目录如下所示：
 `-- z3helper.py
 ```
 
-### ctrl.py 文件
+## ctrl.py 文件
 主要功能包括：
 
 - merge：将多个文件系统的源代码合并成一个文件，方便进行静态分析。
@@ -212,7 +212,7 @@ analyzer目录如下所示：
 - 分析脚本从clang-log目录读取结果文件，进行各种分析，如锁使用分析等，结果输出到results目录下。
 - status命令可以查看合并和分析的状态。
 
-#### merge 操作
+### merge 操作
 ```python
 def cmd_merge(opts, args):
     """merge fs specified (e.g., 'merge ext3 ext4')"""
@@ -289,7 +289,7 @@ def get_fs(kind):
 ```
 具体各文件是如何生成的将在[merger.py 文件](#merger.py-文件)中具体介绍。
 
-#### clang 操作（静态分析）
+### clang 操作（静态分析）
 类似于`cmd_merge_all`函数，`cmd_clang`和`cmd_clang_all`函数通过调用`_run_clang`函数进行静态分析。
 ```python
 def _run_clang(fs, clang):
@@ -373,9 +373,9 @@ And you should run the command under the path `./analyzer/out/specific_fs`.
 ```
 接下来我们将进入`analyzer/../llvm/tools/clang/tools/scan-build`目录下，来[深入探究一下`fss-build`文件做了哪些工作](#fss-build-脚本)。
 
-### merger.py 文件
+## merger.py 文件
 
-#### merge_fs 函数
+### merge_fs 函数
 ```python
 # process a fs
 def merge_fs(opts, fs):
@@ -419,7 +419,7 @@ def merge_fs(opts, fs):
 
 最后注释掉或修复特定文件中的特定代码段。自此就完成了文件系统的合并。
 
-#### preprocess 函数
+### preprocess 函数
 preprocess(fs, src_d, files)对某一文件系统下的所有文件进行预处理，包括处理头文件引用和内联C文件，并将处理后的代码存储在一个列表中以供后续使用。
 
 ```python
@@ -437,7 +437,7 @@ def preprocess(fs, src_d, files):
 
     return codes
 ```
-#### preprocess_headers 函数
+### preprocess_headers 函数
 `preprocess_headers(fs, src_d, code, headers)`函数预处理文件系统C代码中的头文件。
 
 `preprocess_headers` 函数接受四个参数：
@@ -508,7 +508,7 @@ extern void BUG();
 最后，将处理后的代码行逐行 `yield` 出来，生成器函数返回处理后的C代码。
 
 
-#### rewrite 函数
+### rewrite 函数
 `rewrite(fs, codes, out)`将代码中的特定符号（symbols）替换为新的符号，然后将重写后的代码写入输出文件。
 
 首先利用`prepare_rewritting`函数生成重写计划。
@@ -537,7 +537,7 @@ def rewrite(fs, codes, out):
 
     return (static_symbols, rewriting_plan)
 ```
-#### prepare_rewritting 函数
+### prepare_rewritting 函数
 ```python
 # manual opt out
 #  (see, logfs defines hash_32() which was included by other c files)
@@ -619,7 +619,7 @@ def prepare_rewritting(target, codes):
 
 
 
-#### StaticDecl 类
+### StaticDecl 类
 `Token.Comment.Preproc`（预处理器注释令牌）是指用于表示预处理器指令或注释的特殊类型的标记（Token）。在 C 语言中常见的可标注为`Token.Comment.Preproc`的例子如下：
 
 1. 条件编译指令：
@@ -689,7 +689,7 @@ class StaticDecl(Formatter):
 
 最后一行`lookup.append((ttype, value))`跳过了`self.blacklist`（不包括预处理指令中的，预处理指令中的格式是`Token.Comment.Preproc, u'define nfsd3_voidres\t\t\tnfsd3_voidargs'`，没有单独的`nfsd3_voidargs`）和函数名开头为`DEFINE_`、`LIST_HEAD`、`LLIST_HEAD`、`DECLARE_DELAYED_WORK`的函数。
 
-#### TokenRewritter 类
+### TokenRewritter 类
 `TokenRewritter`是一个自定义的Pygments格式化器类，它继承自Pygments中的 `Formatter` 类。这个类的主要目的是在代码高亮和着色的过程中，根据预定的重写计划对特定符号进行替换。
 
 ```python
@@ -748,10 +748,10 @@ class TokenRewritter(Formatter):
 `self.lookup` 是一个空列表，用于存储遍历Token时的历史信息。
 
 
-### Clang 相关代码解析
+## Clang 相关代码解析
 Juxta 所用 Clang 为修改后的版本，其之间的差别见 [https://github.com/jtzhpf/llvm-project-juxta-sosp/blob/juxta-sosp/README.md](https://github.com/jtzhpf/llvm-project-juxta-sosp/blob/juxta-sosp/README.md)。
 
-#### Options.td 文件
+### Options.td 文件
 `./llvm/tools/clang/include/clang/Driver/Options.td` 文件定义了clang编译器支持的所有命令行选项。
 
 ```TableGen
@@ -795,7 +795,7 @@ def ffs_semantic_EQ : Joined<["-"], "ffs-semantic=">,
 - HistoricalEvent类，记录ProgramState变化事件。
 -->
 
-#### fss-build 脚本
+### fss-build 脚本
 `fss-build` 是一个 Perl 脚本，位于`./llvm/tools/clang/tools/scan-build/fss-build`，用于在构建过程中运行 Clang 静态分析工具。`fss-build` 是在 `scan-build` 的基础上修改而来，在这里我们只用到了其中的部分功能。
 
 主要流程:
@@ -878,7 +878,7 @@ export CCC_ANALYZER_ANALYSIS='-analyzer-checker alpha.unix.PathCondExtract -anal
 make -f Makefile.build CC=/home/juxta/llvm/tools/clang/tools/scan-build/fssccc-analyzer
 ```
 
-#### fssccc-analyzer 与 fssc++-analyzer 脚本
+### fssccc-analyzer 与 fssc++-analyzer 脚本
 `fssccc-analyzer` 脚本位于 `./llvm/tools/clang/tools/scan-build/fssccc-analyzer`，`fssccc-analyzer`的主要执行流程如下：
 
 > 1 获取编译命令行参数，分析出编译选项、链接选项和输入文件\
@@ -1173,10 +1173,10 @@ sub Analyze {
 
 
 
-## 结果分析
+# 结果分析
 TODO
 
-## 改进
+# 改进
 TODO
 
 向量数据库？

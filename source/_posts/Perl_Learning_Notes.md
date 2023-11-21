@@ -13,8 +13,8 @@ tags:
 ---
 <!--more-->
 
-## debug 的方法
-### 利用 perl 命令
+# debug 的方法
+## 利用 perl 命令
 
 ```perl -d xxx.pl xxx.parameter```
 
