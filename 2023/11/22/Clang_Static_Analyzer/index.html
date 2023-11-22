@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf8"/>
+    <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
+    <title>
+      
+        Clang Static Analyzer | ZPF.SITE
+      
+    </title>
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    
+      <link rel="apple-touch-icon"
+            sizes="180x180"
+            href="/images/apple-touch-icon.png"/>
+    
+    
+      <link rel="icon"
+            type="image/png"
+            sizes="32x32"
+            href="/images/favicon-32x32.png"/>
+    
+    
+      <link rel="icon"
+            type="image/png"
+            sizes="16x16"
+            href="/images/favicon-16x16.png"/>
+    
+    
+      <link rel="mask-icon"
+            href="/images/logo.svg"
+            color=""/>
+    
+    
+    
+      
+  <style>
+    @font-face {
+        font-family:sourceHanSerif;
+        src: url(/font/regular.ttf);
+        font-weight: regular;
+    }
+  </style>
+
+  <style>
+    @font-face {
+        font-family:sourceHanSerif;
+        src: url(/font/bold.ttf);
+        font-weight: bold;
+    }
+  </style>
+
+
+    
+    <link rel="stylesheet"
+          type="text/css"
+          href='/css/layout.css'/>
+    
+    
+  <link rel="stylesheet" type="text/css" href="/css/post.css" />
+  
+
+  <meta name="generator" content="Hexo 6.3.0"></head>
+  <body>
+    <div class="head">
+      <div class="nav">
+        <a href='/' class="nav-logo">
+          <img alt="logo" height="60px" width="60px" src="/images/logo.svg"/>
+        </a>
+        <input id="navBtn" type="checkbox"/>
+        <div class="nav-menu">
+          
+            
+              <a class="nav-menu-item" href="/CS&Maths">Computer Science & Maths</a>
+            
+              <a class="nav-menu-item" href="/Life">Life</a>
+            
+          
+          
+        </div>
+        <label class="nav-btn" for="navBtn"></label>
+      </div>
+    </div>
+    <div class="body">
+      
+  <article class="post-content">
+    <div class="post-inner--toc">
+      <div class="post-content__head">
+        <div class="post-title">Clang Static Analyzer</div>
+        <div class="post-info">
+          
+  <a href="/tags/LLVM/" class="post-tag">#LLVM</a><a href="/tags/Clang/" class="post-tag">#Clang</a><a href="/tags/Compiler/" class="post-tag">#Compiler</a><a href="/tags/Symbolic-Execution/" class="post-tag">#Symbolic Execution</a><a href="/tags/Static-Analyzer/" class="post-tag">#Static Analyzer</a>
+
+
+          <span class="post-date">2023-11-22</span>
+        </div>
+      </div>
+      
+        <aside class="toc-outer">
+          <div class="toc-title">目录</div>
+          <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#forward-dataflow-analysis"><span class="post-toc-text">Forward Dataflow Analysis</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#symbolic-execution"><span class="post-toc-text">Symbolic Execution</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#static-analyzer"><span class="post-toc-text">Static Analyzer</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#design-of-clang-static-analyzer"><span class="post-toc-text">Design of Clang Static Analyzer</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#clang-%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90%E6%A8%A1%E5%BC%8F"><span class="post-toc-text">Clang 静态分析模式</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#control-flow-graph"><span class="post-toc-text">Control Flow Graph</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%9E%84%E9%80%A0basic-blocks"><span class="post-toc-text">构造Basic Blocks</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%9E%84%E9%80%A0cfg"><span class="post-toc-text">构造CFG</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#static-analyzer-checker"><span class="post-toc-text">Static Analyzer Checker</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E7%9B%B4%E6%8E%A5%E8%B0%83%E7%94%A8-clang-%E5%91%BD%E4%BB%A4%E8%BF%90%E8%A1%8C-checker-%E7%9A%84%E6%96%B9%E5%BC%8F"><span class="post-toc-text">直接调用 Clang 命令运行 Checker 的方式</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E9%80%9A%E8%BF%87-driver-%E8%BF%90%E8%A1%8C"><span class="post-toc-text">通过 Driver 运行</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E5%90%AF%E7%94%A8%E6%8C%87%E5%AE%9A%E5%8C%85%E7%9A%84%E6%89%80%E6%9C%89%E6%A3%80%E6%9F%A5%E5%99%A8"><span class="post-toc-text">启用指定包的所有检查器</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E5%90%AF%E7%94%A8%E6%8C%87%E5%AE%9A%E7%9A%84%E6%A3%80%E6%9F%A5%E5%99%A8"><span class="post-toc-text">启用指定的检查器</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E7%A6%81%E7%94%A8%E6%8C%87%E5%AE%9A%E7%9A%84%E6%A3%80%E6%9F%A5%E5%99%A8"><span class="post-toc-text">禁用指定的检查器</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E9%80%9A%E8%BF%87--cc1-%E8%BF%90%E8%A1%8C"><span class="post-toc-text">通过 -cc1 运行</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E5%90%AF%E7%94%A8%E6%8C%87%E5%AE%9A%E5%8C%85%E7%9A%84%E6%89%80%E6%9C%89%E6%A3%80%E6%9F%A5%E5%99%A8-1"><span class="post-toc-text">启用指定包的所有检查器</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E5%90%AF%E7%94%A8%E6%8C%87%E5%AE%9A%E7%9A%84%E6%A3%80%E6%9F%A5%E5%99%A8-1"><span class="post-toc-text">启用指定的检查器</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%AF%BC%E5%87%BA%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90%E7%BB%93%E6%9E%9C"><span class="post-toc-text">导出静态分析结果</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%80%9A%E8%BF%87-scan-build-%E8%BF%90%E8%A1%8C-checker-%E7%9A%84%E6%96%B9%E5%BC%8F"><span class="post-toc-text">通过 scan-build 运行 Checker 的方式</span></a></li></ol></li></ol>
+          <a href="#" class="toc-top">回到顶部</a>
+        </aside>
+      
+      <div class="post-content__body">
+        
+          <div class="post-gallery">
+            
+          </div>
+        
+        <h1 id="forward-dataflow-analysis">Forward Dataflow Analysis</h1>
+<figure>
+<img src="/Getting_Started_with_LLVM_Core_Libraries阅读/image1.png" alt="" /><figcaption>Forward Dataflow Analysis 的过程以及可能出现的 False Positive 的情况<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></figcaption>
+</figure>
+<h1 id="symbolic-execution">Symbolic Execution</h1>
+<figure>
+<img src="/Getting_Started_with_LLVM_Core_Libraries阅读/image2.png" alt="" /><figcaption>利用 Symbolic Execution 对上述例子进行分析<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></figcaption>
+</figure>
+<p><img src="/Getting_Started_with_LLVM_Core_Libraries阅读/image3.png" /></p>
+<figure>
+<img src="/Getting_Started_with_LLVM_Core_Libraries阅读/image4.png" alt="" /><figcaption>Symbolic Execution 相较于 Forward Dataflow Analysis，其同样合并了部分节点，但不能合并的又没有强行合并<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></figcaption>
+</figure>
+<h1 id="static-analyzer">Static Analyzer</h1>
+<p>Static Analyzer 的源代码入口主要位于 Clang 代码库的 <code>lib/StaticAnalyzer</code> 目录中。以下是几个关键文件和目录：</p>
+<ul>
+<li><strong><code>lib/StaticAnalyzer/Core</code>：</strong> 包含 Static Analyzer 的核心实现，如路径敏感性分析器、检查器管理器等。</li>
+<li><strong><code>lib/StaticAnalyzer/Checkers</code>：</strong> 包含各种 Checker 的实现，每个 Checker 都有一个对应的目录，其中包含 Checker 的具体实现和规则定义。</li>
+<li><strong><code>lib/StaticAnalyzer/Frontend</code>：</strong> 包含与前端集成相关的代码，处理命令行参数，设置分析配置等。</li>
+<li><strong><code>lib/StaticAnalyzer/PathSensitive</code>：</strong> 包含路径敏感性分析的相关实现。</li>
+<li><strong><code>lib/StaticAnalyzer/Frontend/AnalysisConsumer.cpp</code>：</strong> 这个文件定义了 <code>AnalysisConsumer</code> 类，它是 Static Analyzer 在编译过程中的 AST 消费者，负责驱动整个静态分析过程。</li>
+<li><strong><code>lib/StaticAnalyzer/Core/CheckerManager.cpp</code>：</strong> 这个文件包含 <code>CheckerManager</code> 类的实现，负责管理所有的 Checker。</li>
+<li><strong><code>tools/scan-build</code>：</strong> 该工具用于通过 Clang Static Analyzer 进行静态分析。</li>
+</ul>
+<p>调用情况如图所示： <img src="/Clang_Static_Analyzer/image1.png" alt="Clang Static Analyzer 调用情况" /></p>
+<p>总体而言，<code>AnalysisConsumer.cpp</code> 和 <code>CheckerManager.cpp</code> 可以看作是 Static Analyzer 的源代码入口，它们定义了整个分析过程的驱动和管理逻辑。其他目录则包含了各个组件的具体实现。</p>
+<h2 id="design-of-clang-static-analyzer">Design of Clang Static Analyzer</h2>
+<p><img src="/Getting_Started_with_LLVM_Core_Libraries阅读/image5.png" /> <img src="/Getting_Started_with_LLVM_Core_Libraries阅读/image6.png" /></p>
+<h2 id="clang-静态分析模式">Clang 静态分析模式</h2>
+<p>在 Clang 的静态分析器（<code>/llvm/tools/clang/lib/StaticAnalyzer/Frontend/AnalysisConsumer.cpp: HandleTranslationUnit()</code>）中，<code>AM_Syntax</code> 和 <code>AM_Path</code> 分别代表不同的分析模式，用于控制静态分析的行为。以下是它们的区别：</p>
+<ol type="1">
+<li><strong><code>AM_Syntax</code>（语法分析模式）：</strong>
+<ul>
+<li><strong>含义：</strong> <code>AM_Syntax</code> 表示语法分析模式，指的是在分析中仅关注语法层面的结构，而不考虑程序的具体路径执行信息。</li>
+<li><strong>行为：</strong> 在 <code>AM_Syntax</code> 模式下，静态分析器主要关注程序的语法结构，执行基本的语法检查和分析，例如识别语法错误、检查变量的声明和使用情况等。这种模式下的分析通常更快，但可能会错过一些路径敏感性的问题。</li>
+</ul></li>
+<li><strong><code>AM_Path</code>（路径敏感分析模式）：</strong>
+<ul>
+<li><strong>含义：</strong> <code>AM_Path</code> 表示路径敏感分析模式，指的是在分析中考虑程序的具体路径执行信息，以检测可能的路径相关问题。</li>
+<li><strong>行为：</strong> 在 <code>AM_Path</code> 模式下，静态分析器会模拟程序的不同执行路径，考虑程序在不同条件下的行为。这种模式下的分析可以发现更多的潜在问题，例如路径上的条件分支错误、空指针解引用等。然而，路径敏感分析通常会增加分析的复杂性和执行时间。</li>
+</ul></li>
+</ol>
+<p>总的来说，区别在于分析是否关注程序的路径执行信息。<code>AM_Syntax</code> 主要关注语法结构，而 <code>AM_Path</code> 则在此基础上考虑了路径敏感性，以更全面地发现潜在问题。</p>
+<p><a href="/2023/08/31/Cross-checking_Semantic_Correctness:The_Case_of_Finding_File_System_Bugs阅读/">Cross-checking Semantic Correctness: The Case of Finding File System Bugs</a> 这篇文章中使用的是<code>AM_Syntax</code>。</p>
+<h1 id="control-flow-graph">Control Flow Graph</h1>
+<p>控制流图（control-flow graph）简称CFG，是计算机科学中的表示法，利用数学中图的表示方式，标示计算机程序执行过程中所经过的所有路径。</p>
+<p>节点表示基本块（basic block），边表示控制流的流向。Basic Block是CFG的主体。</p>
+<blockquote>
+<p>Basic Block：一个最长的语句序列，并保证入口只能在最开始指令且出口只能在最后一个指令。</p>
+</blockquote>
+<h2 id="构造basic-blocks">构造Basic Blocks</h2>
+<ul>
+<li>Input：程序P的三地址码序列</li>
+<li>Output：程序P的basic blocks</li>
+<li>算法
+<ul>
+<li>确定leaders（每个basic block的头）
+<ul>
+<li>序列中的第一个指令</li>
+<li>跳转指令的目标指令</li>
+<li>跳转指令的下一条指令</li>
+<li>return指令</li>
+</ul></li>
+<li>每个Basic Block包含其leader至下一个leader前的所有语句</li>
+</ul></li>
+<li>算法的另一种阐释
+<ul>
+<li>初始语句作为第一个基本块的入口</li>
+<li>遇到标号类语句，结束当前基本块，标号作为新基本块的入口（标号不在当前基本块中，而是划到下一个基本块）</li>
+<li>遇到转移类语句时，结束当前当前基本块，转移语句作为当前基本块的结尾</li>
+<li>当给引用类型变量赋值时，结束基本块，作为出口</li>
+</ul></li>
+<li>基本块有以下特点：
+<ul>
+<li>单一入口点，其他程式中，没有任何一个分支指令的目标在这段程式基本块之内（基本块的第一行除外）。</li>
+<li>单一结束点，这段程式一定要执行完最后一行才会执行其他基本块的程式。</li>
+<li>因为上述特点，基本块中的程式，只要执行了第一行，后面的程式码就会依序执行，每一行程式都会执行一次。</li>
+</ul></li>
+</ul>
+<h2 id="构造cfg">构造CFG</h2>
+<p>添加边，在以下两种情况下：</p>
+<ul>
+<li>无条件跳转：一条无条件跳转语句会创建一个有向边，将当前基本块的出口指向目标基本块的入口。</li>
+<li>条件跳转：创建两条有向边，分别表示条件为真和条件为假时的目标基本块。</li>
+</ul>
+<p>在构建控制流图（CFG）时，通常会引入两个特殊的节点，即entry节点和exit节点，以更好地表示程序的整体控制流。这两个节点不对应具体的代码块，而是代表程序的入口和出口。</p>
+<ul>
+<li>entry节点： entry节点表示程序的起始点。它没有对应的代码，而是作为整个控制流图的入口。从entry节点开始，程序的执行流程进入其他基本块。</li>
+<li>exit节点： exit节点表示程序的结束点。类似地，它也没有对应的代码，而是作为整个控制流图的出口。程序的执行流程可能从不同的基本块经过，最终都会汇聚到exit节点。</li>
+</ul>
+<p><strong>示例：</strong></p>
+<p>考虑以下伪代码：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs markdown"><span class="hljs-bullet">1.</span>  if condition<br><span class="hljs-bullet">2.</span>    statement1<br><span class="hljs-bullet">3.</span>  else<br><span class="hljs-bullet">4.</span>    statement2<br><span class="hljs-bullet">5.</span>  endif<br><span class="hljs-bullet">6.</span>  statement3<br></code></pre></td></tr></table></figure>
+<ol type="1">
+<li><p>划分基本块：</p>
+<ul>
+<li>基本块1: Line. 1</li>
+<li>基本块2: Line. 2 - 3</li>
+<li>基本块3: Line. 4</li>
+<li>基本块4: Line. 5 - 6</li>
+</ul>
+<p><code>else</code> 为转移类语句，<code>endif</code> 为标号类语句。</p></li>
+<li><p>构建基本块间的控制流关系：</p>
+<ul>
+<li>从基本块1到基本块2，因为有条件跳转语句。</li>
+<li>从基本块1到基本块3，因为有条件跳转语句。</li>
+<li>从基本块2到基本块4，因为是顺序执行。</li>
+<li>从基本块3到基本块4，因为是顺序执行。</li>
+</ul></li>
+<li><p>建立CFG：</p></li>
+</ol>
+<pre class="mermaid">  graph TD
+  
+    entry --> 1[<div style="text-align:left;">1.  if condition</div>]
+    1 --> 2[<div style="text-align:left;">2.    statement1<br>3.  else</div>]
+    1 --> 3[<div style="text-align:left;">4.    statement2</div>]
+    2 --> 4[<div style="text-align:left;">5.  endif<br>6.  statement3</div>]
+    3 --> 4
+    4 --> exit
+
+    style entry fill:#98FB98,stroke:#4CAF50,stroke-width:2px;
+    style exit fill:#98FB98,stroke:#4CAF50,stroke-width:2px;</pre>
+<h1 id="static-analyzer-checker">Static Analyzer Checker</h1>
+<p><code>clang -cc1 -analyzer-checker-help</code> 命令可以查看 Clang 所支持的所有的 Static Analyzer Checker。单个 Checker 是 Static Analyzer 在代码中执行的单个分析单元。每个分析都针对特定类型的错误，静态分析器允许选择符合需求的任意一部分检查器。</p>
+<p>详细的检查器可以查看此网页： <a target="_blank" rel="noopener" href="https://clang.llvm.org/docs/analyzer/checkers.html">https://clang.llvm.org/docs/analyzer/checkers.html</a></p>
+<iframe src="https://clang.llvm.org/docs/analyzer/checkers.html" height="500" width="100%" frameborder="0" seamless>
+</iframe>
+<p>检查器的命名规范遵循 <code>&lt;package&gt;.&lt;subpackage&gt;.&lt;checker&gt;</code>。</p>
+<figure>
+<img src="/Clang_Static_Analyzer/image2.png" alt="" /><figcaption>package 命名与功能</figcaption>
+</figure>
+<h2 id="直接调用-clang-命令运行-checker-的方式">直接调用 Clang 命令运行 Checker 的方式</h2>
+<h3 id="通过-driver-运行">通过 Driver 运行</h3>
+<h4 id="启用指定包的所有检查器">启用指定包的所有检查器</h4>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">clang --analyze -Xanalyzer -analyzer-checker=&lt;package&gt; &lt;source-files&gt;<br></code></pre></td></tr></table></figure>
+<ul>
+<li><code>--analyze</code>选项，表示运行 Clang 静态分析器。</li>
+<li><code>-Xanalyzer -analyzer-checker=&lt;package&gt;</code>选项，表示将<code>-analyzer-checker=&lt;package&gt;</code>参数传递给 Clang 静态分析器。</li>
+<li><code>-analyzer-checker=&lt;package&gt;</code>选项，表示启用指定包中的所有检查器。如果要同时指定多个包的所有检查器，则形如：<code>clang --analyze -Xanalyzer -analyzer-checker=core -Xanalyzer -analyzer-checker=cplusplus hello.cpp</code>。</li>
+<li><code>source-files</code>选项，表示要分析的源程序文件列表，源程序文件之间以空格分隔。</li>
+</ul>
+<h4 id="启用指定的检查器">启用指定的检查器</h4>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">clang --analyze -Xanalyzer -analyzer-checker=&lt;package.subpackage.checker&gt; &lt;source-files&gt;<br></code></pre></td></tr></table></figure>
+<p>如果要同时指定多个检查器，则形如：<code>clang --analyze -Xanalyzer -analyzer-checker=core.DivideZero -Xanalyzer -analyzer-checker=cplusplus.NewDelete hello.cpp</code></p>
+<p>需要注意的是， 通过编译器驱动程序运行 Clang 静态分析器的方式，会根据系统环境默认提供一些检查器。比如，未显式指定任何检查器，但编译器驱动程序默认提供的检查器中包括core、unix、deadcode和cplusplus等的所有检查器，仍可以检测出“除 0”错误。可以通过<code>-###</code>打印详细参数。</p>
+<p>需要注意的是，Clang 静态分析器可能不会一次性输出所有错误。这提示我们在修复警告后最好再次运行 Clang 静态分析器。</p>
+<h4 id="禁用指定的检查器">禁用指定的检查器</h4>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">clang --analyze -Xanalyzer -analyzer-disable-checker=&lt;arg&gt; &lt;source-files&gt;<br></code></pre></td></tr></table></figure>
+<h3 id="通过--cc1-运行">通过 -cc1 运行</h3>
+<p>如果要真正实现只运行我们指定的检查器，则应该通过 <code>clang -cc1</code> 的方式直接进入前端运行 Clang 静态分析器。</p>
+<h4 id="启用指定包的所有检查器-1">启用指定包的所有检查器</h4>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">clang -cc1 -w -fcolor-diagnostics -analyze -analyzer-checker=&lt;package&gt; &lt;source-files&gt; -I&lt;directory&gt;<br></code></pre></td></tr></table></figure>
+<ul>
+<li><code>-w</code>选项，表示禁用编译器的所有诊断，即禁用类似于<code>-Wdivision-by-zero</code>的诊断。从而，只启用 Clang 静态分析器的分析功能以避免重复警告。</li>
+<li><code>-fcolor-diagnostics</code>选项，表示输出带颜色的诊断信息。</li>
+<li><code>-analyze</code>选项，表示运行 Clang 静态分析器。</li>
+<li><code>-I</code>选项，表示为需要的头文件指定其所在的目录。</li>
+</ul>
+<h4 id="启用指定的检查器-1">启用指定的检查器</h4>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">clang -cc1 -w -fcolor-diagnostics -analyze -analyzer-checker=&lt;package.subpackage.checker&gt; &lt;source-files&gt;<br></code></pre></td></tr></table></figure>
+<h3 id="导出静态分析结果">导出静态分析结果</h3>
+<p>我们可以通过如下两条命令查看 Clang 静态分析器提供的所有命令。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">clang cc1 -help | grep analyzer<br>clang -cc1 -help | grep analyzer<br></code></pre></td></tr></table></figure>
+<p><img src="/Clang_Static_Analyzer/image3.png" /> 其中，与<code>--analyzer-output</code>标志相关的内容如下：</p>
+<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs gherkin">--analyzer-output <span class="hljs-variable">&lt;value&gt;</span>   <br>                      Static analyzer report output format (html|<span class="hljs-string">plist</span>|<span class="hljs-string">plist-multi-file</span>|<span class="hljs-string">plist-html</span>|<span class="hljs-string">sarif</span>|<span class="hljs-string">text).</span><br></code></pre></td></tr></table></figure>
+<p>我们可以通过<code>--analyzer-output</code>标志指定静态分析结果的文件格式。命令如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">clang -cc1 -w -fcolor-diagnostics -analyze -analyzer-checker=&lt;package.subpackage.checker&gt; &lt;source-files&gt; -analyzer-output &lt;format&gt; -o &lt;output-file&gt;<br></code></pre></td></tr></table></figure>
+<h2 id="通过-scan-build-运行-checker-的方式">通过 scan-build 运行 Checker 的方式</h2>
+<p>要使用 scan-build，只要在构建命令的最前面添加 <code>scan-build</code> 即可，如下所示：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">scan-build [scan-build options] &lt;command&gt; [command options]<br></code></pre></td></tr></table></figure>
+<p>常用的 scan-build options 如下表所示。</p>
+<table>
+<thead>
+<tr class="header">
+<th>scan-build options</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+|-o
+<output location>
+<p>|指定分析结果的存储位置| |-v |输出分析过程，可以连续使用两个或三个 -v 以提高输出信息的详细度。| |-V 或 --view |在生成错误报告完成后，立即在浏览器中查看（即自动调用scan-view命令）|</p>
+<p>要查看所有的 scan-build options，可以通过 <code>scan-build --help</code> 命令。</p>
+<div id="footnotes">
+<hr>
+<div id="footnotelist">
+<ol style="list-style:none; padding-left: 0;">
+<li id="fn:1">
+<span style="display: inline-block; vertical-align: top; padding-right: 10px;">1.</span><span style="display: inline-block; vertical-align: top;"><a target="_blank" rel="noopener" href="https://onedrive.chick.eu.org/%E7%94%B5%E5%AD%90%E4%B9%A6/Computer%20Science/%E7%BC%96%E8%AF%91%E6%8A%80%E6%9C%AF%E4%B8%8E%E7%A8%8B%E5%BA%8F%E8%AF%AD%E8%A8%80/%E7%BC%96%E8%AF%91%E5%8E%9F%E7%90%86%E4%B8%8E%E6%8A%80%E6%9C%AF/Getting%20Started%20with%20LLVM%20Core%20Libraries%20(Bruno%20Cardoso%20Lopes,%20Rafael%20Auler).pdf">Lopes B C, Auler R. Getting started with LLVM core libraries[M]. Packt Publishing Ltd, 2014.</a></span><a href="#fnref:1" rev="footnote"> ↩︎</a>
+</li>
+</ol>
+</div>
+</div>
+
+      </div>
+    </div>
+  </article>
+  <div class="post__foot">
+    
+    <div class="post-nav">
+  
+    <div class="post-nav-item-left"></div>
+  
+  <div class="vhr"></div>
+  
+    <a class="post-nav-item-right" href="/2023/11/21/%E8%AF%BB%E7%A0%94%E7%94%9F%E6%B4%BB%E9%9A%8F%E7%AC%94/">
+      <div class="text-align">
+        <span class="text-small">下一篇</span>
+        <svg t="1670570876164"
+             class="icon"
+             viewBox="0 0 1024 1024"
+             transform="scale(-1,-1)"
+             width="16"
+             height="16">
+          <path d="M384 512L731.733333 202.666667c17.066667-14.933333 19.2-42.666667 4.266667-59.733334-14.933333-17.066667-42.666667-19.2-59.733333-4.266666l-384 341.333333c-10.666667 8.533333-14.933333 19.2-14.933334 32s4.266667 23.466667 14.933334 32l384 341.333333c8.533333 6.4 19.2 10.666667 27.733333 10.666667 12.8 0 23.466667-4.266667 32-14.933333 14.933333-17.066667 14.933333-44.8-4.266667-59.733334L384 512z" p-id="14596"/>
+        </svg>
+      </div>
+      读研生活随笔
+    </a>
+  
+</div>
+
+    
+      <div class="related-post">
+  <div class="related__head">
+  <a href="/tags/LLVM/" class="post-tag">#LLVM</a><a href="/tags/Clang/" class="post-tag">#Clang</a><a href="/tags/Compiler/" class="post-tag">#Compiler</a><a href="/tags/Symbolic-Execution/" class="post-tag">#Symbolic Execution</a><a href="/tags/Static-Analyzer/" class="post-tag">#Static Analyzer</a>
+
+</div>
+  <div class="realated__body">
+    
+      <div class="null"><div class="null-item"><div class="null-title"><a href="/2023/11/21/Getting_Started_with_LLVM_Core_Libraries阅读/" title="Getting Started with LLVM Core Libraries 阅读" rel="bookmark">Getting Started with LLVM Core Libraries 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/11/07/@蓝色老师的LLVM系列文章汇总/" title="@蓝色老师的LLVM系列文章汇总" rel="bookmark">@蓝色老师的LLVM系列文章汇总</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/10/17/Clang_AST/" title="Clang AST" rel="bookmark">Clang AST</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/06/All_File_Systems_Are_Not_Created_Equal:On_the_Complexity_of_Crafting_Crash-Consistent_Applications阅读/" title="All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读" rel="bookmark">All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/10/30/All_You_Ever_Wanted_to_Know_About_Dynamic_Taint_Analysis_and_Forward_Symbolic_Execution阅读/" title="All You Ever Wanted to Know About Dynamic Taint Analysis and Forward Symbolic Execution 阅读" rel="bookmark">All You Ever Wanted to Know About Dynamic Taint Analysis and Forward Symbolic Execution 阅读</a></div></div></div>
+    
+  </div>
+</div>
+
+    
+    
+    
+      <script src="https://utteranc.es/client.js"
+    repo="jtzhpf/jtzhpf.github.io"
+    issue-term="pathname"
+    theme="github-light"
+    crossorigin="anonymous"
+    async>
+</script>
+    
+  </div>
+
+    </div>
+    <div class="foot">
+      <div class="foot-inner">
+        <div class="foot__head">
+          
+            <div class="foot-line">
+              
+                <div class="matts">海</div>
+              
+                <div class="matts">内</div>
+              
+                <div class="matts">存</div>
+              
+                <div class="matts">知</div>
+              
+                <div class="matts">己</div>
+              
+            </div>
+          
+            <div class="foot-line">
+              
+                <div class="matts">天</div>
+              
+                <div class="matts">涯</div>
+              
+                <div class="matts">若</div>
+              
+                <div class="matts">比</div>
+              
+                <div class="matts">邻</div>
+              
+            </div>
+          
+        </div>
+        <div class="foot__body">
+          
+          
+            <div class="foot-item">
+              <div class="foot-item__head">账号</div>
+              <div class="foot-item__body">
+                
+                  <div class="text">
+                    <img alt="link" height="20px" width="20px" src="/images/logo-github.svg"/>
+                    <a class="foot-link" target="_blank" rel="noopener" href="https://github.com/jtzhpf">github</a>
+                  </div>
+                
+              </div>
+            </div>
+          
+          <div class="foot-item">
+            <div class="foot-item__head">联系</div>
+            <div class="foot-item__body">
+              <div class="text">
+                <img alt="link" height="20px" width="20px" src="/images/icon/icon-email.svg"/>
+                <a class="foot-link" href="mailto:jtzhpf@126.com">jtzhpf@126.com</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="copyright">
+          <a href="https://zpf.pages.dev">ZPF.SITE</a> &nbsp;|&nbsp;由&nbsp;<a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>&nbsp;及&nbsp;
+          <svg width="20" height="20" viewBox="0 0 725 725">
+            <path fill-rule="evenodd" fill="rgb(221, 221, 221)" d="M145.870,236.632 L396.955,103.578 L431.292,419.44 L156.600,522.53 L145.870,236.632 Z"/>
+            <path fill-rule="evenodd" fill="rgb(159, 159, 159)" d="M396.955,103.578 L564.345,234.486 L611.558,513.469 L431.292,419.44 L396.955,103.578 Z"/>
+            <path fill-rule="evenodd" fill="rgb(0, 0, 0)" d="M431.292,419.44 L611.558,513.469 L358.327,595.18 L156.600,522.53 L431.292,419.44 Z"/>
+          </svg>
+          <a target="_blank" rel="noopener" href="https://github.com/hooozen/hexo-theme-tranquility">致远</a>&nbsp;驱动
+        </div>
+      </div>
+    </div>
+    
+    
+    <script src="https://cdn.bootcdn.net/ajax/libs/mermaid/10.4.0/mermaid.min.js"></script>
+    
+    
+  
+
+  </body>
+</html>
