@@ -99,7 +99,7 @@
       
         <aside class="toc-outer">
           <div class="toc-title">目录</div>
-          <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#compilerinstance-%E7%B1%BB"><span class="post-toc-text">CompilerInstance 类</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#compilerinstance-%E7%9A%84%E7%BB%93%E6%9E%84"><span class="post-toc-text">CompilerInstance 的结构</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#static-analyzer"><span class="post-toc-text">Static Analyzer</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#clang-%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90%E6%A8%A1%E5%BC%8F"><span class="post-toc-text">Clang 静态分析模式</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#control-flow-graph"><span class="post-toc-text">Control Flow Graph</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%9E%84%E9%80%A0basic-blocks"><span class="post-toc-text">构造Basic Blocks</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%9E%84%E9%80%A0cfg"><span class="post-toc-text">构造CFG</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#static-analyzer-checker"><span class="post-toc-text">Static Analyzer Checker</span></a></li></ol>
+          <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#compilerinstance-%E7%B1%BB"><span class="post-toc-text">CompilerInstance 类</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#compilerinstance-%E7%9A%84%E7%BB%93%E6%9E%84"><span class="post-toc-text">CompilerInstance 的结构</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#static-analyzer"><span class="post-toc-text">Static Analyzer</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#clang-%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90%E6%A8%A1%E5%BC%8F"><span class="post-toc-text">Clang 静态分析模式</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#control-flow-graph"><span class="post-toc-text">Control Flow Graph</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%9E%84%E9%80%A0basic-blocks"><span class="post-toc-text">构造Basic Blocks</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%9E%84%E9%80%A0cfg"><span class="post-toc-text">构造CFG</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#static-analyzer-checker"><span class="post-toc-text">Static Analyzer Checker</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E7%9B%B4%E6%8E%A5%E8%B0%83%E7%94%A8-clang-%E5%91%BD%E4%BB%A4%E8%BF%90%E8%A1%8C-checker-%E7%9A%84%E6%96%B9%E5%BC%8F"><span class="post-toc-text">直接调用 Clang 命令运行 Checker 的方式</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E9%80%9A%E8%BF%87-driver-%E8%BF%90%E8%A1%8C"><span class="post-toc-text">通过 Driver 运行</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E5%90%AF%E7%94%A8%E6%8C%87%E5%AE%9A%E5%8C%85%E7%9A%84%E6%89%80%E6%9C%89%E6%A3%80%E6%9F%A5%E5%99%A8"><span class="post-toc-text">启用指定包的所有检查器</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E5%90%AF%E7%94%A8%E6%8C%87%E5%AE%9A%E7%9A%84%E6%A3%80%E6%9F%A5%E5%99%A8"><span class="post-toc-text">启用指定的检查器</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E7%A6%81%E7%94%A8%E6%8C%87%E5%AE%9A%E7%9A%84%E6%A3%80%E6%9F%A5%E5%99%A8"><span class="post-toc-text">禁用指定的检查器</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E9%80%9A%E8%BF%87--cc1-%E8%BF%90%E8%A1%8C"><span class="post-toc-text">通过 -cc1 运行</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E5%90%AF%E7%94%A8%E6%8C%87%E5%AE%9A%E5%8C%85%E7%9A%84%E6%89%80%E6%9C%89%E6%A3%80%E6%9F%A5%E5%99%A8-1"><span class="post-toc-text">启用指定包的所有检查器</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E5%90%AF%E7%94%A8%E6%8C%87%E5%AE%9A%E7%9A%84%E6%A3%80%E6%9F%A5%E5%99%A8-1"><span class="post-toc-text">启用指定的检查器</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%AF%BC%E5%87%BA%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90%E7%BB%93%E6%9E%9C"><span class="post-toc-text">导出静态分析结果</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%80%9A%E8%BF%87-scan-build-%E8%BF%90%E8%A1%8C-checker-%E7%9A%84%E6%96%B9%E5%BC%8F"><span class="post-toc-text">通过 scan-build 运行 Checker 的方式</span></a></li></ol></li></ol>
           <a href="#" class="toc-top">回到顶部</a>
         </aside>
       
@@ -234,6 +234,472 @@
     style exit fill:#98FB98,stroke:#4CAF50,stroke-width:2px;</pre>
 <h1 id="static-analyzer-checker">Static Analyzer Checker</h1>
 <p><code>clang -cc1 -analyzer-checker-help</code> 命令可以查看 Clang 所支持的所有的 Static Analyzer Checker。单个 Checker 是 Static Analyzer 在代码中执行的单个分析单元。每个分析都针对特定类型的错误，静态分析器允许选择符合需求的任意一部分检查器。</p>
+<p><code>clang -cc1 -analyzer-checker-help</code> 命令输出如下： <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br></pre></td><td class="code"><pre><code class="hljs rust">OVERVIEW: Clang Static Analyzer Checkers List<br><br>USAGE: -analyzer-checker &lt;CHECKER or PACKAGE,...&gt;<br><br>CHECKERS:<br>  alpha.core.BoolAssignment       Warn about assigning non-&#123;<span class="hljs-number">0</span>,<span class="hljs-number">1</span>&#125; values to Boolean variables<br>  alpha.core.CallAndMessageUnInitRefArg<br>                                  Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">logical</span> errors <span class="hljs-keyword">for</span> <span class="hljs-title class_">function</span> calls and Objective-C message <span class="hljs-title function_ invoke__">expressions</span> (e.g., uninitialized arguments, null function pointers, and pointer to undefined variables)<br>  alpha.core.CastSize             Check when casting a malloc<span class="hljs-symbol">&#x27;ed</span> <span class="hljs-keyword">type</span> <span class="hljs-title class_">T</span>, whether the size is a multiple of the size of T<br>  alpha.core.CastToStruct         Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">cast</span> from non-<span class="hljs-keyword">struct</span> <span class="hljs-title class_">pointer</span> to <span class="hljs-keyword">struct</span> <span class="hljs-title class_">pointer</span><br>  alpha.core.FixedAddr            Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">assignment</span> of a fixed address to a pointer<br>  alpha.core.IdenticalExpr        Warn about unintended <span class="hljs-keyword">use</span> of identical expressions <span class="hljs-keyword">in</span> operators<br>  alpha.core.PointerArithm        Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">pointer</span> arithmetic on locations other than array elements<br>  alpha.core.PointerSub           Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">pointer</span> subtractions on two pointers pointing to different memory chunks<br>  alpha.core.SizeofPtr            Warn about unintended <span class="hljs-keyword">use</span> of <span class="hljs-title function_ invoke__">sizeof</span>() on pointer expressions<br>  alpha.core.TestAfterDivZero     Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">division</span> by variable that is later compared against <span class="hljs-number">0</span>. Either the comparison is useless or there is division by zero.<br>  alpha.cplusplus.VirtualCall     Check <span class="hljs-keyword">virtual</span> function calls during construction or destruction<br>  alpha.deadcode.UnreachableCode  Check unreachable code<br>  alpha.osx.cocoa.Dealloc         Warn about Objective-C classes that lack a correct implementation of -dealloc<br>  alpha.osx.cocoa.DirectIvarAssignment<br>                                  Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">direct</span> assignments to instance variables<br>  alpha.osx.cocoa.DirectIvarAssignmentForAnnotatedFunctions<br>                                  Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">direct</span> assignments to instance variables <span class="hljs-keyword">in</span> the methods annotated with objc_no_direct_instance_variable_assignment<br>  alpha.osx.cocoa.InstanceVariableInvalidation<br>                                  Check that the invalidatable instance variables are invalidated <span class="hljs-keyword">in</span> the methods annotated with objc_instance_variable_invalidator<br>  alpha.osx.cocoa.MissingInvalidationMethod<br>                                  Check that the invalidation methods are present <span class="hljs-keyword">in</span> classes that contain invalidatable instance variables<br>  alpha.security.ArrayBound       Warn about buffer <span class="hljs-title function_ invoke__">overflows</span> (older checker)<br>  alpha.security.ArrayBoundV2     Warn about buffer <span class="hljs-title function_ invoke__">overflows</span> (newer checker)<br>  alpha.security.MallocOverflow   Check <span class="hljs-keyword">for</span> <span class="hljs-variable">overflows</span> <span class="hljs-keyword">in</span> the arguments to <span class="hljs-title function_ invoke__">malloc</span>()<br>  alpha.security.ReturnPtrRange   Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">an</span> out-of-bound pointer being returned to callers<br>  alpha.security.taint.TaintPropagation<br>                                  Generate taint information used by other checkers<br>  alpha.unix.Chroot               Check improper <span class="hljs-keyword">use</span> of chroot<br>  alpha.unix.MallocWithAnnotations<br>                                  Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">memory</span> leaks, double free, and <span class="hljs-keyword">use</span>-after-free problems. Traces memory managed by <span class="hljs-title function_ invoke__">malloc</span>()/<span class="hljs-title function_ invoke__">free</span>(). Assumes that all user-defined functions which might free a pointer are annotated.<br>  alpha.unix.PathCondExtract      Extract path conditions <span class="hljs-keyword">for</span> <span class="hljs-title class_">each</span> <span class="hljs-keyword">return</span> code<br>  alpha.unix.PthreadLock          Simple lock <span class="hljs-punctuation">-&gt;</span> unlock checker<br>  alpha.unix.SimpleStream         Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">misuses</span> of stream APIs<br>  alpha.unix.Stream               Check stream handling functions<br>  alpha.unix.cstring.BufferOverlap<br>                                  Checks <span class="hljs-keyword">for</span> <span class="hljs-variable">overlap</span> <span class="hljs-keyword">in</span> two buffer arguments<br>  alpha.unix.cstring.NotNullTerminated<br>                                  Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">arguments</span> which are not null-terminating strings<br>  alpha.unix.cstring.OutOfBounds  Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">out</span>-of-bounds access <span class="hljs-keyword">in</span> string functions<br>  core.CallAndMessage             Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">logical</span> errors <span class="hljs-keyword">for</span> <span class="hljs-title class_">function</span> calls and Objective-C message <span class="hljs-title function_ invoke__">expressions</span> (e.g., uninitialized arguments, null function pointers)<br>  core.DivideZero                 Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">division</span> by zero<br>  core.DynamicTypePropagation     Generate dynamic <span class="hljs-keyword">type</span> <span class="hljs-title class_">information</span><br>  core.NonNullParamChecker        Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">null</span> pointers passed <span class="hljs-keyword">as</span> arguments to a function whose arguments are references or marked with the <span class="hljs-symbol">&#x27;nonnull</span>&#x27; attribute<br>  core.NullDereference            Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">dereferences</span> of null pointers<br>  core.StackAddressEscape         Check that addresses to stack memory <span class="hljs-keyword">do</span> not escape the function<br>  core.UndefinedBinaryOperatorResult<br>                                  Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">undefined</span> results of binary operators<br>  core.VLASize                    Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">declarations</span> of VLA of undefined or zero size<br>  core.builtin.BuiltinFunctions   Evaluate compiler builtin <span class="hljs-title function_ invoke__">functions</span> (e.g., <span class="hljs-title function_ invoke__">alloca</span>())<br>  core.builtin.NoReturnFunctions  Evaluate <span class="hljs-string">&quot;panic&quot;</span> functions that are known to not <span class="hljs-keyword">return</span> to the caller<br>  core.uninitialized.ArraySubscript<br>                                  Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">uninitialized</span> values used <span class="hljs-keyword">as</span> array subscripts<br>  core.uninitialized.Assign       Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">assigning</span> uninitialized values<br>  core.uninitialized.Branch       Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">uninitialized</span> values used <span class="hljs-keyword">as</span> branch conditions<br>  core.uninitialized.CapturedBlockVariable<br>                                  Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">blocks</span> that capture uninitialized values<br>  core.uninitialized.UndefReturn  Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">uninitialized</span> values being returned to the caller<br>  cplusplus.NewDelete             Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">double</span>-free and <span class="hljs-keyword">use</span>-after-free problems. Traces memory managed by new/delete.<br>  cplusplus.NewDeleteLeaks        Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">memory</span> leaks. Traces memory managed by new/delete.<br>  deadcode.DeadStores             Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">values</span> stored to variables that are never read afterwards<br>  debug.ConfigDumper              Dump config table<br>  debug.DumpCFG                   Display Control-Flow Graphs<br>  debug.DumpCallGraph             Display Call Graph<br>  debug.DumpCalls                 Print calls <span class="hljs-keyword">as</span> they are traversed by the engine<br>  debug.DumpDominators            Print the dominance tree <span class="hljs-keyword">for</span> <span class="hljs-title class_">a</span> given CFG<br>  debug.DumpLiveVars              Print results of live variable analysis<br>  debug.DumpTraversal             Print branch conditions <span class="hljs-keyword">as</span> they are traversed by the engine<br>  debug.ExprInspection            Check the analyzer<span class="hljs-symbol">&#x27;s</span> understanding of expressions<br>  debug.Stats                     Emit warnings with analyzer statistics<br>  debug.TaintTest                 Mark tainted symbols <span class="hljs-keyword">as</span> such.<br>  debug.ViewCFG                   View Control-Flow Graphs using GraphViz<br>  debug.ViewCallGraph             View Call Graph using GraphViz<br>  debug.ViewExplodedGraph         View Exploded Graphs using GraphViz<br>  llvm.Conventions                Check code <span class="hljs-keyword">for</span> <span class="hljs-title class_">LLVM</span> codebase conventions<br>  osx.API                         Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">proper</span> uses of various Apple APIs<br>  osx.SecKeychainAPI              Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">proper</span> uses of Secure Keychain APIs<br>  osx.cocoa.AtSync                Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">nil</span> pointers used <span class="hljs-keyword">as</span> mutexes <span class="hljs-keyword">for</span> @synchronized<br>  osx.cocoa.ClassRelease          Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">sending</span> <span class="hljs-symbol">&#x27;retain</span>&#x27;, <span class="hljs-symbol">&#x27;release</span>&#x27;, or <span class="hljs-symbol">&#x27;autorelease</span>&#x27; directly to a Class<br>  osx.cocoa.IncompatibleMethodTypes<br>                                  Warn about Objective-C method signatures with <span class="hljs-keyword">type</span> <span class="hljs-title class_">incompatibilities</span><br>  osx.cocoa.Loops                 Improved modeling of loops using Cocoa collection types<br>  osx.cocoa.MissingSuperCall      Warn about Objective-C methods that lack a necessary call to <span class="hljs-keyword">super</span><br>  osx.cocoa.NSAutoreleasePool     Warn <span class="hljs-keyword">for</span> <span class="hljs-title class_">suboptimal</span> uses of NSAutoreleasePool <span class="hljs-keyword">in</span> Objective-C GC mode<br>  osx.cocoa.NSError               Check usage of NSError** parameters<br>  osx.cocoa.NilArg                Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">prohibited</span> nil arguments to ObjC method calls<br>  osx.cocoa.NonNilReturnValue     Model the APIs that are guaranteed to <span class="hljs-keyword">return</span> a non-nil value<br>  osx.cocoa.RetainCount           Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">leaks</span> and improper reference count management<br>  osx.cocoa.SelfInit              Check that <span class="hljs-symbol">&#x27;self</span>&#x27; is properly initialized inside an initializer method<br>  osx.cocoa.UnusedIvars           Warn about private ivars that are never used<br>  osx.cocoa.VariadicMethodTypes   Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">passing</span> non-Objective-C types to variadic collection initialization methods that expect only Objective-C types<br>  osx.coreFoundation.CFError      Check usage of CFErrorRef* parameters<br>  osx.coreFoundation.CFNumber     Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">proper</span> uses of CFNumberCreate<br>  osx.coreFoundation.CFRetainRelease<br>                                  Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">null</span> arguments to CFRetain/CFRelease/CFMakeCollectable<br>  osx.coreFoundation.containers.OutOfBounds<br>                                  Checks <span class="hljs-keyword">for</span> <span class="hljs-title class_">index</span> out-of-bounds when using <span class="hljs-symbol">&#x27;CFArray</span>&#x27; API<br>  osx.coreFoundation.containers.PointerSizedValues<br>                                  Warns <span class="hljs-keyword">if</span> <span class="hljs-symbol">&#x27;CFArray</span>&#x27;, <span class="hljs-symbol">&#x27;CFDictionary</span>&#x27;, <span class="hljs-symbol">&#x27;CFSet</span>&#x27; are created with non-pointer-size values<br>  security.FloatLoopCounter       Warn on using a floating point value <span class="hljs-keyword">as</span> a <span class="hljs-keyword">loop</span> <span class="hljs-title function_ invoke__">counter</span> (CERT: FLP30-C, FLP30-CPP)<br>  security.insecureAPI.UncheckedReturn<br>                                  Warn on uses of functions whose <span class="hljs-keyword">return</span> values must be always checked<br>  security.insecureAPI.getpw      Warn on uses of the <span class="hljs-symbol">&#x27;getpw</span>&#x27; function<br>  security.insecureAPI.gets       Warn on uses of the <span class="hljs-symbol">&#x27;gets</span>&#x27; function<br>  security.insecureAPI.mkstemp    Warn when <span class="hljs-symbol">&#x27;mkstemp</span>&#x27; is passed fewer than <span class="hljs-number">6</span> X<span class="hljs-symbol">&#x27;s</span> <span class="hljs-keyword">in</span> the format string<br>  security.insecureAPI.mktemp     Warn on uses of the <span class="hljs-symbol">&#x27;mktemp</span>&#x27; function<br>  security.insecureAPI.rand       Warn on uses of the <span class="hljs-symbol">&#x27;rand</span>&#x27;, <span class="hljs-symbol">&#x27;random</span>&#x27;, and related functions<br>  security.insecureAPI.strcpy     Warn on uses of the <span class="hljs-symbol">&#x27;strcpy</span>&#x27; and <span class="hljs-symbol">&#x27;strcat</span>&#x27; functions<br>  security.insecureAPI.vfork      Warn on uses of the <span class="hljs-symbol">&#x27;vfork</span>&#x27; function<br>  unix.API                        Check calls to various UNIX/Posix functions<br>  unix.Malloc                     Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">memory</span> leaks, double free, and <span class="hljs-keyword">use</span>-after-free problems. Traces memory managed by <span class="hljs-title function_ invoke__">malloc</span>()/<span class="hljs-title function_ invoke__">free</span>().<br>  unix.MallocSizeof               Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">dubious</span> malloc arguments involving sizeof<br>  unix.MismatchedDeallocator      Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">mismatched</span> deallocators.<br>  unix.cstring.BadSizeArg         Check the size argument passed into C string functions <span class="hljs-keyword">for</span> <span class="hljs-title class_">common</span> erroneous patterns<br>  unix.cstring.NullArg            Check <span class="hljs-keyword">for</span> <span class="hljs-title class_">null</span> pointers being passed <span class="hljs-keyword">as</span> arguments to C string functions<br></code></pre></td></tr></table></figure></p>
+<p>Too tedious? OK, here is the Chinese Table version.</p>
+<table>
+<colgroup>
+<col style="width: 35%" />
+<col style="width: 64%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>检查器</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>alpha.core.BoolAssignment</td>
+<td>警告：将非{0,1}值分配给布尔变量</td>
+</tr>
+<tr class="even">
+<td>alpha.core.CallAndMessageUnInitRefArg</td>
+<td>检查函数调用和Objective-C消息表达式的逻辑错误（例如，未初始化的参数、空函数指针和指向未定义变量的指针）</td>
+</tr>
+<tr class="odd">
+<td>alpha.core.CastSize</td>
+<td>当对malloc分配的类型T进行强制转换时，检查大小是否是T大小的倍数</td>
+</tr>
+<tr class="even">
+<td>alpha.core.CastToStruct</td>
+<td>检查从非结构指针到结构指针的转换</td>
+</tr>
+<tr class="odd">
+<td>alpha.core.FixedAddr</td>
+<td>检查将固定地址赋给指针的情况</td>
+</tr>
+<tr class="even">
+<td>alpha.core.IdenticalExpr</td>
+<td>警告：在运算符中意外使用相同的表达式</td>
+</tr>
+<tr class="odd">
+<td>alpha.core.PointerArithm</td>
+<td>检查除数组元素之外的位置上的指针算术运算</td>
+</tr>
+<tr class="even">
+<td>alpha.core.PointerSub</td>
+<td>检查两个指针指向不同内存块的情况下的指针减法</td>
+</tr>
+<tr class="odd">
+<td>alpha.core.SizeofPtr</td>
+<td>警告：在指针表达式上意外使用sizeof()</td>
+</tr>
+<tr class="even">
+<td>alpha.core.TestAfterDivZero</td>
+<td>检查除以后与0进行比较的变量。要么比较是无用的，要么存在除以零的情况</td>
+</tr>
+<tr class="odd">
+<td>alpha.cplusplus.VirtualCall</td>
+<td>在构造或析构期间检查虚拟函数调用</td>
+</tr>
+<tr class="even">
+<td>alpha.deadcode.UnreachableCode</td>
+<td>检查无法访问的代码</td>
+</tr>
+<tr class="odd">
+<td>alpha.osx.cocoa.Dealloc</td>
+<td>警告：Objective-C类缺乏正确实现-dealloc方法</td>
+</tr>
+<tr class="even">
+<td>alpha.osx.cocoa.DirectIvarAssignment</td>
+<td>检查直接对实例变量进行赋值的情况</td>
+</tr>
+<tr class="odd">
+<td>alpha.osx.cocoa.DirectIvarAssignmentForAnnotatedFunctions</td>
+<td>在带有objc_no_direct_instance_variable_assignment注解的方法中检查直接对实例变量进行赋值的情况</td>
+</tr>
+<tr class="even">
+<td>alpha.osx.cocoa.InstanceVariableInvalidation</td>
+<td>检查在带有objc_instance_variable_invalidator注解的方法中无效的实例变量</td>
+</tr>
+<tr class="odd">
+<td>alpha.osx.cocoa.MissingInvalidationMethod</td>
+<td>检查包含无效实例变量的类中是否存在无效方法</td>
+</tr>
+<tr class="even">
+<td>alpha.security.ArrayBound</td>
+<td>警告：缓冲区溢出（较旧的检查器）</td>
+</tr>
+<tr class="odd">
+<td>alpha.security.ArrayBoundV2</td>
+<td>警告：缓冲区溢出（较新的检查器）</td>
+</tr>
+<tr class="even">
+<td>alpha.security.MallocOverflow</td>
+<td>检查malloc()参数的溢出</td>
+</tr>
+<tr class="odd">
+<td>alpha.security.ReturnPtrRange</td>
+<td>检查将越界指针返回给调用者的情况</td>
+</tr>
+<tr class="even">
+<td>alpha.security.taint.TaintPropagation</td>
+<td>生成其他检查器使用的污点信息</td>
+</tr>
+<tr class="odd">
+<td>alpha.unix.Chroot</td>
+<td>检查chroot的不当使用</td>
+</tr>
+<tr class="even">
+<td>alpha.unix.MallocWithAnnotations</td>
+<td>检查内存泄漏、double free和use-after-free问题。跟踪malloc()/free()管理的内存。假设可能释放指针的所有用户定义函数都有注释。</td>
+</tr>
+<tr class="odd">
+<td>alpha.unix.PathCondExtract</td>
+<td>提取每个返回码的路径条件</td>
+</tr>
+<tr class="even">
+<td>alpha.unix.PthreadLock</td>
+<td>简单的锁 -&gt; 解锁检查器</td>
+</tr>
+<tr class="odd">
+<td>alpha.unix.SimpleStream</td>
+<td>检查流API的误用</td>
+</tr>
+<tr class="even">
+<td>alpha.unix.Stream</td>
+<td>检查流处理函数</td>
+</tr>
+<tr class="odd">
+<td>alpha.unix.cstring.BufferOverlap</td>
+<td>检查两个缓冲区参数的重叠</td>
+</tr>
+<tr class="even">
+<td>alpha.unix.cstring.NotNullTerminated</td>
+<td>检查不是以null结尾的字符串参数</td>
+</tr>
+<tr class="odd">
+<td>alpha.unix.cstring.OutOfBounds</td>
+<td>检查字符串函数中的越界访问</td>
+</tr>
+<tr class="even">
+<td>core.CallAndMessage</td>
+<td>检查函数调用和Objective-C消息表达式的逻辑错误（例如，未初始化的参数、空函数指针）</td>
+</tr>
+<tr class="odd">
+<td>core.DivideZero</td>
+<td>检查除以零</td>
+</tr>
+<tr class="even">
+<td>core.DynamicTypePropagation</td>
+<td>生成动态类型信息</td>
+</tr>
+<tr class="odd">
+<td>core.NonNullParamChecker</td>
+<td>检查传递给函数的空指针参数，这些参数是引用或带'nonnull'属性的函数</td>
+</tr>
+<tr class="even">
+<td>core.NullDereference</td>
+<td>检查对空指针的解引用</td>
+</tr>
+<tr class="odd">
+<td>core.StackAddressEscape</td>
+<td>检查栈内存地址不逃逸函数</td>
+</tr>
+<tr class="even">
+<td>core.UndefinedBinaryOperatorResult</td>
+<td>检查二进制运算符的未定义结果</td>
+</tr>
+<tr class="odd">
+<td>core.VLASize</td>
+<td>检查对未定义或大小为零的VLA的声明</td>
+</tr>
+<tr class="even">
+<td>core.builtin.BuiltinFunctions</td>
+<td>评估编译器内建函数（例如，alloca()）</td>
+</tr>
+<tr class="odd">
+<td>core.builtin.NoReturnFunctions</td>
+<td>评估已知不会返回调用者的“panic”函数</td>
+</tr>
+<tr class="even">
+<td>core.uninitialized.ArraySubscript</td>
+<td>检查未初始化值用作数组下标</td>
+</tr>
+<tr class="odd">
+<td>core.uninitialized.Assign</td>
+<td>检查对未初始化值的赋值</td>
+</tr>
+<tr class="even">
+<td>core.uninitialized.Branch</td>
+<td>检查未初始化值用作分支条件</td>
+</tr>
+<tr class="odd">
+<td>core.uninitialized.CapturedBlockVariable</td>
+<td>检查捕获未初始化值的块</td>
+</tr>
+<tr class="even">
+<td>core.uninitialized.UndefReturn</td>
+<td>检查未初始化值是否返回给调用者</td>
+</tr>
+<tr class="odd">
+<td>cplusplus.NewDelete</td>
+<td>检查double-free和use-after-free问题。跟踪new/delete管理的内存。</td>
+</tr>
+<tr class="even">
+<td>cplusplus.NewDeleteLeaks</td>
+<td>检查内存泄漏。跟踪new/delete管理的内存。</td>
+</tr>
+<tr class="odd">
+<td>deadcode.DeadStores</td>
+<td>检查将值存储到后续永远不会读取的变量</td>
+</tr>
+<tr class="even">
+<td>debug.ConfigDumper</td>
+<td>转储配置表</td>
+</tr>
+<tr class="odd">
+<td>debug.DumpCFG</td>
+<td>显示控制流图</td>
+</tr>
+<tr class="even">
+<td>debug.DumpCallGraph</td>
+<td>显示调用图</td>
+</tr>
+<tr class="odd">
+<td>debug.DumpCalls</td>
+<td>按引擎遍历调用时打印调用</td>
+</tr>
+<tr class="even">
+<td>debug.DumpDominators</td>
+<td>打印给定CFG的支配树</td>
+</tr>
+<tr class="odd">
+<td>debug.DumpLiveVars</td>
+<td>打印活动变量分析的结果</td>
+</tr>
+<tr class="even">
+<td>debug.DumpTraversal</td>
+<td>按引擎遍历时打印分支条件</td>
+</tr>
+<tr class="odd">
+<td>debug.ExprInspection</td>
+<td>检查分析器对表达式的理解</td>
+</tr>
+<tr class="even">
+<td>debug.Stats</td>
+<td>使用分析器统计信息发出警告</td>
+</tr>
+<tr class="odd">
+<td>debug.TaintTest</td>
+<td>将受污染的符号标记为受污染。</td>
+</tr>
+<tr class="even">
+<td>debug.ViewCFG</td>
+<td>使用GraphViz查看控制流图</td>
+</tr>
+<tr class="odd">
+<td>debug.ViewCallGraph</td>
+<td>使用GraphViz查看调用图</td>
+</tr>
+<tr class="even">
+<td>debug.ViewExplodedGraph</td>
+<td>使用GraphViz查看爆炸图</td>
+</tr>
+<tr class="odd">
+<td>llvm.Conventions</td>
+<td>检查LLVM代码库的代码约定</td>
+</tr>
+<tr class="even">
+<td>osx.API</td>
+<td>检查对各种Apple API的正确使用</td>
+</tr>
+<tr class="odd">
+<td>osx.SecKeychainAPI</td>
+<td>检查Secure Keychain API的正确使用</td>
+</tr>
+<tr class="even">
+<td>osx.cocoa.AtSync</td>
+<td>检查用作@synchronized互斥锁的nil指针</td>
+</tr>
+<tr class="odd">
+<td>osx.cocoa.ClassRelease</td>
+<td>检查直接向类发送'retain'、'release'或'autorelease'的情况</td>
+</tr>
+<tr class="even">
+<td>osx.cocoa.IncompatibleMethodTypes</td>
+<td>警告：Objective-C方法签名存在类型不兼容的情况</td>
+</tr>
+<tr class="odd">
+<td>osx.cocoa.Loops</td>
+<td>使用Cocoa集合类型改进循环建模</td>
+</tr>
+<tr class="even">
+<td>osx.cocoa.MissingSuperCall</td>
+<td>警告：缺少对super的必要调用的Objective-C方法</td>
+</tr>
+<tr class="odd">
+<td>osx.cocoa.NSAutoreleasePool</td>
+<td>在Objective-C GC模式下警告NSAutoreleasePool的次优用法</td>
+</tr>
+<tr class="even">
+<td>osx.cocoa.NSError</td>
+<td>检查NSError**参数的使用</td>
+</tr>
+<tr class="odd">
+<td>osx.cocoa.NilArg</td>
+<td>检查禁止向ObjC方法调用传递nil参数的情况</td>
+</tr>
+<tr class="even">
+<td>osx.cocoa.NonNilReturnValue</td>
+<td>对确保返回非nil值的API进行建模</td>
+</tr>
+<tr class="odd">
+<td>osx.cocoa.RetainCount</td>
+<td>检查泄漏和不正确的引用计数管理</td>
+</tr>
+<tr class="even">
+<td>osx.cocoa.SelfInit</td>
+<td>检查在初始化方法中是否正确初始化'self'</td>
+</tr>
+<tr class="odd">
+<td>osx.cocoa.UnusedIvars</td>
+<td>警告：未使用的私有ivar</td>
+</tr>
+<tr class="even">
+<td>osx.cocoa.VariadicMethodTypes</td>
+<td>检查将非Objective-C类型传递给期望仅接受Objective-C类型的可变集合初始化方法的情况</td>
+</tr>
+<tr class="odd">
+<td>osx.coreFoundation.CFError</td>
+<td>检查CFErrorRef*参数的使用</td>
+</tr>
+<tr class="even">
+<td>osx.coreFoundation.CFNumber</td>
+<td>检查CFNumberCreate的正确使用</td>
+</tr>
+<tr class="odd">
+<td>osx.coreFoundation.CFRetainRelease</td>
+<td>检查对CFRetain/CFRelease/CFMakeCollectable的null参数的使用</td>
+</tr>
+<tr class="even">
+<td>osx.coreFoundation.containers.OutOfBounds</td>
+<td>使用'CFArray' API时检查索引越界</td>
+</tr>
+<tr class="odd">
+<td>osx.coreFoundation.containers.PointerSizedValues</td>
+<td>如果使用非指针大小的值创建'CFArray'、'CFDictionary'或'CFSet'，发出警告</td>
+</tr>
+<tr class="even">
+<td>security.FloatLoopCounter</td>
+<td>警告：使用浮点值作为循环计数器</td>
+</tr>
+<tr class="odd">
+<td>security.insecureAPI.UncheckedReturn</td>
+<td>警告：使用必须始终检查返回值的函数</td>
+</tr>
+<tr class="even">
+<td>security.insecureAPI.getpw</td>
+<td>警告：使用'getpw'函数</td>
+</tr>
+<tr class="odd">
+<td>security.insecureAPI.gets</td>
+<td>警告：使用'gets'函数</td>
+</tr>
+<tr class="even">
+<td>security.insecureAPI.mkstemp</td>
+<td>警告：当'mkstemp'的格式字符串中包含少于6个X时</td>
+</tr>
+<tr class="odd">
+<td>security.insecureAPI.mktemp</td>
+<td>警告：使用'mktemp'函数</td>
+</tr>
+<tr class="even">
+<td>security.insecureAPI.rand</td>
+<td>警告：使用'rand'、'random'及相关函数</td>
+</tr>
+<tr class="odd">
+<td>security.insecureAPI.strcpy</td>
+<td>警告：使用'strcpy'和'strcat'函数</td>
+</tr>
+<tr class="even">
+<td>security.insecureAPI.vfork</td>
+<td>警告：使用'vfork'函数</td>
+</tr>
+<tr class="odd">
+<td>unix.API</td>
+<td>检查对各种UNIX/Posix函数的调用</td>
+</tr>
+<tr class="even">
+<td>unix.Malloc</td>
+<td>检查内存泄漏、double free和use-after-free问题。跟踪malloc()/free()管理的内存。假设可能释放指针的所有用户定义函数都有注释。</td>
+</tr>
+<tr class="odd">
+<td>unix.MallocSizeof</td>
+<td>检查涉及sizeof的可疑malloc参数</td>
+</tr>
+<tr class="even">
+<td>unix.MismatchedDeallocator</td>
+<td>检查不匹配的deallocators</td>
+</tr>
+<tr class="odd">
+<td>unix.cstring.BadSizeArg</td>
+<td>检查传递给C字符串函数的大小参数的常见错误模式</td>
+</tr>
+<tr class="even">
+<td>unix.cstring.NullArg</td>
+<td>检查将null指针作为参数传递给C字符串函数的情况</td>
+</tr>
+</tbody>
+</table>
+<p>检查器的命名规范遵循 <code>&lt;package&gt;.&lt;subpackage&gt;.&lt;checker&gt;</code>。</p>
+<figure>
+<img src="/Clang阅读随笔/image2.png" alt="" /><figcaption>package 命名与功能</figcaption>
+</figure>
+<h2 id="直接调用-clang-命令运行-checker-的方式">直接调用 Clang 命令运行 Checker 的方式</h2>
+<h3 id="通过-driver-运行">通过 Driver 运行</h3>
+<h4 id="启用指定包的所有检查器">启用指定包的所有检查器</h4>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">clang --analyze -Xanalyzer -analyzer-checker=&lt;package&gt; &lt;source-files&gt;<br></code></pre></td></tr></table></figure>
+<ul>
+<li><code>--analyze</code>选项，表示运行 Clang 静态分析器。</li>
+<li><code>-Xanalyzer -analyzer-checker=&lt;package&gt;</code>选项，表示将<code>-analyzer-checker=&lt;package&gt;</code>参数传递给 Clang 静态分析器。</li>
+<li><code>-analyzer-checker=&lt;package&gt;</code>选项，表示启用指定包中的所有检查器。如果要同时指定多个包的所有检查器，则形如：<code>clang --analyze -Xanalyzer -analyzer-checker=core -Xanalyzer -analyzer-checker=cplusplus hello.cpp</code>。</li>
+<li><code>source-files</code>选项，表示要分析的源程序文件列表，源程序文件之间以空格分隔。</li>
+</ul>
+<h4 id="启用指定的检查器">启用指定的检查器</h4>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">clang --analyze -Xanalyzer -analyzer-checker=&lt;package.subpackage.checker&gt; &lt;source-files&gt;<br></code></pre></td></tr></table></figure>
+<p>如果要同时指定多个检查器，则形如：<code>clang --analyze -Xanalyzer -analyzer-checker=core.DivideZero -Xanalyzer -analyzer-checker=cplusplus.NewDelete hello.cpp</code></p>
+<p>需要注意的是， 通过编译器驱动程序运行 Clang 静态分析器的方式，会根据系统环境默认提供一些检查器。比如，未显式指定任何检查器，但编译器驱动程序默认提供的检查器中包括core、unix、deadcode和cplusplus等的所有检查器，仍可以检测出“除 0”错误。可以通过<code>-###</code>打印详细参数。</p>
+<p>需要注意的是，Clang 静态分析器可能不会一次性输出所有错误。这提示我们在修复警告后最好再次运行 Clang 静态分析器。</p>
+<h4 id="禁用指定的检查器">禁用指定的检查器</h4>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">clang --analyze -Xanalyzer -analyzer-disable-checker=&lt;arg&gt; &lt;source-files&gt;<br></code></pre></td></tr></table></figure>
+<h3 id="通过--cc1-运行">通过 -cc1 运行</h3>
+<p>如果要真正实现只运行我们指定的检查器，则应该通过 <code>clang -cc1</code> 的方式直接进入前端运行 Clang 静态分析器。</p>
+<h4 id="启用指定包的所有检查器-1">启用指定包的所有检查器</h4>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">clang -cc1 -w -fcolor-diagnostics -analyze -analyzer-checker=&lt;package&gt; &lt;source-files&gt; -I&lt;directory&gt;<br></code></pre></td></tr></table></figure>
+<ul>
+<li><code>-w</code>选项，表示禁用编译器的所有诊断，即禁用类似于<code>-Wdivision-by-zero</code>的诊断。从而，只启用 Clang 静态分析器的分析功能以避免重复警告。</li>
+<li><code>-fcolor-diagnostics</code>选项，表示输出带颜色的诊断信息。</li>
+<li><code>-analyze</code>选项，表示运行 Clang 静态分析器。</li>
+<li><code>-I</code>选项，表示为需要的头文件指定其所在的目录。</li>
+</ul>
+<h4 id="启用指定的检查器-1">启用指定的检查器</h4>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">clang -cc1 -w -fcolor-diagnostics -analyze -analyzer-checker=&lt;package.subpackage.checker&gt; &lt;source-files&gt;<br></code></pre></td></tr></table></figure>
+<h3 id="导出静态分析结果">导出静态分析结果</h3>
+<p>我们可以通过如下命令查看 Clang 静态分析器提供的所有命令。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">clang cc1 -help | grep analyzer<br></code></pre></td></tr></table></figure>
+<p>其中，与<code>--analyzer-output</code>标志相关的内容如下：</p>
+<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs gherkin">--analyzer-output <span class="hljs-variable">&lt;value&gt;</span>   <br>                      Static analyzer report output format (html|<span class="hljs-string">plist</span>|<span class="hljs-string">plist-multi-file</span>|<span class="hljs-string">plist-html</span>|<span class="hljs-string">sarif</span>|<span class="hljs-string">text).</span><br></code></pre></td></tr></table></figure>
+<p>我们可以通过<code>--analyzer-output</code>标志指定静态分析结果的文件格式。命令如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">clang -cc1 -w -fcolor-diagnostics -analyze -analyzer-checker=&lt;package.subpackage.checker&gt; &lt;source-files&gt; -analyzer-output &lt;format&gt; -o &lt;output-file&gt;<br></code></pre></td></tr></table></figure>
+<h2 id="通过-scan-build-运行-checker-的方式">通过 scan-build 运行 Checker 的方式</h2>
+<p>要使用 scan-build，只要在构建命令的最前面添加 <code>scan-build</code> 即可，如下所示：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">scan-build [scan-build options] &lt;command&gt; [command options]<br></code></pre></td></tr></table></figure>
+<p>常用的 scan-build options 如下表所示。</p>
+<table>
+<thead>
+<tr class="header">
+<th>scan-build options</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+|-o
+<output location>
+<p>|指定分析结果的存储位置| |-v |输出分析过程，可以连续使用两个或三个 -v 以提高输出信息的详细度。| |-V 或 --view |在生成错误报告完成后，立即在浏览器中查看（即自动调用scan-view命令）|</p>
+<p>要查看所有的 scan-build options，可以通过 <code>scan-build --help</code> 命令。</p>
 
       </div>
     </div>
