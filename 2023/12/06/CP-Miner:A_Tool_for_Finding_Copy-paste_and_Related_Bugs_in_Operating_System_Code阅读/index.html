@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf8"/>
+    <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
+    <title>
+      
+        CP-Miner: A Tool for Finding Copy-paste and Related Bugs in Operating System Code 阅读 | ZPF.SITE
+      
+    </title>
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    
+      <link rel="apple-touch-icon"
+            sizes="180x180"
+            href="/images/apple-touch-icon.png"/>
+    
+    
+      <link rel="icon"
+            type="image/png"
+            sizes="32x32"
+            href="/images/favicon-32x32.png"/>
+    
+    
+      <link rel="icon"
+            type="image/png"
+            sizes="16x16"
+            href="/images/favicon-16x16.png"/>
+    
+    
+      <link rel="mask-icon"
+            href="/images/logo.svg"
+            color=""/>
+    
+    
+    
+      
+  <style>
+    @font-face {
+        font-family:sourceHanSerif;
+        src: url(/font/regular.ttf);
+        font-weight: regular;
+    }
+  </style>
+
+  <style>
+    @font-face {
+        font-family:sourceHanSerif;
+        src: url(/font/bold.ttf);
+        font-weight: bold;
+    }
+  </style>
+
+
+    
+    <link rel="stylesheet"
+          type="text/css"
+          href='/css/layout.css'/>
+    
+    
+  <link rel="stylesheet" type="text/css" href="/css/post.css" />
+  
+
+  <meta name="generator" content="Hexo 6.3.0"></head>
+  <body>
+    <div class="head">
+      <div class="nav">
+        <a href='/' class="nav-logo">
+          <img alt="logo" height="60px" width="60px" src="/images/logo.svg"/>
+        </a>
+        <input id="navBtn" type="checkbox"/>
+        <div class="nav-menu">
+          
+            
+              <a class="nav-menu-item" href="/CS&Maths">Computer Science & Maths</a>
+            
+              <a class="nav-menu-item" href="/Life">Life</a>
+            
+          
+          
+        </div>
+        <label class="nav-btn" for="navBtn"></label>
+      </div>
+    </div>
+    <div class="body">
+      
+  <article class="post-content">
+    <div class="post-inner--toc">
+      <div class="post-content__head">
+        <div class="post-title">CP-Miner: A Tool for Finding Copy-paste and Related Bugs in Operating System Code 阅读</div>
+        <div class="post-info">
+          
+  <a href="/tags/Linux/" class="post-tag">#Linux</a><a href="/tags/OSDI/" class="post-tag">#OSDI</a><a href="/tags/Paper/" class="post-tag">#Paper</a><a href="/tags/Symbolic-Execution/" class="post-tag">#Symbolic Execution</a><a href="/tags/Staitc-Analysis/" class="post-tag">#Staitc Analysis</a><a href="/tags/OSDI-04/" class="post-tag">#OSDI'04</a>
+
+
+          <span class="post-date">2023-12-06</span>
+        </div>
+      </div>
+      
+        <aside class="toc-outer">
+          <div class="toc-title">目录</div>
+          <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AFtoken%E6%B5%81"><span class="post-toc-text">为什么是token流？</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E9%A2%91%E7%B9%81%E5%BA%8F%E5%88%97%E6%8C%96%E6%8E%98%E6%8A%80%E6%9C%AF"><span class="post-toc-text">频繁序列挖掘技术</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E8%AF%86%E5%88%AB%E5%A4%8D%E5%88%B6%E7%B2%98%E8%B4%B4%E6%AE%B5%E7%9A%84%E4%B8%BB%E8%A6%81%E6%AD%A5%E9%AA%A4"><span class="post-toc-text">识别复制粘贴段的主要步骤</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%89%AA%E6%9E%9D%E8%AF%AF%E6%8A%A5"><span class="post-toc-text">剪枝误报</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%89%AA%E6%9E%9D%E4%B8%8D%E5%8F%AF%E6%98%A0%E5%B0%84%E6%AE%B5"><span class="post-toc-text">剪枝不可映射段</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%89%AA%E6%9E%9D%E5%BE%AE%E5%B0%8F%E6%AE%B5"><span class="post-toc-text">剪枝微小段</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%89%AA%E6%9E%9D%E9%87%8D%E5%8F%A0%E6%AE%B5"><span class="post-toc-text">剪枝重叠段</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%89%AA%E6%9E%9D%E9%97%B4%E9%9A%94%E8%BE%83%E5%A4%A7%E7%9A%84%E6%AE%B5"><span class="post-toc-text">剪枝间隔较大的段</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E6%A3%80%E6%B5%8B%E5%A4%8D%E5%88%B6%E7%B2%98%E8%B4%B4%E7%9B%B8%E5%85%B3%E9%94%99%E8%AF%AF"><span class="post-toc-text">检测复制粘贴相关错误</span></a></li></ol>
+          <a href="#" class="toc-top">回到顶部</a>
+        </aside>
+      
+      <div class="post-content__body">
+        
+          <div class="post-gallery">
+            
+          </div>
+        
+        <p>在做开题报告的时候找到了这篇论文，挺巧妙的想法，简单记录一下其思路。 <span id="more"></span></p>
+<p>作者发现在现代操作系统中存在大量复制粘贴的代码，例如Linux和FreeBSD源代码的20-22%的代码存在复制粘贴的现象。但是复制粘贴后程序员会忘记修改标识符（变量、函数、类型等），由于是复制粘贴的代码，可能不存在标识符未定义或类型错误的问题，这些错误往往会通过编译时检查，成为很难检测到的隐藏错误。同时此问题由于是语义错误而非内存相关错误，也不会被静态检查器或Purify、Valgrind和CCured等动态工具检查到。</p>
+<figure>
+<img src="/CP-Miner:A_Tool_for_Finding_Copy-paste_and_Related_Bugs_in_Operating_System_Code阅读/image1.png" width="500" alt="" /><figcaption>问题示例</figcaption>
+</figure>
+<p>针对此问题Li等人提出了CP-Miner，该工具使用频繁序列挖掘技术通过对token流检测高效识别包括操作系统代码在内的大型软件中的复制粘贴代码，并检测复制粘贴相关的错误。</p>
+<h1 id="为什么是token流">为什么是token流？</h1>
+<p>由于复制粘贴的代码段通常与原始代码段相似，因此复制粘贴代码的检测涉及检测相同或相似的代码段。</p>
+<p>先前用于复制粘贴检测的技术大致可以分为三类：（1）基于字符串的方法，其中程序被分割成字符串（通常是行），然后对这些字符串进行比较，以找到重复字符串的序列；（2）基于解析树的方法，其中对代码的解析树进行模式匹配，以搜索相似的子树；（3）基于token的方法，其中程序被分割成token流，然后识别重复的token序列。</p>
+<p>基于token的方法有其独到的优势。首先，基于字符串的方法不利用任何词法信息，因此无法处理诸如标识符重命名之类的简单修改。其次，使用解析树可能引入误报，因为具有相同语法树的两个段不一定是复制粘贴的。这是因为复制粘贴是基于代码而不是基于语法的，即它重新使用了一段代码而不是抽象语法结构。</p>
+<h1 id="频繁序列挖掘技术">频繁序列挖掘技术</h1>
+<p>在序列数据库中，当一个子序列在至少指定数量的序列中出现时（称为最小支持度 min_support），则被视为频繁子序列。这里的子序列不一定在原始序列中是连续的。我们用支持度来表示一个子序列出现的次数。包含某个给定子序列的序列被称为该子序列的支持序列。</p>
+<p>举个🌰：</p>
+<p><span class="math display">\[D=\{abced, abecf, agbch, abijc, aklc\}\]</span></p>
+<p>其中，<span class="math inline">\(abc\)</span>序列出现的次数为4次，<span class="math inline">\(agbch\)</span>是其一个支持序列。如果最小支持度为4，那么所得到的频繁序列为<span class="math inline">\(\{a:5, b:4, c:5, ab:4, ac:5, bc:4, abc:4\}\)</span>。</p>
+<p>CP-Miner使用一种名为CloSpan（闭合顺序模式挖掘）的频繁子序列挖掘算法<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>。</p>
+<h1 id="识别复制粘贴段的主要步骤">识别复制粘贴段的主要步骤</h1>
+<ol type="1">
+<li><p>解析源代码：对给定的源代码进行解析，并构建一个序列数据库（序列的集合）。此外，还将有关基本块和块嵌套级别的信息传递给挖掘算法。</p></li>
+<li><p>挖掘基本复制粘贴段：将增强型频繁子序列挖掘算法应用于序列数据库，以找到基本的复制粘贴段。</p></li>
+<li><p>剪枝误报：使用包括标识符映射在内的各种技术来剪枝误报。</p></li>
+<li><p>组合更大的复制粘贴段：通过组合相邻的较小段来识别更大的复制粘贴段。将组合的复制粘贴段反馈到步骤（3）以剪枝误报。这是必要的，因为组合体可能并非复制粘贴，即使每个较小段都是。</p></li>
+</ol>
+<h2 id="剪枝误报">剪枝误报</h2>
+<p>挖掘算法或组合过程发现的复制粘贴段可能包含误报。误报的主要原因是对标识符（变量/函数/类型）进行token化，以容忍复制粘贴中的标识符重命名。由于相同类型的标识符被映射到相同的token，可能会识别出虚假的复制粘贴段。例如，所有类似于 <span class="math inline">\(x = y + z\)</span> 的语句将具有相同的哈希值，这可能导致许多误报。为了剪枝误报，CP-Miner 对基本和组合的复制粘贴段都应用了几种技术。剪枝技术包括：</p>
+<h3 id="剪枝不可映射段">剪枝不可映射段</h3>
+<p>此技术用于剪枝由标识符token化引入的误报。这基于这样的观察：如果程序员复制粘贴了一个代码段然后重命名了一个标识符，很可能会在新的复制粘贴段中的所有出现中重命名此标识符。因此，我们可以建立一个标识符映射，将一个段中的旧名称映射到属于同一复制粘贴组的另一个段中的相应新名称。在上图中所示的示例中，变量 <code>prom_phys_total</code> 被更改为 <code>prom_prom_taken</code>（除了第117行的错误）。</p>
+<p>如果将一个标识符名称映射到两个或更多不同的新名称这样的冲突很少，说明映射方案是一致的。如果无法在一对复制粘贴的段之间建立一致的标识符映射，它们很可能是误报。</p>
+<p>为了衡量冲突的数量，CP-Miner 使用一种称为 <code>ConflictRatio</code> 的度量，该度量记录了两个候选复制粘贴段之间的标识符映射的冲突比率。例如，如果段1中的变量 <span class="math inline">\(A\)</span> 被更改为段2中的 <span class="math inline">\(a\)</span> 的出现的75%，但其出现的25%被更改为其他变量，那么映射 <span class="math inline">\(A \rightarrow a\)</span> 的 <code>ConflictRatio</code> 为25%。这两个段之间整个映射方案的 <code>ConflictRatio</code> 是每个唯一标识符的映射的 <code>ConflictRatio</code> 的加权和。给定代码段中标识符 <span class="math inline">\(A\)</span> 的权重是总标识符出现的 <span class="math inline">\(A\)</span> 的出现的比例。如果两个候选复制粘贴段的 <code>ConflictRatio</code> 高于预定义的阈值，这两个代码段将被过滤为误报。在实验中将阈值设置为60%。</p>
+<h3 id="剪枝微小段">剪枝微小段</h3>
+<p>我们的挖掘算法可能会找到仅由1-2个简单语句组成的微小复制粘贴段。如果这样的微小段无法与相邻段组合以构成更大的段，则将其从复制粘贴列表中移除。这基于这样的观察：复制粘贴的段通常不会很小，因为程序员在复制粘贴简单的小代码段时无法节省太多工作。</p>
+<p>CP-Miner 使用token数来衡量段的大小。这个度量比语句数更合适，因为语句的长度变化很大。如果单个语句非常复杂，包含许多token，程序员仍然可以复制粘贴它。</p>
+<p>为了剪枝微小段，CP-Miner 使用一个可调参数，称为 <code>min_size</code>。如果一对复制粘贴段中的token数少于 <code>min_size</code>，则删除这对。</p>
+<h3 id="剪枝重叠段">剪枝重叠段</h3>
+<p>如果一对候选复制粘贴段彼此重叠，它们也被视为误报。CP-Miner 在一对复制粘贴段彼此重叠时停止扩展。对于一些包含许多相似段对的程序结构，比如包含许多自相似段对的 switch 语句，剪枝重叠段可以避免大多数 switch 语句中的误报。</p>
+<h3 id="剪枝间隔较大的段">剪枝间隔较大的段</h3>
+<p>除了基本复制粘贴段的挖掘过程之外，间隔约束也适用于组合的复制粘贴段。当两个相邻段组合时，新组合的大段的最大间隔可能会大于预定义的阈值 <code>max_total_gap</code>。如果是这样，组合是无效的。因此，新组合不会添加到候选集中，两个较小的段在集合中token为不可扩展。</p>
+<p>当然，即使经过如此严格的剪枝，误报仍然可能存在。然而，作者已经手动检查了由 CP-Miner 报告的 Linux 的100个随机复制粘贴段，只发现了很少的误报（8个）。当然作者只能手动检查每个识别出的复制粘贴段，因为在软件开发过程中没有记录程序员复制粘贴操作的痕迹。</p>
+<h1 id="检测复制粘贴相关错误">检测复制粘贴相关错误</h1>
+<p>正如在一开始提到的，复制粘贴相关错误的主要原因是程序员在复制粘贴后忘记始终如一地修改标识符。一旦我们获得一对复制粘贴段中的标识符之间的映射关系，我们可以找到不一致之处并报告这些复制粘贴相关的错误。 <img src="/CP-Miner:A_Tool_for_Finding_Copy-paste_and_Related_Bugs_in_Operating_System_Code阅读/image2.png" width="500" /></p>
+<div id="footnotes">
+<hr>
+<div id="footnotelist">
+<ol style="list-style:none; padding-left: 0;">
+<li id="fn:1">
+<span style="display: inline-block; vertical-align: top; padding-right: 10px;">1.</span><span style="display: inline-block; vertical-align: top;">X. Yan, J. Han, and R. Afshar. CloSpan: Mining closed sequential patterns in large datasets. In Proceedings of 2003 SIAM International Conference on Data Mining (SDM'03), San Fransisco, CA, May 2003.</span><a href="#fnref:1" rev="footnote"> ↩︎</a>
+</li>
+</ol>
+</div>
+</div>
+
+      </div>
+    </div>
+  </article>
+  <div class="post__foot">
+    
+    <div class="post-nav">
+  
+    <div class="post-nav-item-left"></div>
+  
+  <div class="vhr"></div>
+  
+    <a class="post-nav-item-right" href="/2023/11/22/Clang_Static_Analyzer/">
+      <div class="text-align">
+        <span class="text-small">下一篇</span>
+        <svg t="1670570876164"
+             class="icon"
+             viewBox="0 0 1024 1024"
+             transform="scale(-1,-1)"
+             width="16"
+             height="16">
+          <path d="M384 512L731.733333 202.666667c17.066667-14.933333 19.2-42.666667 4.266667-59.733334-14.933333-17.066667-42.666667-19.2-59.733333-4.266666l-384 341.333333c-10.666667 8.533333-14.933333 19.2-14.933334 32s4.266667 23.466667 14.933334 32l384 341.333333c8.533333 6.4 19.2 10.666667 27.733333 10.666667 12.8 0 23.466667-4.266667 32-14.933333 14.933333-17.066667 14.933333-44.8-4.266667-59.733334L384 512z" p-id="14596"/>
+        </svg>
+      </div>
+      Clang Static Analyzer
+    </a>
+  
+</div>
+
+    
+      <div class="related-post">
+  <div class="related__head">
+  <a href="/tags/Linux/" class="post-tag">#Linux</a><a href="/tags/OSDI/" class="post-tag">#OSDI</a><a href="/tags/Paper/" class="post-tag">#Paper</a><a href="/tags/Symbolic-Execution/" class="post-tag">#Symbolic Execution</a><a href="/tags/Staitc-Analysis/" class="post-tag">#Staitc Analysis</a><a href="/tags/OSDI-04/" class="post-tag">#OSDI'04</a>
+
+</div>
+  <div class="realated__body">
+    
+      <div class="null"><div class="null-item"><div class="null-title"><a href="/2023/08/31/Cross-checking_Semantic_Correctness:The_Case_of_Finding_File_System_Bugs阅读/" title="Cross-checking Semantic Correctness: The Case of Finding File System Bugs 阅读" rel="bookmark">Cross-checking Semantic Correctness: The Case of Finding File System Bugs 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/10/23/Push-Button_Verification_of_File_Systems_via_Crash_Refinement阅读/" title="Push-Button Verification of File Systems via Crash Refinement 阅读" rel="bookmark">Push-Button Verification of File Systems via Crash Refinement 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/06/All_File_Systems_Are_Not_Created_Equal:On_the_Complexity_of_Crafting_Crash-Consistent_Applications阅读/" title="All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读" rel="bookmark">All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/11/07/@蓝色老师的LLVM系列文章汇总/" title="@蓝色老师的LLVM系列文章汇总" rel="bookmark">@蓝色老师的LLVM系列文章汇总</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/10/30/All_You_Ever_Wanted_to_Know_About_Dynamic_Taint_Analysis_and_Forward_Symbolic_Execution阅读/" title="All You Ever Wanted to Know About Dynamic Taint Analysis and Forward Symbolic Execution 阅读" rel="bookmark">All You Ever Wanted to Know About Dynamic Taint Analysis and Forward Symbolic Execution 阅读</a></div></div></div>
+    
+  </div>
+</div>
+
+    
+    
+    
+      <script src="https://utteranc.es/client.js"
+    repo="jtzhpf/jtzhpf.github.io"
+    issue-term="pathname"
+    theme="github-light"
+    crossorigin="anonymous"
+    async>
+</script>
+    
+  </div>
+
+    </div>
+    <div class="foot">
+      <div class="foot-inner">
+        <div class="foot__head">
+          
+            <div class="foot-line">
+              
+                <div class="matts">海</div>
+              
+                <div class="matts">内</div>
+              
+                <div class="matts">存</div>
+              
+                <div class="matts">知</div>
+              
+                <div class="matts">己</div>
+              
+            </div>
+          
+            <div class="foot-line">
+              
+                <div class="matts">天</div>
+              
+                <div class="matts">涯</div>
+              
+                <div class="matts">若</div>
+              
+                <div class="matts">比</div>
+              
+                <div class="matts">邻</div>
+              
+            </div>
+          
+        </div>
+        <div class="foot__body">
+          
+          
+            <div class="foot-item">
+              <div class="foot-item__head">账号</div>
+              <div class="foot-item__body">
+                
+                  <div class="text">
+                    <img alt="link" height="20px" width="20px" src="/images/logo-github.svg"/>
+                    <a class="foot-link" target="_blank" rel="noopener" href="https://github.com/jtzhpf">github</a>
+                  </div>
+                
+              </div>
+            </div>
+          
+          <div class="foot-item">
+            <div class="foot-item__head">联系</div>
+            <div class="foot-item__body">
+              <div class="text">
+                <img alt="link" height="20px" width="20px" src="/images/icon/icon-email.svg"/>
+                <a class="foot-link" href="mailto:jtzhpf@126.com">jtzhpf@126.com</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="copyright">
+          <a href="https://zpf.pages.dev">ZPF.SITE</a> &nbsp;|&nbsp;由&nbsp;<a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>&nbsp;及&nbsp;
+          <svg width="20" height="20" viewBox="0 0 725 725">
+            <path fill-rule="evenodd" fill="rgb(221, 221, 221)" d="M145.870,236.632 L396.955,103.578 L431.292,419.44 L156.600,522.53 L145.870,236.632 Z"/>
+            <path fill-rule="evenodd" fill="rgb(159, 159, 159)" d="M396.955,103.578 L564.345,234.486 L611.558,513.469 L431.292,419.44 L396.955,103.578 Z"/>
+            <path fill-rule="evenodd" fill="rgb(0, 0, 0)" d="M431.292,419.44 L611.558,513.469 L358.327,595.18 L156.600,522.53 L431.292,419.44 Z"/>
+          </svg>
+          <a target="_blank" rel="noopener" href="https://github.com/hooozen/hexo-theme-tranquility">致远</a>&nbsp;驱动
+        </div>
+      </div>
+    </div>
+    
+      <script src="https://unpkg.com/js-polyfills@0.1.43/es6.js"></script>
+      <script id="MathJax-script"
+              async
+              src="https://www.unpkg.com/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+    
+    
+    <script src="https://cdn.bootcdn.net/ajax/libs/mermaid/10.4.0/mermaid.min.js"></script>
+    
+    
+  
+
+  </body>
+</html>
