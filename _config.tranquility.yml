@@ -2,7 +2,7 @@ slogan: “鹏北海，凤朝阳。又携书剑路茫茫。”
 email: jtzhpf@126.com
 logo: "/images/logo.svg"
 
-mathjax: false # 加载 LateX 数学公式库
+mathjax: true # 加载 LateX 数学公式库
 
 mermaid: ## mermaid url https://github.com/knsv/mermaid
   enable: true  # default false
