@@ -12,8 +12,4 @@ toc: true
 #cover: /images/about.jpg # 指定封面图片的 URL
 timeline: article  # 展示在时间线列表中
 ---
-<object data="https://github.com/devicetree-org/devicetree-specification/releases/download/v0.4/devicetree-specification-v0.4.pdf" type="application/pdf" width="95%" height="700px">
-    <embed src="https://github.com/devicetree-org/devicetree-specification/releases/download/v0.4/devicetree-specification-v0.4.pdf">
-        <p>This browser does not support PDFs. Please download the PDF to view it: <a href="https://github.com/devicetree-org/devicetree-specification/releases/download/v0.4/devicetree-specification-v0.4.pdf">Download PDF</a>.</p>
-    </embed>
-</object>
+ <embed src="/PCI_in_Device_Tree/devicetree-specification-v0.4.pdf" width="100%" height="750" type="application/pdf">
