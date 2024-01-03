@@ -2,7 +2,7 @@
 title: "AddressSanitizer"
 category: CS&Maths
 #id: 57
-date: 2023-1-3 09:00:00
+date: 2024-1-3 09:00:00
 tags: 
   - LLVM
   - Clang
@@ -58,7 +58,7 @@ int main(){
 ```
 ![ERROR: AddressSanitizer: heap-buffer-overflow](/AddressSanitizer/image1.png)
 
-倒是新奇，查询一番得知这是因为LeetCode开启了AddressSanitizer，在编译时加上`-fsanitize=address`即可开启。开启后再执行就会报一样的错误了。
+倒是新奇，查询一番得知这是因为LeetCode开启了AddressSanitizer[^1]，在编译时加上`-fsanitize=address`即可开启。开启后再执行就会报一样的错误了。
 
 
 ## 原理
@@ -158,3 +158,5 @@ hook动态运行库主要提供将malloc，free等系统调用函数hook住。
 
 hook malloc/free函数。在malloc函数中额外的分配了Redzone区域的内存，将与Redzone区域对应的影子内存加锁，主要的内存区域对应的影子内存不加锁。
 free函数将所有分配的内存区域加锁，并放到了隔离区域的队列中(保证在一定的时间内不会再被malloc函数分配)，可检测Use after free类的问题。
+
+[^1]: [https://github.com/google/sanitizers/wiki/AddressSanitizerAlgorithm](https://github.com/google/sanitizers/wiki/AddressSanitizerAlgorithm)
