@@ -160,3 +160,6 @@ hook malloc/free函数。在malloc函数中额外的分配了Redzone区域的内
 free函数将所有分配的内存区域加锁，并放到了隔离区域的队列中(保证在一定的时间内不会再被malloc函数分配)，可检测Use after free类的问题。
 
 [^1]: [https://github.com/google/sanitizers/wiki/AddressSanitizerAlgorithm](https://github.com/google/sanitizers/wiki/AddressSanitizerAlgorithm)
+
+
+回到最开始的题目，是什么问题导致的堆溢出呢？字符串的末尾应该是`\0`结尾，所以字符串的长度应该为真实长度+1。
