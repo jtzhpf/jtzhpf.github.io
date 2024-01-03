@@ -141,6 +141,7 @@
 <p>插桩主要是对访问内存的操作(store，load，alloc等)，将它们进行处理。 hook动态运行库主要提供将malloc，free等系统调用函数hook住。</p>
 <p>该算法的思路是：如果想防住Buffer Overflow漏洞，只需要在每块内存区域两端加一块区域（RedZone），使RedZone的区域的影子内存（Shadow Memory）设置为不可写即可。</p>
 <p>hook malloc/free函数。在malloc函数中额外的分配了Redzone区域的内存，将与Redzone区域对应的影子内存加锁，主要的内存区域对应的影子内存不加锁。 free函数将所有分配的内存区域加锁，并放到了隔离区域的队列中(保证在一定的时间内不会再被malloc函数分配)，可检测Use after free类的问题。</p>
+回到最开始的题目，是什么问题导致的堆溢出呢？字符串的末尾应该是<code>\0</code>结尾，所以字符串的长度应该为真实长度+1。
 <div id="footnotes">
 <hr>
 <div id="footnotelist">
