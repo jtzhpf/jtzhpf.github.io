@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf8"/>
+    <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
+    <title>
+      
+        AddressSanitizer | ZPF.SITE
+      
+    </title>
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    
+      <link rel="apple-touch-icon"
+            sizes="180x180"
+            href="/images/apple-touch-icon.png"/>
+    
+    
+      <link rel="icon"
+            type="image/png"
+            sizes="32x32"
+            href="/images/favicon-32x32.png"/>
+    
+    
+      <link rel="icon"
+            type="image/png"
+            sizes="16x16"
+            href="/images/favicon-16x16.png"/>
+    
+    
+      <link rel="mask-icon"
+            href="/images/logo.svg"
+            color=""/>
+    
+    
+    
+      
+  <style>
+    @font-face {
+        font-family:sourceHanSerif;
+        src: url(/font/regular.ttf);
+        font-weight: regular;
+    }
+  </style>
+
+  <style>
+    @font-face {
+        font-family:sourceHanSerif;
+        src: url(/font/bold.ttf);
+        font-weight: bold;
+    }
+  </style>
+
+
+    
+    <link rel="stylesheet"
+          type="text/css"
+          href='/css/layout.css'/>
+    
+    
+  <link rel="stylesheet" type="text/css" href="/css/post.css" />
+  
+
+  <meta name="generator" content="Hexo 6.3.0"></head>
+  <body>
+    <div class="head">
+      <div class="nav">
+        <a href='/' class="nav-logo">
+          <img alt="logo" height="60px" width="60px" src="/images/logo.svg"/>
+        </a>
+        <input id="navBtn" type="checkbox"/>
+        <div class="nav-menu">
+          
+            
+              <a class="nav-menu-item" href="/CS&Maths">Computer Science & Maths</a>
+            
+              <a class="nav-menu-item" href="/Life">Life</a>
+            
+          
+          
+        </div>
+        <label class="nav-btn" for="navBtn"></label>
+      </div>
+    </div>
+    <div class="body">
+      
+  <article class="post-content">
+    <div class="post-inner--toc">
+      <div class="post-content__head">
+        <div class="post-title">AddressSanitizer</div>
+        <div class="post-info">
+          
+  <a href="/tags/LLVM/" class="post-tag">#LLVM</a><a href="/tags/Clang/" class="post-tag">#Clang</a><a href="/tags/Compiler/" class="post-tag">#Compiler</a><a href="/tags/GCC/" class="post-tag">#GCC</a>
+
+
+          <span class="post-date">2023-01-03</span>
+        </div>
+      </div>
+      
+        <aside class="toc-outer">
+          <div class="toc-title">目录</div>
+          <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%8E%9F%E7%90%86"><span class="post-toc-text">原理</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84"><span class="post-toc-text">内存映射</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%BE%8B%E5%AD%90"><span class="post-toc-text">例子</span></a></li></ol></li></ol>
+          <a href="#" class="toc-top">回到顶部</a>
+        </aside>
+      
+      <div class="post-content__body">
+        
+          <div class="post-gallery">
+            
+          </div>
+        
+        <p>昨天晚上写了个LeetCode的第5题，最长回文子串，本地测试了发现结果是正确的之后就提交了，但提交之后却出了问题。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><code class="hljs C"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdlib.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;string.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdbool.h&gt;</span></span><br><span class="hljs-type">char</span>* <span class="hljs-title function_">longestPalindrome</span><span class="hljs-params">(<span class="hljs-type">char</span>* s)</span> &#123;<br>    <span class="hljs-type">int</span> ssize=<span class="hljs-built_in">strlen</span>(s);<br>    <span class="hljs-type">bool</span> (*vec)[ssize]=(<span class="hljs-type">bool</span>*)<span class="hljs-built_in">malloc</span>(<span class="hljs-keyword">sizeof</span>(<span class="hljs-type">bool</span>)*ssize*ssize);<br>    <span class="hljs-built_in">memset</span>(vec,<span class="hljs-number">0</span>,ssize*ssize);<br>    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i&lt;ssize;i++)&#123;<br>        vec[i][i]=<span class="hljs-literal">true</span>;<br>    &#125;<br>    <span class="hljs-type">int</span> length=<span class="hljs-number">1</span>;<br>    <span class="hljs-type">int</span> pos=<span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> L=<span class="hljs-number">2</span>;L&lt;=ssize;L++)&#123;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i+L<span class="hljs-number">-1</span>&lt;ssize;i++)&#123;<br>            <span class="hljs-keyword">if</span>(L&lt;<span class="hljs-number">3</span>)&#123;<br>                vec[i][i+L<span class="hljs-number">-1</span>]=s[i]==s[i+L<span class="hljs-number">-1</span>];<br>            &#125;<span class="hljs-keyword">else</span>&#123;<br>                vec[i][i+L<span class="hljs-number">-1</span>]=s[i]==s[i+L<span class="hljs-number">-1</span>]&amp;&amp;vec[i+<span class="hljs-number">1</span>][i+L<span class="hljs-number">-2</span>];<br>            &#125;<br>            <span class="hljs-keyword">if</span>(vec[i][i+L<span class="hljs-number">-1</span>])&#123;<br>                length=L;<br>                pos=i;<br>            &#125;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-type">char</span> *res=(<span class="hljs-type">char</span>*)(<span class="hljs-built_in">malloc</span>((length)*<span class="hljs-keyword">sizeof</span>(<span class="hljs-type">char</span>)));<br>    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i&lt;length;i++)<br>        res[i]=s[pos+i];<br>    <br>    <span class="hljs-keyword">return</span> res;<br>&#125;<br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span>&#123;<br>    <span class="hljs-type">char</span> s[]=<span class="hljs-string">&quot;aaaaa&quot;</span>;<br>    <span class="hljs-type">char</span> *res=longestPalindrome(s);<br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%s&quot;</span>,res);<br>    <span class="hljs-built_in">free</span>(res);<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure>
+<img src="/AddressSanitizer/image1.png" alt="" /><figcaption>ERROR: AddressSanitizer: heap-buffer-overflow</figcaption>
+</figure>
+<p>倒是新奇，查询一番得知这是因为LeetCode开启了AddressSanitizer，在编译时加上<code>-fsanitize=address</code>即可开启。开启后再执行就会报一样的错误了。</p>
+<h2 id="原理">原理</h2>
+<p>由于是内存检测工具，其需要对每一次内存读写操作进行检查： <code>*address = ...; // or: ... = *address;</code></p>
+<p>进行如下的逻辑判断：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs C"><span class="hljs-keyword">if</span> (IsPoisoned(address)) &#123;<br>  ReportError(address, kAccessSize, kIsWrite);<br>&#125;<br>*address = ...;  <span class="hljs-comment">// or: ... = *address;</span><br></code></pre></td></tr></table></figure>
+<p>如果指针读写异常，则统计及打印异常信息，可见整个工具的关键在于 <code>IsPoisoned</code> 如何实现，该函数需要快速而且准确。</p>
+<h3 id="内存映射">内存映射</h3>
+<p>其将内存分为两块：</p>
+<ul>
+<li>主内存：程序常规使用</li>
+<li>影子内存：记录主内存是否可用等meta信息</li>
+</ul>
+<p>如果有个函数 <code>MemToShadow</code> 可以根据主内存地址获取到对应的影子内存地址，那么内存检测的实现，可以改写为： <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs C">shadow_address = MemToShadow(address);<br><span class="hljs-keyword">if</span> (ShadowIsPoisoned(shadow_address)) &#123;<br>  ReportError(address, kAccessSize, kIsWrite);<br>&#125;<br></code></pre></td></tr></table></figure> #### 影子内存 AddressSanitizer 用 1 byte 的影子内存，记录主内存中 8 bytes 的数据。</p>
+<p>为什么是 8 bytes ，因为malloc分配内存是按照 8 bytes 对齐。</p>
+<p>这样，8 bytes 的主内存，共构成 9 种不同情况：</p>
+<ul>
+<li>8 bytes 的数据可读写，影子内存中的value值为 <strong>0</strong></li>
+<li>8 bytes 的数据不可读写，影子内存中的value值为 <strong>负数</strong></li>
+<li>前 k bytes 可读写，后 (8 - k) bytes 不可读写，影子内存中的value值为 <strong>k</strong></li>
+</ul>
+<p>如果 <code>malloc(13)</code>，根据 8 bytes 字节对齐的原则，需要 2 bytes 的影子内存，第一个byte的值为 0，第二个byte的值为 5。</p>
+<p>这时，整个判断流程，可改写为： <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs C">byte *shadow_address = MemToShadow(address);<br>byte shadow_value = *shadow_address;<br><span class="hljs-keyword">if</span> (shadow_value) &#123;<br>  <span class="hljs-keyword">if</span> (SlowPathCheck(shadow_value, address, kAccessSize)) &#123;<br>    ReportError(address, kAccessSize, kIsWrite);<br>  &#125;<br>&#125;<br><br><span class="hljs-comment">// Check the cases where we access first k bytes of the qword</span><br><span class="hljs-comment">// and these k bytes are unpoisoned.</span><br><span class="hljs-type">bool</span> <span class="hljs-title function_">SlowPathCheck</span><span class="hljs-params">(shadow_value, address, kAccessSize)</span> &#123;<br>  last_accessed_byte = (address &amp; <span class="hljs-number">7</span>) + kAccessSize - <span class="hljs-number">1</span>;<br>  <span class="hljs-keyword">return</span> (last_accessed_byte &gt;= shadow_value);<br>&#125;<br></code></pre></td></tr></table></figure></p>
+<h3 id="例子">例子</h3>
+<p>如何检测数组访问越界： <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs C"><span class="hljs-type">void</span> <span class="hljs-title function_">foo</span><span class="hljs-params">()</span> &#123;<br>  <span class="hljs-type">char</span> a[<span class="hljs-number">8</span>];<br>  ...<br>  <span class="hljs-keyword">return</span>;<br>&#125;<br></code></pre></td></tr></table></figure> 通过插桩(Instrumentation)和 hook 动态运行库(Run-time library)， <code>AddressSanitizer</code> 将其改写为： <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs C"><span class="hljs-type">void</span> <span class="hljs-title function_">foo</span><span class="hljs-params">()</span> &#123;<br>  <span class="hljs-type">char</span> redzone1[<span class="hljs-number">32</span>];  <span class="hljs-comment">// 32-byte aligned</span><br>  <span class="hljs-type">char</span> a[<span class="hljs-number">8</span>];          <span class="hljs-comment">// 32-byte aligned</span><br>  <span class="hljs-type">char</span> redzone2[<span class="hljs-number">24</span>];<br>  <span class="hljs-type">char</span> redzone3[<span class="hljs-number">32</span>];  <span class="hljs-comment">// 32-byte aligned</span><br>  <span class="hljs-type">int</span>  *shadow_base = MemToShadow(redzone1);<br>  shadow_base[<span class="hljs-number">0</span>] = <span class="hljs-number">0xffffffff</span>;  <span class="hljs-comment">// poison redzone1</span><br>  shadow_base[<span class="hljs-number">1</span>] = <span class="hljs-number">0xffffff00</span>;  <span class="hljs-comment">// poison redzone2, unpoison &#x27;a&#x27;</span><br>  shadow_base[<span class="hljs-number">2</span>] = <span class="hljs-number">0xffffffff</span>;  <span class="hljs-comment">// poison redzone3</span><br>  ...<br>  shadow_base[<span class="hljs-number">0</span>] = shadow_base[<span class="hljs-number">1</span>] = shadow_base[<span class="hljs-number">2</span>] = <span class="hljs-number">0</span>; <span class="hljs-comment">// unpoison all</span><br>  <span class="hljs-keyword">return</span>;<br>&#125;<br></code></pre></td></tr></table></figure></p>
+<p>插桩主要是对访问内存的操作(store，load，alloc等)，将它们进行处理。 hook动态运行库主要提供将malloc，free等系统调用函数hook住。</p>
+<p>该算法的思路是：如果想防住Buffer Overflow漏洞，只需要在每块内存区域两端加一块区域（RedZone），使RedZone的区域的影子内存（Shadow Memory）设置为不可写即可。</p>
+<p>hook malloc/free函数。在malloc函数中额外的分配了Redzone区域的内存，将与Redzone区域对应的影子内存加锁，主要的内存区域对应的影子内存不加锁。 free函数将所有分配的内存区域加锁，并放到了隔离区域的队列中(保证在一定的时间内不会再被malloc函数分配)，可检测Use after free类的问题。</p>
+
+      </div>
+    </div>
+  </article>
+  <div class="post__foot">
+    
+    <div class="post-nav">
+  
+    <a class="post-nav-item-left" href="/2023/07/02/feat-%E7%9B%AE%E5%BD%95%E6%B5%8B%E8%AF%95/">
+      <div class="text-align">
+        <svg t="1670570876164"
+             class="icon"
+             viewBox="0 0 1024 1024"
+             width="16"
+             height="16">
+          <path d="M384 512L731.733333 202.666667c17.066667-14.933333 19.2-42.666667 4.266667-59.733334-14.933333-17.066667-42.666667-19.2-59.733333-4.266666l-384 341.333333c-10.666667 8.533333-14.933333 19.2-14.933334 32s4.266667 23.466667 14.933334 32l384 341.333333c8.533333 6.4 19.2 10.666667 27.733333 10.666667 12.8 0 23.466667-4.266667 32-14.933333 14.933333-17.066667 14.933333-44.8-4.266667-59.733334L384 512z" p-id="14596"/>
+        </svg>
+        <span class="text-small">上一篇</span>
+      </div>
+      <div>目录测试</div>
+    </a>
+  
+  <div class="vhr"></div>
+  
+    <a class="post-nav-item-right" href="/2019/07/25/code-highlight/">
+      <div class="text-align">
+        <span class="text-small">下一篇</span>
+        <svg t="1670570876164"
+             class="icon"
+             viewBox="0 0 1024 1024"
+             transform="scale(-1,-1)"
+             width="16"
+             height="16">
+          <path d="M384 512L731.733333 202.666667c17.066667-14.933333 19.2-42.666667 4.266667-59.733334-14.933333-17.066667-42.666667-19.2-59.733333-4.266666l-384 341.333333c-10.666667 8.533333-14.933333 19.2-14.933334 32s4.266667 23.466667 14.933334 32l384 341.333333c8.533333 6.4 19.2 10.666667 27.733333 10.666667 12.8 0 23.466667-4.266667 32-14.933333 14.933333-17.066667 14.933333-44.8-4.266667-59.733334L384 512z" p-id="14596"/>
+        </svg>
+      </div>
+      代码高亮
+    </a>
+  
+</div>
+
+    
+      <div class="related-post">
+  <div class="related__head">
+  <a href="/tags/LLVM/" class="post-tag">#LLVM</a><a href="/tags/Clang/" class="post-tag">#Clang</a><a href="/tags/Compiler/" class="post-tag">#Compiler</a><a href="/tags/GCC/" class="post-tag">#GCC</a>
+
+</div>
+  <div class="realated__body">
+    
+      <div class="null"><div class="null-item"><div class="null-title"><a href="/2023/11/07/@蓝色老师的LLVM系列文章汇总/" title="@蓝色老师的LLVM系列文章汇总" rel="bookmark">@蓝色老师的LLVM系列文章汇总</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/10/17/Clang_AST/" title="Clang AST" rel="bookmark">Clang AST</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/11/22/Clang_Static_Analyzer/" title="Clang Static Analyzer" rel="bookmark">Clang Static Analyzer</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/06/All_File_Systems_Are_Not_Created_Equal:On_the_Complexity_of_Crafting_Crash-Consistent_Applications阅读/" title="All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读" rel="bookmark">All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/10/30/All_You_Ever_Wanted_to_Know_About_Dynamic_Taint_Analysis_and_Forward_Symbolic_Execution阅读/" title="All You Ever Wanted to Know About Dynamic Taint Analysis and Forward Symbolic Execution 阅读" rel="bookmark">All You Ever Wanted to Know About Dynamic Taint Analysis and Forward Symbolic Execution 阅读</a></div></div></div>
+    
+  </div>
+</div>
+
+    
+    
+    
+      <script src="https://utteranc.es/client.js"
+    repo="jtzhpf/jtzhpf.github.io"
+    issue-term="pathname"
+    theme="github-light"
+    crossorigin="anonymous"
+    async>
+</script>
+    
+  </div>
+
+    </div>
+    <div class="foot">
+      <div class="foot-inner">
+        <div class="foot__head">
+          
+            <div class="foot-line">
+              
+                <div class="matts">海</div>
+              
+                <div class="matts">内</div>
+              
+                <div class="matts">存</div>
+              
+                <div class="matts">知</div>
+              
+                <div class="matts">己</div>
+              
+            </div>
+          
+            <div class="foot-line">
+              
+                <div class="matts">天</div>
+              
+                <div class="matts">涯</div>
+              
+                <div class="matts">若</div>
+              
+                <div class="matts">比</div>
+              
+                <div class="matts">邻</div>
+              
+            </div>
+          
+        </div>
+        <div class="foot__body">
+          
+          
+            <div class="foot-item">
+              <div class="foot-item__head">账号</div>
+              <div class="foot-item__body">
+                
+                  <div class="text">
+                    <img alt="link" height="20px" width="20px" src="/images/logo-github.svg"/>
+                    <a class="foot-link" target="_blank" rel="noopener" href="https://github.com/jtzhpf">github</a>
+                  </div>
+                
+              </div>
+            </div>
+          
+          <div class="foot-item">
+            <div class="foot-item__head">联系</div>
+            <div class="foot-item__body">
+              <div class="text">
+                <img alt="link" height="20px" width="20px" src="/images/icon/icon-email.svg"/>
+                <a class="foot-link" href="mailto:jtzhpf@126.com">jtzhpf@126.com</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="copyright">
+          <a href="https://zpf.pages.dev">ZPF.SITE</a> &nbsp;|&nbsp;由&nbsp;<a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>&nbsp;及&nbsp;
+          <svg width="20" height="20" viewBox="0 0 725 725">
+            <path fill-rule="evenodd" fill="rgb(221, 221, 221)" d="M145.870,236.632 L396.955,103.578 L431.292,419.44 L156.600,522.53 L145.870,236.632 Z"/>
+            <path fill-rule="evenodd" fill="rgb(159, 159, 159)" d="M396.955,103.578 L564.345,234.486 L611.558,513.469 L431.292,419.44 L396.955,103.578 Z"/>
+            <path fill-rule="evenodd" fill="rgb(0, 0, 0)" d="M431.292,419.44 L611.558,513.469 L358.327,595.18 L156.600,522.53 L431.292,419.44 Z"/>
+          </svg>
+          <a target="_blank" rel="noopener" href="https://github.com/hooozen/hexo-theme-tranquility">致远</a>&nbsp;驱动
+        </div>
+      </div>
+    </div>
+    
+      <script src="https://unpkg.com/js-polyfills@0.1.43/es6.js"></script>
+      <script id="MathJax-script"
+              async
+              src="https://www.unpkg.com/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+    
+    
+    <script src="https://cdn.bootcdn.net/ajax/libs/mermaid/10.4.0/mermaid.min.js"></script>
+    
+    
+  
+
+  </body>
+</html>
