@@ -239,11 +239,11 @@ scan-build [scan-build options] <command> [command options]
 ```
 常用的 scan-build options 如下表所示。
 
-| Scan-build 选项         | 用途                                               |
-|-------------------------|----------------------------------------------------|
-| -o <output location>    | 指定分析结果的存储位置                               |
-| -v                      | 输出分析过程，可以连续使用两个或三个 -v 以提高输出信息的详细度  |
-| -V 或 --view            | 在生成错误报告完成后，立即在浏览器中查看（即自动调用 scan-view 命令） |
+scan-build options	|用途
+-------|---------------------
+-o <output location>	|指定分析结果的存储位置
+-v	|输出分析过程，可以连续使用两个或三个 -v 以提高输出信息的详细度。
+-V 或 --view	|在生成错误报告完成后，立即在浏览器中查看（即自动调用scan-view命令）
 
 要查看所有的 scan-build options，可以通过 `scan-build --help` 命令。
 
