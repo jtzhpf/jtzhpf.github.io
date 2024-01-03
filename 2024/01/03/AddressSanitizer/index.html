@@ -93,7 +93,7 @@
   <a href="/tags/LLVM/" class="post-tag">#LLVM</a><a href="/tags/Clang/" class="post-tag">#Clang</a><a href="/tags/Compiler/" class="post-tag">#Compiler</a><a href="/tags/GCC/" class="post-tag">#GCC</a>
 
 
-          <span class="post-date">2023-01-03</span>
+          <span class="post-date">2024-01-03</span>
         </div>
       </div>
       
@@ -114,7 +114,7 @@
 <figure>
 <img src="/AddressSanitizer/image1.png" alt="" /><figcaption>ERROR: AddressSanitizer: heap-buffer-overflow</figcaption>
 </figure>
-<p>倒是新奇，查询一番得知这是因为LeetCode开启了AddressSanitizer，在编译时加上<code>-fsanitize=address</code>即可开启。开启后再执行就会报一样的错误了。</p>
+<p>倒是新奇，查询一番得知这是因为LeetCode开启了AddressSanitizer<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>，在编译时加上<code>-fsanitize=address</code>即可开启。开启后再执行就会报一样的错误了。</p>
 <h2 id="原理">原理</h2>
 <p>由于是内存检测工具，其需要对每一次内存读写操作进行检查： <code>*address = ...; // or: ... = *address;</code></p>
 <p>进行如下的逻辑判断：</p>
@@ -141,6 +141,16 @@
 <p>插桩主要是对访问内存的操作(store，load，alloc等)，将它们进行处理。 hook动态运行库主要提供将malloc，free等系统调用函数hook住。</p>
 <p>该算法的思路是：如果想防住Buffer Overflow漏洞，只需要在每块内存区域两端加一块区域（RedZone），使RedZone的区域的影子内存（Shadow Memory）设置为不可写即可。</p>
 <p>hook malloc/free函数。在malloc函数中额外的分配了Redzone区域的内存，将与Redzone区域对应的影子内存加锁，主要的内存区域对应的影子内存不加锁。 free函数将所有分配的内存区域加锁，并放到了隔离区域的队列中(保证在一定的时间内不会再被malloc函数分配)，可检测Use after free类的问题。</p>
+<div id="footnotes">
+<hr>
+<div id="footnotelist">
+<ol style="list-style:none; padding-left: 0;">
+<li id="fn:1">
+<span style="display: inline-block; vertical-align: top; padding-right: 10px;">1.</span><span style="display: inline-block; vertical-align: top;"><a target="_blank" rel="noopener" href="https://github.com/google/sanitizers/wiki/AddressSanitizerAlgorithm">https://github.com/google/sanitizers/wiki/AddressSanitizerAlgorithm</a></span><a href="#fnref:1" rev="footnote"> ↩︎</a>
+</li>
+</ol>
+</div>
+</div>
 
       </div>
     </div>
@@ -149,23 +159,11 @@
     
     <div class="post-nav">
   
-    <a class="post-nav-item-left" href="/2023/07/02/feat-%E7%9B%AE%E5%BD%95%E6%B5%8B%E8%AF%95/">
-      <div class="text-align">
-        <svg t="1670570876164"
-             class="icon"
-             viewBox="0 0 1024 1024"
-             width="16"
-             height="16">
-          <path d="M384 512L731.733333 202.666667c17.066667-14.933333 19.2-42.666667 4.266667-59.733334-14.933333-17.066667-42.666667-19.2-59.733333-4.266666l-384 341.333333c-10.666667 8.533333-14.933333 19.2-14.933334 32s4.266667 23.466667 14.933334 32l384 341.333333c8.533333 6.4 19.2 10.666667 27.733333 10.666667 12.8 0 23.466667-4.266667 32-14.933333 14.933333-17.066667 14.933333-44.8-4.266667-59.733334L384 512z" p-id="14596"/>
-        </svg>
-        <span class="text-small">上一篇</span>
-      </div>
-      <div>目录测试</div>
-    </a>
+    <div class="post-nav-item-left"></div>
   
   <div class="vhr"></div>
   
-    <a class="post-nav-item-right" href="/2019/07/25/code-highlight/">
+    <a class="post-nav-item-right" href="/2023/12/31/leetcode4.%E5%AF%BB%E6%89%BE%E4%B8%A4%E4%B8%AA%E6%AD%A3%E5%BA%8F%E6%95%B0%E7%BB%84%E7%9A%84%E4%B8%AD%E4%BD%8D%E6%95%B0/">
       <div class="text-align">
         <span class="text-small">下一篇</span>
         <svg t="1670570876164"
@@ -177,7 +175,7 @@
           <path d="M384 512L731.733333 202.666667c17.066667-14.933333 19.2-42.666667 4.266667-59.733334-14.933333-17.066667-42.666667-19.2-59.733333-4.266666l-384 341.333333c-10.666667 8.533333-14.933333 19.2-14.933334 32s4.266667 23.466667 14.933334 32l384 341.333333c8.533333 6.4 19.2 10.666667 27.733333 10.666667 12.8 0 23.466667-4.266667 32-14.933333 14.933333-17.066667 14.933333-44.8-4.266667-59.733334L384 512z" p-id="14596"/>
         </svg>
       </div>
-      代码高亮
+      leetcode 4. 寻找两个正序数组的中位数
     </a>
   
 </div>
