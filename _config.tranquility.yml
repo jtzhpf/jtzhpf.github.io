@@ -54,8 +54,10 @@ foot:
     - "天涯若比邻"
 
 links: # 朋友
-#  - name: "Theme Tranquility"
-#    url: https://github.com/hooozen/hexo-theme-tranquility
+  - name: "诚"
+    url: https://dzc2000.github.io
+  - name: "宇"
+    url: https://nuistgy.github.io/
 
 social: # 账号
   - name: "github"
