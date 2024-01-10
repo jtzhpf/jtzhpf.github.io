@@ -5,7 +5,8 @@ category: CS&Maths
 date: 2023-8-31 18:42:32
 tags: 
   - leetcode
-  - C/C++
+  - C++
+  - C
   - Rust
 #toc: true
 #sticky: 1 # 数字越大置顶优先级越高。数字都需要大于 0。
