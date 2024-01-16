@@ -7,13 +7,27 @@ tags:
   - LLVM
   - Clang
   - Compiler
-  - Static Analyzer
+  - Static Analysis
   - Symbolic Execution
 toc: true
 #sticky: 1 # 数字越大置顶优先级越高。数字都需要大于 0。
 #cover: /images/about.jpg # 指定封面图片的 URL
 timeline: article  # 展示在时间线列表中
 ---
+
+考虑此例：
+
+```c
+#include <stdio.h>
+void my_function(int unknownvalue) {
+  int schroedinger_integer;
+  if (unknownvalue)
+    schroedinger_integer = 5;
+    printf("hi");
+  if (!unknownvalue)
+    printf("%d", schroedinger_integer);
+}
+```
 # Forward Dataflow Analysis
 ![Forward Dataflow Analysis 的过程以及可能出现的 False Positive 的情况[^1]](/Getting_Started_with_LLVM_Core_Libraries阅读/image1.png)
 
