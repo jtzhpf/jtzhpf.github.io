@@ -5,7 +5,7 @@
     <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
     <title>
       
-        C++ | ZPF.SITE
+        理清常量指针和指针常量 | ZPF.SITE
       
     </title>
     <meta name="description" content=""/>
@@ -58,9 +58,8 @@
           href='/css/layout.css'/>
     
     
-  <link rel="stylesheet"
-        type="text/css"
-        href="/css/category.css" />
+  <link rel="stylesheet" type="text/css" href="/css/post.css"/>
+  
 
   <meta name="generator" content="Hexo 6.3.0"></head>
   <body>
@@ -85,105 +84,99 @@
     </div>
     <div class="body">
       
-  <div class="tag-page-title">#C++</div>
-  <div class="post-list">
-    
-  
-  <div class="post-card">
-    <div class="post__head">
-      <a href="/2024/01/17/%E7%90%86%E6%B8%85%E5%B8%B8%E9%87%8F%E6%8C%87%E9%92%88%E5%92%8C%E6%8C%87%E9%92%88%E5%B8%B8%E9%87%8F/" class="post-title hover-line">理清常量指针和指针常量</a>
+  <article class="post-content">
+    <div class="post-inner">
+      <div class="post-content__head">
+        <div class="post-title">理清常量指针和指针常量</div>
+        <div class="post-info">
+          
+  <a href="/tags/C/" class="post-tag">#C++</a>
+
+
+          <span class="post-date">2024-01-17</span>
+        </div>
+      </div>
       
-    </div>
-    <div class="post__body">
-      
-      <div class="post-excerpt"><p>鉴于这玩意儿的叫法一团乱麻，甚至存在完全相反的叫法，实在是令人头大，故此本人选择如下叫法：</p>
+      <div class="post-content__body">
+        
+          <div class="post-gallery">
+            
+          </div>
+        
+        <p>鉴于这玩意儿的叫法一团乱麻，甚至存在完全相反的叫法，实在是令人头大，故此本人选择如下叫法：</p>
 <ul>
 <li>指向<strong>常量</strong>的指针<strong>变量</strong>：const int* p</li>
 <li>指向<strong>变量</strong>的指针<strong>常量</strong>：int* const p</li>
 <li>指向<strong>常量</strong>的指针<strong>常量</strong>：const int* const p</li>
-</ul></div>
+</ul>
+<span id="more"></span>
+<h1 id="判断方法">判断方法</h1>
+<p>本人采用的方法是看 const 和 * 的相对位置。</p>
+<p>如果 const 在 * 和 p 之间，说明 const 修饰的是 p，即指针为常量；</p>
+<p>反之，则说明 const 修饰的是 *p，即所指的值是常量。</p>
+<p>参考：</p>
+<iframe src="https://www.cnblogs.com/zpcdbky/p/4902688.html" height="500" width="100%" frameborder="0" seamless>
+</iframe>
+
+      </div>
     </div>
-    <div class="post__foot">
-      <div class="post-tags">
+    
+      <script src='https://unpkg.com/mermaid@10.4.0/dist/mermaid.min.js'></script>
+      <script>
+        if (window.mermaid) {
+          mermaid.initialize({"startOnload":true});
+        }
+      </script>
+    
+  </article>
+  <div class="post__foot">
+    
+    <div class="post-nav">
+  
+    <div class="post-nav-item-left"></div>
+  
+  <div class="vhr"></div>
+  
+    <a class="post-nav-item-right" href="/2024/01/16/%E6%89%A9%E5%B1%95Static_Analyzer/">
+      <div class="text-align">
+        <span class="text-small">下一篇</span>
+        <svg t="1670570876164"
+             class="icon"
+             viewBox="0 0 1024 1024"
+             transform="scale(-1,-1)"
+             width="16"
+             height="16">
+          <path d="M384 512L731.733333 202.666667c17.066667-14.933333 19.2-42.666667 4.266667-59.733334-14.933333-17.066667-42.666667-19.2-59.733333-4.266666l-384 341.333333c-10.666667 8.533333-14.933333 19.2-14.933334 32s4.266667 23.466667 14.933334 32l384 341.333333c8.533333 6.4 19.2 10.666667 27.733333 10.666667 12.8 0 23.466667-4.266667 32-14.933333 14.933333-17.066667 14.933333-44.8-4.266667-59.733334L384 512z" p-id="14596"/>
+        </svg>
+      </div>
+      扩展 Static Analyzer
+    </a>
+  
+</div>
+
+    
+      <div class="related-post">
+  <div class="related__head">
   <a href="/tags/C/" class="post-tag">#C++</a>
 
 </div>
-    </div>
+  <div class="realated__body">
+    
+      <div class="null"><div class="null-item"><div class="null-title"><a href="/2024/01/05/Duff's_device/" title="Duff's device" rel="bookmark">Duff's device</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/08/31/leetcode26.删除有序数组中的重复项/" title="leetcode 26. 删除有序数组中的重复项" rel="bookmark">leetcode 26. 删除有序数组中的重复项</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/12/31/leetcode4.寻找两个正序数组的中位数/" title="leetcode 4. 寻找两个正序数组的中位数" rel="bookmark">leetcode 4. 寻找两个正序数组的中位数</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/11/07/@蓝色老师的LLVM系列文章汇总/" title="@蓝色老师的LLVM系列文章汇总" rel="bookmark">@蓝色老师的LLVM系列文章汇总</a></div></div><div class="null-item"><div class="null-title"><a href="/2024/01/03/AddressSanitizer/" title="AddressSanitizer" rel="bookmark">AddressSanitizer</a></div></div></div>
+    
   </div>
-
-  
-  <div class="post-card">
-    <div class="post__head">
-      <a href="/2024/01/10/std::enable_if%E7%9A%84%E5%87%A0%E7%A7%8D%E7%94%A8%E6%B3%95/" class="post-title hover-line">C++ std::enable_if 的几种用法</a>
-      
-    </div>
-    <div class="post__body">
-      
-      <div class="post-excerpt"></div>
-    </div>
-    <div class="post__foot">
-      <div class="post-tags">
-  <a href="/tags/C/" class="post-tag">#C++</a><a href="/tags/Metaprogramming/" class="post-tag">#Metaprogramming</a>
-
 </div>
-    </div>
-  </div>
 
-  
-  <div class="post-card">
-    <div class="post__head">
-      <a href="/2024/01/05/Duff's_device/" class="post-title hover-line">Duff's device</a>
-      
-    </div>
-    <div class="post__body">
-      
-      <div class="post-excerpt"><p>达夫设备（英文：Duff's device）是串行复制（serial copy）的一种优化实现。</p></div>
-    </div>
-    <div class="post__foot">
-      <div class="post-tags">
-  <a href="/tags/C/" class="post-tag">#C</a><a href="/tags/C/" class="post-tag">#C++</a>
-
-</div>
-    </div>
-  </div>
-
-  
-  <div class="post-card">
-    <div class="post__head">
-      <a href="/2023/12/31/leetcode4.%E5%AF%BB%E6%89%BE%E4%B8%A4%E4%B8%AA%E6%AD%A3%E5%BA%8F%E6%95%B0%E7%BB%84%E7%9A%84%E4%B8%AD%E4%BD%8D%E6%95%B0/" class="post-title hover-line">leetcode 4. 寻找两个正序数组的中位数</a>
-      
-    </div>
-    <div class="post__body">
-      
-      <div class="post-excerpt"></div>
-    </div>
-    <div class="post__foot">
-      <div class="post-tags">
-  <a href="/tags/C/" class="post-tag">#C</a><a href="/tags/C/" class="post-tag">#C++</a><a href="/tags/leetcode/" class="post-tag">#leetcode</a>
-
-</div>
-    </div>
-  </div>
-
-  
-  <div class="post-card">
-    <div class="post__head">
-      <a href="/2023/08/31/leetcode26.%E5%88%A0%E9%99%A4%E6%9C%89%E5%BA%8F%E6%95%B0%E7%BB%84%E4%B8%AD%E7%9A%84%E9%87%8D%E5%A4%8D%E9%A1%B9/" class="post-title hover-line">leetcode 26. 删除有序数组中的重复项</a>
-      
-    </div>
-    <div class="post__body">
-      
-      <div class="post-excerpt"></div>
-    </div>
-    <div class="post__foot">
-      <div class="post-tags">
-  <a href="/tags/C/" class="post-tag">#C</a><a href="/tags/C/" class="post-tag">#C++</a><a href="/tags/leetcode/" class="post-tag">#leetcode</a><a href="/tags/Rust/" class="post-tag">#Rust</a>
-
-</div>
-    </div>
-  </div>
-
-
+    
+    
+    
+      <script src="https://utteranc.es/client.js"
+    repo="jtzhpf/jtzhpf.github.io"
+    issue-term="pathname"
+    theme="github-light"
+    crossorigin="anonymous"
+    async>
+</script>
     
   </div>
 
@@ -301,5 +294,7 @@
     <script src="https://cdn.bootcdn.net/ajax/libs/mermaid/10.4.0/mermaid.min.js"></script>
     
     
+  
+
   </body>
 </html>
