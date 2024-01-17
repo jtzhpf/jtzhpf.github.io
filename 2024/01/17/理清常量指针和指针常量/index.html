@@ -103,20 +103,49 @@
             
           </div>
         
-        <p>鉴于这玩意儿的叫法一团乱麻，甚至存在完全相反的叫法，实在是令人头大，故此本人选择如下叫法：</p>
+        <p>鉴于这玩意儿的叫法一团乱麻，甚至存在完全相反的叫法，实在是令人头大，故此本人选择如下叫法<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>：</p>
 <ul>
 <li>指向<strong>常量</strong>的指针<strong>变量</strong>：const int* p</li>
 <li>指向<strong>变量</strong>的指针<strong>常量</strong>：int* const p</li>
-<li>指向<strong>常量</strong>的指针<strong>常量</strong>：const int* const p</li>
+<li>指向<strong>常量</strong>的指针<strong>常量</strong>：const int* const p<br />
+<span id="more"></span> 此外，const int *p 与 int const *p 是等价的。</li>
 </ul>
-<span id="more"></span>
 <h1 id="判断方法">判断方法</h1>
 <p>本人采用的方法是看 const 和 * 的相对位置。</p>
 <p>如果 const 在 * 和 p 之间，说明 const 修饰的是 p，即指针为常量；</p>
 <p>反之，则说明 const 修饰的是 *p，即所指的值是常量。</p>
-<p>参考：</p>
-<iframe src="https://www.cnblogs.com/zpcdbky/p/4902688.html" height="500" width="100%" frameborder="0" seamless>
-</iframe>
+<h1 id="关于引用">关于引用</h1>
+<p>按理说，引用也应该有如下两种形式：</p>
+<ul>
+<li>const int&amp; p</li>
+<li>int&amp; const p</li>
+</ul>
+<p>然而，现实情况是第二种不存在，因为引用只能在初始化时绑定一个对象（左值），之后不能再重新绑定其它对象，对引用的操作实际上都是对引用绑定的对象进行操作，即绑定关系已不可更改，用const修饰引用本身无意义。</p>
+<h1 id="符合类型">符合类型</h1>
+<h2 id="指向指针的指针">指向指针的指针</h2>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-type">int</span> ival = <span class="hljs-number">1024</span>;<br><span class="hljs-type">int</span> *pi = &amp;ival; <span class="hljs-comment">// pi指向一个int型的数</span><br><span class="hljs-type">int</span> **ppi = &amp;pi; <span class="hljs-comment">// ppi 指向一个int型的指针</span><br></code></pre></td></tr></table></figure>
+<p>此处pi是指向int型数的指针，而ppi是指向int型指针的指针。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c++">cout &lt;&lt; <span class="hljs-string">&quot;The value of ival\n&quot;</span><br>     &lt;&lt; <span class="hljs-string">&quot;direct value: &quot;</span> &lt;&lt; ival &lt;&lt; <span class="hljs-string">&quot;\n&quot;</span><br>     &lt;&lt; <span class="hljs-string">&quot;indirect value: &quot;</span> &lt;&lt; *pi &lt;&lt; <span class="hljs-string">&quot;\n&quot;</span><br>     &lt;&lt; <span class="hljs-string">&quot;doubly indirect value: &quot;</span> &lt;&lt; **ppi<br>     &lt;&lt; endl ;<br></code></pre></td></tr></table></figure>
+<p>该程序使用三种不同的方式输出了变量ival的值：</p>
+<ul>
+<li>第一种直接输出；</li>
+<li>第二种通过int型指针pi输出；</li>
+<li>第三种两次解引用ppi，取得ival的值。</li>
+</ul>
+<h2 id="指向指针的引用">指向指针的引用</h2>
+<p>引用本身不是一个对象，因此不能定义指向引用的指针。但指针是对象，所以存在对指针的引用：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-type">int</span> i = <span class="hljs-number">42</span>;<br><span class="hljs-type">int</span> *p;         p是一个<span class="hljs-type">int</span>型指针<br><span class="hljs-type">int</span> *&amp;r = p;    r是一个对指针p的引用<br>r=&amp;i;           r引用了一个指针，因此给r赋值&amp;i就是令p指向i<br>*r=<span class="hljs-number">0</span>;           解引用r得到i，也就是p指向的对象，将i的值改为<span class="hljs-number">0</span><br></code></pre></td></tr></table></figure>
+<p>面对一条比较复杂的指针或引用的声明语句时，从右向左阅读有助于弄清楚它的真实含义。</p>
+<div id="footnotes">
+<hr>
+<div id="footnotelist">
+<ol style="list-style:none; padding-left: 0;">
+<li id="fn:1">
+<span style="display: inline-block; vertical-align: top; padding-right: 10px;">1.</span><span style="display: inline-block; vertical-align: top;"><a target="_blank" rel="noopener" href="https://www.cnblogs.com/zpcdbky/p/4902688.html">https://www.cnblogs.com/zpcdbky/p/4902688.html</a></span><a href="#fnref:1" rev="footnote"> ↩︎</a>
+</li>
+</ol>
+</div>
+</div>
 
       </div>
     </div>
