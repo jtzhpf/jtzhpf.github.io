@@ -5,7 +5,7 @@
     <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
     <title>
       
-        C++ | ZPF.SITE
+        C++ 中的优化技巧——虚函数anchor() | ZPF.SITE
       
     </title>
     <meta name="description" content=""/>
@@ -58,9 +58,8 @@
           href='/css/layout.css'/>
     
     
-  <link rel="stylesheet"
-        type="text/css"
-        href="/css/category.css" />
+  <link rel="stylesheet" type="text/css" href="/css/post.css"/>
+  
 
   <meta name="generator" content="Hexo 6.3.0"></head>
   <body>
@@ -85,122 +84,105 @@
     </div>
     <div class="body">
       
-  <div class="tag-page-title">#C++</div>
-  <div class="post-list">
+  <article class="post-content">
+    <div class="post-inner--toc">
+      <div class="post-content__head">
+        <div class="post-title">C++ 中的优化技巧——虚函数anchor()</div>
+        <div class="post-info">
+          
+  <a href="/tags/LLVM/" class="post-tag">#LLVM</a><a href="/tags/Clang/" class="post-tag">#Clang</a><a href="/tags/C/" class="post-tag">#C++</a>
+
+
+          <span class="post-date">2024-01-18</span>
+        </div>
+      </div>
+      
+        <aside class="toc-outer">
+          <div class="toc-title">目录</div>
+          
+          <a href="#" class="toc-top">回到顶部</a>
+        </aside>
+      
+      <div class="post-content__body">
+        
+          <div class="post-gallery">
+            
+          </div>
+        
+        <p>在Clang中，很多类都有这么一个虚函数： <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">virtual</span> <span class="hljs-type">void</span> <span class="hljs-title">anchor</span><span class="hljs-params">()</span></span>;<br></code></pre></td></tr></table></figure></p>
+<p>查阅<a target="_blank" rel="noopener" href="https://llvm.org/docs/CodingStandards.html#provide-a-virtual-method-anchor-for-classes-in-headers">LLVM Coding Standards</a>，得到如下解释：</p>
+<blockquote>
+<p>If a class is defined in a header file and has a vtable (either it has virtual methods or it derives from classes with virtual methods), it must always have at least one out-of-line virtual method in the class. Without this, the compiler will copy the vtable and RTTI into every .o file that #includes the header, bloating .o file sizes and increasing link times.</p>
+</blockquote>
+<p>如果一个类定义在header文件中，并且有虚函数或者派生自有虚函数的类，那么它就会有一个vtable。</p>
+<p>对于有vtable的类，编译器需要为每个包含该头文件的编译单元生成vtable的副本。如果类中所有的虚函数都是内联的(inline)，那么vtable就会非常小，只包含几个函数指针。编译器为了优化，会选择把这种小的vtable和RTTI信息内联到每个包含头文件的.o文件中。</p>
+<p>但是如果类中有至少一个实体虚函数，那么vtable大小会非常大，包含这个虚函数的指针和其他从基类继承的虚函数指针。这时编译器就不会内联整个大的vtable了，只会在每个.o文件中放一个指向这个vtable的指针，真正的vtable只会存在于定义该类的那个编译单元中。这样可以避免vtable被复制多次浪费空间，也加快了链接时间，因为不需要合并重复的符号了。</p>
+<p>为了避免这个问题，有以下建议:</p>
+<ul>
+<li>如果一个头文件类有vtable，那么在类中至少定义一个非内联的虚函数。</li>
+<li>将vtable相关的类定义在cpp文件中，而不是头文件中。</li>
+<li>将有vtable的类的定义分割成头文件中的声明和cpp文件中的定义。</li>
+</ul>
+
+      </div>
+    </div>
     
+      <script src='https://unpkg.com/mermaid@10.4.0/dist/mermaid.min.js'></script>
+      <script>
+        if (window.mermaid) {
+          mermaid.initialize({"startOnload":true});
+        }
+      </script>
+    
+  </article>
+  <div class="post__foot">
+    
+    <div class="post-nav">
   
-  <div class="post-card">
-    <div class="post__head">
-      <a href="/2024/01/18/Virtual_Method_anchor()_in_Classes/" class="post-title hover-line">C++ 中的优化技巧——虚函数anchor()</a>
-      
-    </div>
-    <div class="post__body">
-      
-      <div class="post-excerpt"></div>
-    </div>
-    <div class="post__foot">
-      <div class="post-tags">
+    <div class="post-nav-item-left"></div>
+  
+  <div class="vhr"></div>
+  
+    <a class="post-nav-item-right" href="/2024/01/17/%E7%90%86%E6%B8%85%E5%B8%B8%E9%87%8F%E6%8C%87%E9%92%88%E5%92%8C%E6%8C%87%E9%92%88%E5%B8%B8%E9%87%8F/">
+      <div class="text-align">
+        <span class="text-small">下一篇</span>
+        <svg t="1670570876164"
+             class="icon"
+             viewBox="0 0 1024 1024"
+             transform="scale(-1,-1)"
+             width="16"
+             height="16">
+          <path d="M384 512L731.733333 202.666667c17.066667-14.933333 19.2-42.666667 4.266667-59.733334-14.933333-17.066667-42.666667-19.2-59.733333-4.266666l-384 341.333333c-10.666667 8.533333-14.933333 19.2-14.933334 32s4.266667 23.466667 14.933334 32l384 341.333333c8.533333 6.4 19.2 10.666667 27.733333 10.666667 12.8 0 23.466667-4.266667 32-14.933333 14.933333-17.066667 14.933333-44.8-4.266667-59.733334L384 512z" p-id="14596"/>
+        </svg>
+      </div>
+      理清常量指针和指针常量
+    </a>
+  
+</div>
+
+    
+      <div class="related-post">
+  <div class="related__head">
   <a href="/tags/LLVM/" class="post-tag">#LLVM</a><a href="/tags/Clang/" class="post-tag">#Clang</a><a href="/tags/C/" class="post-tag">#C++</a>
 
 </div>
-    </div>
+  <div class="realated__body">
+    
+      <div class="null"><div class="null-item"><div class="null-title"><a href="/2023/11/07/@蓝色老师的LLVM系列文章汇总/" title="@蓝色老师的LLVM系列文章汇总" rel="bookmark">@蓝色老师的LLVM系列文章汇总</a></div></div><div class="null-item"><div class="null-title"><a href="/2024/01/03/AddressSanitizer/" title="AddressSanitizer" rel="bookmark">AddressSanitizer</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/10/17/Clang_AST/" title="Clang AST" rel="bookmark">Clang AST</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/06/All_File_Systems_Are_Not_Created_Equal:On_the_Complexity_of_Crafting_Crash-Consistent_Applications阅读/" title="All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读" rel="bookmark">All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/10/30/All_You_Ever_Wanted_to_Know_About_Dynamic_Taint_Analysis_and_Forward_Symbolic_Execution阅读/" title="All You Ever Wanted to Know About Dynamic Taint Analysis and Forward Symbolic Execution 阅读" rel="bookmark">All You Ever Wanted to Know About Dynamic Taint Analysis and Forward Symbolic Execution 阅读</a></div></div></div>
+    
   </div>
-
-  
-  <div class="post-card">
-    <div class="post__head">
-      <a href="/2024/01/17/%E7%90%86%E6%B8%85%E5%B8%B8%E9%87%8F%E6%8C%87%E9%92%88%E5%92%8C%E6%8C%87%E9%92%88%E5%B8%B8%E9%87%8F/" class="post-title hover-line">理清常量指针和指针常量</a>
-      
-    </div>
-    <div class="post__body">
-      
-      <div class="post-excerpt"><p>鉴于这玩意儿的叫法一团乱麻，甚至存在完全相反的叫法，实在是令人头大，故此本人选择如下叫法<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>：</p>
-<ul>
-<li>指向<strong>常量</strong>的指针<strong>变量</strong>：const int* p</li>
-<li>指向<strong>变量</strong>的指针<strong>常量</strong>：int* const p</li>
-<li>指向<strong>常量</strong>的指针<strong>常量</strong>：const int* const p<br /></div>
-    </div>
-    <div class="post__foot">
-      <div class="post-tags">
-  <a href="/tags/C/" class="post-tag">#C++</a>
-
 </div>
-    </div>
-  </div>
 
-  
-  <div class="post-card">
-    <div class="post__head">
-      <a href="/2024/01/10/std::enable_if%E7%9A%84%E5%87%A0%E7%A7%8D%E7%94%A8%E6%B3%95/" class="post-title hover-line">C++ std::enable_if 的几种用法</a>
-      
-    </div>
-    <div class="post__body">
-      
-      <div class="post-excerpt"></div>
-    </div>
-    <div class="post__foot">
-      <div class="post-tags">
-  <a href="/tags/C/" class="post-tag">#C++</a><a href="/tags/Metaprogramming/" class="post-tag">#Metaprogramming</a>
-
-</div>
-    </div>
-  </div>
-
-  
-  <div class="post-card">
-    <div class="post__head">
-      <a href="/2024/01/05/Duff's_device/" class="post-title hover-line">Duff's device</a>
-      
-    </div>
-    <div class="post__body">
-      
-      <div class="post-excerpt"><p>达夫设备（英文：Duff's device）是串行复制（serial copy）的一种优化实现。</p></div>
-    </div>
-    <div class="post__foot">
-      <div class="post-tags">
-  <a href="/tags/C/" class="post-tag">#C</a><a href="/tags/C/" class="post-tag">#C++</a>
-
-</div>
-    </div>
-  </div>
-
-  
-  <div class="post-card">
-    <div class="post__head">
-      <a href="/2023/12/31/leetcode4.%E5%AF%BB%E6%89%BE%E4%B8%A4%E4%B8%AA%E6%AD%A3%E5%BA%8F%E6%95%B0%E7%BB%84%E7%9A%84%E4%B8%AD%E4%BD%8D%E6%95%B0/" class="post-title hover-line">leetcode 4. 寻找两个正序数组的中位数</a>
-      
-    </div>
-    <div class="post__body">
-      
-      <div class="post-excerpt"></div>
-    </div>
-    <div class="post__foot">
-      <div class="post-tags">
-  <a href="/tags/C/" class="post-tag">#C</a><a href="/tags/C/" class="post-tag">#C++</a><a href="/tags/leetcode/" class="post-tag">#leetcode</a>
-
-</div>
-    </div>
-  </div>
-
-  
-  <div class="post-card">
-    <div class="post__head">
-      <a href="/2023/08/31/leetcode26.%E5%88%A0%E9%99%A4%E6%9C%89%E5%BA%8F%E6%95%B0%E7%BB%84%E4%B8%AD%E7%9A%84%E9%87%8D%E5%A4%8D%E9%A1%B9/" class="post-title hover-line">leetcode 26. 删除有序数组中的重复项</a>
-      
-    </div>
-    <div class="post__body">
-      
-      <div class="post-excerpt"></div>
-    </div>
-    <div class="post__foot">
-      <div class="post-tags">
-  <a href="/tags/C/" class="post-tag">#C</a><a href="/tags/C/" class="post-tag">#C++</a><a href="/tags/leetcode/" class="post-tag">#leetcode</a><a href="/tags/Rust/" class="post-tag">#Rust</a>
-
-</div>
-    </div>
-  </div>
-
-
+    
+    
+    
+      <script src="https://utteranc.es/client.js"
+    repo="jtzhpf/jtzhpf.github.io"
+    issue-term="pathname"
+    theme="github-light"
+    crossorigin="anonymous"
+    async>
+</script>
     
   </div>
 
@@ -318,5 +300,7 @@
     <script src="https://cdn.bootcdn.net/ajax/libs/mermaid/10.4.0/mermaid.min.js"></script>
     
     
+  
+
   </body>
 </html>
