@@ -5,7 +5,7 @@
     <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
     <title>
       
-        OSDI | ZPF.SITE
+        Paper | ZPF.SITE
       
     </title>
     <meta name="description" content=""/>
@@ -85,101 +85,29 @@
     </div>
     <div class="body">
       
-  <div class="tag-page-title">#OSDI</div>
+  <div class="tag-page-title">#Paper</div>
   <div class="post-list">
     
   
   <div class="post-card">
     <div class="post__head">
-      <a href="/2024/02/10/Caladan:Mitigating_Interference_at_Microsecond_Timescales%E9%98%85%E8%AF%BB/" class="post-title hover-line">Caladan: Mitigating Interference at Microsecond Timescales</a>
+      <a href="/2023/08/31/Cross-checking_Semantic_Correctness:The_Case_of_Finding_File_System_Bugs%E9%98%85%E8%AF%BB/" class="post-title hover-line">Cross-checking Semantic Correctness: The Case of Finding File System Bugs 阅读</a>
       
     </div>
     <div class="post__body">
       
-      <div class="post-excerpt"></div>
+      <div class="post-excerpt"><p>主要思路是统计多个文件系统的实现，计算具体文件系统与多个文件系统总体之间的差异性（直方图/信息熵），从而窥探出其文件系统的具体实现在语义上的差异。</div>
     </div>
     <div class="post__foot">
       <div class="post-tags">
-  <a href="/tags/OSDI/" class="post-tag">#OSDI</a><a href="/tags/Paper/" class="post-tag">#Paper</a><a href="/tags/OSDI-20/" class="post-tag">#OSDI'20</a>
-
-</div>
-    </div>
-  </div>
-
-  
-  <div class="post-card">
-    <div class="post__head">
-      <a href="/2024/02/05/Semeru:A_Memory-Disaggregated_Managed_Runtime%E9%98%85%E8%AF%BB/" class="post-title hover-line">Semeru: A Memory-Disaggregated Managed Runtime</a>
-      
-    </div>
-    <div class="post__body">
-      
-      <div class="post-excerpt"></div>
-    </div>
-    <div class="post__foot">
-      <div class="post-tags">
-  <a href="/tags/OSDI/" class="post-tag">#OSDI</a><a href="/tags/Paper/" class="post-tag">#Paper</a><a href="/tags/OSDI-20/" class="post-tag">#OSDI'20</a>
-
-</div>
-    </div>
-  </div>
-
-  
-  <div class="post-card">
-    <div class="post__head">
-      <a href="/2023/12/06/CP-Miner:A_Tool_for_Finding_Copy-paste_and_Related_Bugs_in_Operating_System_Code%E9%98%85%E8%AF%BB/" class="post-title hover-line">CP-Miner: A Tool for Finding Copy-paste and Related Bugs in Operating System Code 阅读</a>
-      
-    </div>
-    <div class="post__body">
-      
-      <div class="post-excerpt"><p>在做开题报告的时候找到了这篇论文，挺巧妙的想法，简单记录一下其思路。</div>
-    </div>
-    <div class="post__foot">
-      <div class="post-tags">
-  <a href="/tags/Linux/" class="post-tag">#Linux</a><a href="/tags/OSDI/" class="post-tag">#OSDI</a><a href="/tags/Paper/" class="post-tag">#Paper</a><a href="/tags/Symbolic-Execution/" class="post-tag">#Symbolic Execution</a><a href="/tags/Staitc-Analysis/" class="post-tag">#Staitc Analysis</a><a href="/tags/OSDI-04/" class="post-tag">#OSDI'04</a>
-
-</div>
-    </div>
-  </div>
-
-  
-  <div class="post-card">
-    <div class="post__head">
-      <a href="/2023/10/23/Push-Button_Verification_of_File_Systems_via_Crash_Refinement%E9%98%85%E8%AF%BB/" class="post-title hover-line">Push-Button Verification of File Systems via Crash Refinement 阅读</a>
-      
-    </div>
-    <div class="post__body">
-      
-      <div class="post-excerpt"><p>本文提出了 Yggdrasil，Yggdrasil 是一个工具包，可用于编写具有一键验证功能的文件系统。它通过一种称为崩溃细化的新颖正确性定义实现自动化验证，无需手动注释或证明实现代码，并在出现错误时生成反例。崩溃细化适用于完全自动化的 SMT 推理，并使开发人员能够模块化地实现文件系统以进行验证。 <img src="/Push-Button_Verification_of_File_Systems_via_Crash_Refinement阅读/image1.png" width="500" alt="Yggdrasil的开发流程"></div>
-    </div>
-    <div class="post__foot">
-      <div class="post-tags">
-  <a href="/tags/OSDI/" class="post-tag">#OSDI</a><a href="/tags/Paper/" class="post-tag">#Paper</a><a href="/tags/Symbolic-Execution/" class="post-tag">#Symbolic Execution</a><a href="/tags/Staitc-Analysis/" class="post-tag">#Staitc Analysis</a><a href="/tags/xv6/" class="post-tag">#xv6</a><a href="/tags/OSDI-16/" class="post-tag">#OSDI'16</a>
-
-</div>
-    </div>
-  </div>
-
-  
-  <div class="post-card">
-    <div class="post__head">
-      <a href="/2023/09/06/All_File_Systems_Are_Not_Created_Equal:On_the_Complexity_of_Crafting_Crash-Consistent_Applications%E9%98%85%E8%AF%BB/" class="post-title hover-line">All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读</a>
-      
-    </div>
-    <div class="post__body">
-      
-      <div class="post-excerpt"><p>本文介绍了基于现代文件系统的应用层崩溃一致性协议的首个全面研究。研究发现，应用程序使用复杂的更新协议来持久化状态，而这些协议的正确性高度依赖于底层文件系统的微妙行为，我们称之为持久性属性。作者开发了一个名为BOB的工具来测试持久性属性，并使用它来证明这些属性在六种流行的Linux文件系统中存在广泛的差异。作者还构建了一个名为ALICE的框架，分析应用程序更新协议并发现崩溃漏洞，即需要特定持久性属性才能保证正确性的更新协议代码。使用ALICE，作者分析了11个广泛使用的系统，并发现了60个漏洞，其中许多会导致严重后果。作者还展示了ALICE可以用于评估新文件系统设计对应用程序级一致性的影响。</div>
-    </div>
-    <div class="post__foot">
-      <div class="post-tags">
-  <a href="/tags/Linux/" class="post-tag">#Linux</a><a href="/tags/File-System/" class="post-tag">#File System</a><a href="/tags/Dynamic-Analysis/" class="post-tag">#Dynamic Analysis</a><a href="/tags/OSDI/" class="post-tag">#OSDI</a><a href="/tags/OSDI-14/" class="post-tag">#OSDI'14</a><a href="/tags/Paper/" class="post-tag">#Paper</a>
+  <a href="/tags/Clang/" class="post-tag">#Clang</a><a href="/tags/Linux/" class="post-tag">#Linux</a><a href="/tags/File-System/" class="post-tag">#File System</a><a href="/tags/Paper/" class="post-tag">#Paper</a><a href="/tags/Symbolic-Execution/" class="post-tag">#Symbolic Execution</a><a href="/tags/Staitc-Analysis/" class="post-tag">#Staitc Analysis</a><a href="/tags/SOSP/" class="post-tag">#SOSP</a><a href="/tags/SOSP-15/" class="post-tag">#SOSP'15</a>
 
 </div>
     </div>
   </div>
 
 
-    
+    <div class="paginator"><a class="page-number" href="/tags/Paper/">1</a><span class="page-number current">2</span></div>
   </div>
 
     </div>
