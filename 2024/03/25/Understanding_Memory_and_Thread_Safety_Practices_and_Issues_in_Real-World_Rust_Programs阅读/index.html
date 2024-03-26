@@ -202,7 +202,7 @@ mjx-container[display="true"] + br {
         <div class="post-title">Understanding Memory and Thread Safety Practices and Issues in Real-World Rust Programs 阅读</div>
         <div class="post-info">
           
-  <a href="/tags/Symbolic-Execution/" class="post-tag">#Symbolic Execution</a><a href="/tags/Paper/" class="post-tag">#Paper</a><a href="/tags/Staitc-Analysis/" class="post-tag">#Staitc Analysis</a><a href="/tags/PLDI/" class="post-tag">#PLDI</a><a href="/tags/PLDI-20/" class="post-tag">#PLDI'20</a>
+  <a href="/tags/Paper/" class="post-tag">#Paper</a><a href="/tags/Symbolic-Execution/" class="post-tag">#Symbolic Execution</a><a href="/tags/Staitc-Analysis/" class="post-tag">#Staitc Analysis</a><a href="/tags/PLDI/" class="post-tag">#PLDI</a><a href="/tags/PLDI-20/" class="post-tag">#PLDI'20</a>
 
 
           <span class="post-date">2024-03-25</span>
@@ -267,6 +267,7 @@ mjx-container[display="true"] + br {
 </ul>
 <h2 id="实验">实验</h2>
 <p>实验具体代码位于<a target="_blank" rel="noopener" href="https://github.com/system-pclub/rust-study">https://github.com/system-pclub/rust-study</a>。采用的方法是打印出 MIR，然后 Python/C++ 编写 detector 来分析。</p>
+<p>缺点：只能分析项目本级的 MIR，无法将项目及其所依赖的 crate 作为整体分析，若想分析所依赖 crate，必须单独进行分析。</p>
 
       </div>
     </div>
@@ -307,7 +308,7 @@ mjx-container[display="true"] + br {
     
       <div class="related-post">
   <div class="related__head">
-  <a href="/tags/Symbolic-Execution/" class="post-tag">#Symbolic Execution</a><a href="/tags/Paper/" class="post-tag">#Paper</a><a href="/tags/Staitc-Analysis/" class="post-tag">#Staitc Analysis</a><a href="/tags/PLDI/" class="post-tag">#PLDI</a><a href="/tags/PLDI-20/" class="post-tag">#PLDI'20</a>
+  <a href="/tags/Paper/" class="post-tag">#Paper</a><a href="/tags/Symbolic-Execution/" class="post-tag">#Symbolic Execution</a><a href="/tags/Staitc-Analysis/" class="post-tag">#Staitc Analysis</a><a href="/tags/PLDI/" class="post-tag">#PLDI</a><a href="/tags/PLDI-20/" class="post-tag">#PLDI'20</a>
 
 </div>
   <div class="realated__body">
