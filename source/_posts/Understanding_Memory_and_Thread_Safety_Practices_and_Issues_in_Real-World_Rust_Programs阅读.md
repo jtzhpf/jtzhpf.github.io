@@ -68,3 +68,5 @@ mathjax: true
 
 ## 实验
 实验具体代码位于[https://github.com/system-pclub/rust-study](https://github.com/system-pclub/rust-study)。采用的方法是打印出 MIR，然后 Python/C++ 编写 detector 来分析。
+
+缺点：只能分析项目本级的 MIR，无法将项目及其所依赖的 crate 作为整体分析，若想分析所依赖 crate，必须单独进行分析。
