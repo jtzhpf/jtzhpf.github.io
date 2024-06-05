@@ -5,7 +5,7 @@
     <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
     <title>
       
-        Understanding and Detecting Real-World Safety Issues in Rust 阅读 | ZPF.SITE
+        MirChecker: Detecting Bugs in Rust Programs via Static Analysis 阅读 | ZPF.SITE
       
     </title>
     <meta name="description" content=""/>
@@ -199,19 +199,19 @@ mjx-container[display="true"] + br {
   <article class="post-content">
     <div class="post-inner--toc">
       <div class="post-content__head">
-        <div class="post-title">Understanding and Detecting Real-World Safety Issues in Rust 阅读</div>
+        <div class="post-title">MirChecker: Detecting Bugs in Rust Programs via Static Analysis 阅读</div>
         <div class="post-info">
           
-  <a href="/tags/Paper/" class="post-tag">#Paper</a><a href="/tags/Staitc-Analysis/" class="post-tag">#Staitc Analysis</a>
+  <a href="/tags/Paper/" class="post-tag">#Paper</a><a href="/tags/Symbolic-Execution/" class="post-tag">#Symbolic Execution</a><a href="/tags/Staitc-Analysis/" class="post-tag">#Staitc Analysis</a><a href="/tags/CCS/" class="post-tag">#CCS</a><a href="/tags/CCS-21/" class="post-tag">#CCS'21</a>
 
 
-          <span class="post-date">2024-03-26</span>
+          <span class="post-date">2024-03-11</span>
         </div>
       </div>
       
         <aside class="toc-outer">
           <div class="toc-title">目录</div>
-          <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#unexpected-panic-issues"><span class="post-toc-text">Unexpected Panic Issues</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#suggestions"><span class="post-toc-text">Suggestions</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E5%AE%9E%E9%AA%8C"><span class="post-toc-text">实验</span></a></li></ol>
+          
           <a href="#" class="toc-top">回到顶部</a>
         </aside>
       
@@ -221,31 +221,12 @@ mjx-container[display="true"] + br {
             
           </div>
         
-        <p>本文是 <a target="_blank" rel="noopener" href="https://jtzhpf.github.io/2024/03/25/Understanding_Memory_and_Thread_Safety_Practices_and_Issues_in_Real-World_Rust_Programs阅读/">Understanding Memory and Thread Safety Practices and Issues in Real-World Rust Programs</a> 的续作，在前文 70 个内存安全问题和 100 个线程安全问题的基础上，增加了对 110 个 panic 问题的研究。</p>
-<h1 id="unexpected-panic-issues">Unexpected Panic Issues</h1>
-<p>文章中主要将 Panic 问题类型分为5类：</p>
+        <p>本文主要从以下2点来进行错误的检测：</p>
 <ul>
-<li><strong>Missing error handling</strong><br> Rust提供了Result和Option枚举，供被调用者返回值（Ok(T)或Some(T)）或通知调用者遇到的执行错误（Err(E)或None）。此外，为了提高编程便利性，Rust允许程序员假设被调用函数总是成功执行，并直接使用unwrap()或expect()返回的Result（或Option）对象上检索实际的返回值。然而，如果这种假设是错误的，unwrap()（或expect()）调用会触发恐慌。<br> <img src="/Understanding_and_Detecting_Real-World_Safety_Issues_in_Rust阅读/image1.png"> 图10说明了Servo中的一个例子，以此来说明这个类别。程序员错误地假设第3行的parse()函数调用总是会返回Ok(Url)，从而导致他在返回的Result对象上调用unwrap()。然而，parse()函数调用可能会失败，并返回Err(ParseError)。因此，会触发恐慌。</li>
-<li><strong>Wrong arithmetic operations</strong><br> for example, overflow, dividing by zero, casting a value to a wrong type</li>
-<li><strong>Assertion errors</strong><br> 程序员手动申明断言导致的，例如panic!(), unimplemented!(), unreachable!(), assert!()。</li>
-<li><strong>Out of bounds</strong></li>
-<li><strong>Others</strong> 例如，触发无限递归函数调用时堆栈溢出，调用了错误的库函数。</li>
+<li>利用 Rust 编译器在编译时为无法检查的安全条件自动生成的断言，以其为验证条件，检查例如越界访问和整数溢出等问题。</li>
+<li>Unsafe code 破坏所有权系统，导致悬空指针、共享可变别名等问题。 <span id="more"></span></li>
 </ul>
-<h1 id="suggestions">Suggestions</h1>
-<ul>
-<li>IDE 对生存期进行可视化分析</li>
-<li>静态分析（本文采用的实验方法）
-<ul>
-<li>针对 Memory Safety Issues，通过 MIR 中的 StorageLive / StorageDead 来对生存期进行分析，并维护好变量之间的引用（所有权）关系；</li>
-<li>针对 Thread Safety Issues，通过识别所有lock()的调用点，并从每个调用点提取正在获取的锁的信息以及用于保存返回值的变量。由于Rust在该变量的生命周期结束时隐式释放锁，因此记录此释放时间，然后检查在此时间之前是否已经获取了相同的锁，并在这种情况下报告双重锁定错误。此外，当一个结构体是可共享的（例如，实现 Sync 特征）并且有一个方法不可变地借用 self 时，我们可以分析 self 是否在方法中被修改以及修改是否是不同步的。</li>
-</ul></li>
-<li>动态分析</li>
-</ul>
-<h1 id="实验">实验</h1>
-<p>实验具体代码位于<a target="_blank" rel="noopener" href="https://github.com/BurtonQin/lockbud">https://github.com/BurtonQin/lockbud</a>。采用的方法是打印出 MIR，然后 Python/C++ 编写 detector 来分析。</p>
-<p>已做到接近完美，内存的所有错误都能查找出（得益于rust语言直接标注了 StorageLive 和 StorageDead）</p>
-<p>Thread Safety Issues 存在误报，因为 rust MIR 无显式的 unlock() 语句，需要 gen-kill 算法来计算 unlock 的位置。</p>
-<p>Unexpected Panic Issues 也很简单，直接对着 Panic 语句来对代码进行检查。</p>
+<p><img src="/Mirchecker:Detecting_Bugs_in_Rust_Programs_via_Static_Analysis阅读/image1.png"></p>
 
       </div>
     </div>
@@ -262,7 +243,7 @@ mjx-container[display="true"] + br {
     
     <div class="post-nav">
   
-    <a class="post-nav-item-left" href="/2024/05/28/%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90%E8%B5%84%E6%96%99%E6%B1%87%E6%80%BB/">
+    <a class="post-nav-item-left" href="/2024/03/25/Understanding_Memory_and_Thread_Safety_Practices_and_Issues_in_Real-World_Rust_Programs%E9%98%85%E8%AF%BB/">
       <div class="text-align">
         <svg t="1670570876164"
              class="icon"
@@ -273,12 +254,12 @@ mjx-container[display="true"] + br {
         </svg>
         <span class="text-small">上一篇</span>
       </div>
-      <div>程序分析资料汇总</div>
+      <div>Understanding Memory and Thread Safety Practices and Issues in Real-World Rust Programs 阅读</div>
     </a>
   
   <div class="vhr"></div>
   
-    <a class="post-nav-item-right" href="/2024/03/25/Understanding_Memory_and_Thread_Safety_Practices_and_Issues_in_Real-World_Rust_Programs%E9%98%85%E8%AF%BB/">
+    <a class="post-nav-item-right" href="/2024/03/05/Rust%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E7%9A%84%E5%B8%B8%E8%A7%81%E8%AF%AF%E8%A7%A3/">
       <div class="text-align">
         <span class="text-small">下一篇</span>
         <svg t="1670570876164"
@@ -290,7 +271,7 @@ mjx-container[display="true"] + br {
           <path d="M384 512L731.733333 202.666667c17.066667-14.933333 19.2-42.666667 4.266667-59.733334-14.933333-17.066667-42.666667-19.2-59.733333-4.266666l-384 341.333333c-10.666667 8.533333-14.933333 19.2-14.933334 32s4.266667 23.466667 14.933334 32l384 341.333333c8.533333 6.4 19.2 10.666667 27.733333 10.666667 12.8 0 23.466667-4.266667 32-14.933333 14.933333-17.066667 14.933333-44.8-4.266667-59.733334L384 512z" p-id="14596"/>
         </svg>
       </div>
-      Understanding Memory and Thread Safety Practices and Issues in Real-World Rust Programs 阅读
+      Rust生命周期常见误区
     </a>
   
 </div>
@@ -298,7 +279,7 @@ mjx-container[display="true"] + br {
     
       <div class="related-post">
   <div class="related__head">
-  <a href="/tags/Paper/" class="post-tag">#Paper</a><a href="/tags/Staitc-Analysis/" class="post-tag">#Staitc Analysis</a>
+  <a href="/tags/Paper/" class="post-tag">#Paper</a><a href="/tags/Symbolic-Execution/" class="post-tag">#Symbolic Execution</a><a href="/tags/Staitc-Analysis/" class="post-tag">#Staitc Analysis</a><a href="/tags/CCS/" class="post-tag">#CCS</a><a href="/tags/CCS-21/" class="post-tag">#CCS'21</a>
 
 </div>
   <div class="realated__body">
