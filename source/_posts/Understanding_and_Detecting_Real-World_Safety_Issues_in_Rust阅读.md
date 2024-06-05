@@ -1,12 +1,10 @@
 ---
-title: "Understanding Memory and Thread Safety Practices and Issues in Real-World Rust Programs 阅读"
+title: "Understanding and Detecting Real-World Safety Issues in Rust 阅读"
 category: CS&Maths
 #id: 57
-date: 2024-3-25 09:00:00
+date: 2024-3-26 09:00:00
 tags: 
   - Staitc Analysis
-  - PLDI
-  - PLDI'20
   - Paper
 toc: true
 #sticky: 1 # 数字越大置顶优先级越高。数字都需要大于 0。
@@ -15,31 +13,9 @@ timeline: article  # 展示在时间线列表中
 mathjax: true
 ---
 
-本文研究涵盖了五个基于 Rust 的系统和应用程序（两个操作系统、一个浏览器、一个键值存储系统和一个区块链系统）、五个广泛使用的 Rust 库和两个在线漏洞数据库。总共研究了 850 个 unsafe 代码用法、70 个内存安全问题和 100 个线程安全问题。
+本文是 [Understanding Memory and Thread Safety Practices and Issues in Real-World Rust Programs](https://jtzhpf.github.io/2024/03/25/Understanding_Memory_and_Thread_Safety_Practices_and_Issues_in_Real-World_Rust_Programs阅读/) 的续作，在前文 70 个内存安全问题和 100 个线程安全问题的基础上，增加了对 110 个 panic 问题的研究。
 
-本文发现**所有内存安全错误都涉及不安全代码**，并且其中大多数也涉及安全代码。当程序员编写安全代码而没有注意其他相关代码不安全时，很容易发生错误。本文还发现 Rust 中生命周期的范围很难推理，特别是与不安全代码结合使用时，对生命周期的错误理解会导致许多内存安全问题。
-
-本文还研究并发错误，包括非阻塞和阻塞错误。本文发现**非阻塞错误可能发生在不安全和安全代码中**，并且本文研究的**所有阻塞错误都发生在安全代码中**。尽管 Rust 中的许多错误模式遵循传统的并发错误模式（例如双锁、原子性违规），但 Rust 中的许多并发错误是由于程序员对 Rust（复杂）生命周期和安全规则的误解造成的。
-
-本文构建了两个静态错误检测器（一个用于释放后使用错误，一个用于双锁错误）来对 Rust 错误检测进行了初步探索，发现了 10 个以前未知的错误。
-
-# Memory Safety Issues
-文章中主要将内存错误类型分为2大类，6小类：
-
-- **Wrong Access**
-  - **Buffer overflow**
-  - **Null pointer dereferencing**
-  - **Read uninitialized memory**
-- **Lifetime Violation**
-  - **Invalid free**<br>
-      ![](/Understanding_Memory_and_Thread_Safety_Practices_and_Issues_in_Real-World_Rust_Programs阅读/image1.png)<br>
-      变量 f 是一个指向未初始化内存缓冲区的指针，其大小与 struct FILE 相同（第 6 行）。在第 7 行将一个新的 FILE 结构赋给 \*f，会结束 f 指向的先前结构体的生命周期，导致 Rust 释放先前的结构体。所有先前结构体分配的内存都将被释放（例如，第 2 行的 buf 中的内存）。然而，由于先前的结构体包含一个未初始化的内存缓冲区，释放其堆内存是无效的。请注意，**这种行为是 Rust 独有的**，在传统语言中不会发生（例如，在 C/C++ 中 \*f=buf 不会导致 f 指向的对象被释放）。
-  - **Use after free**<br>
-      ![](/Understanding_Memory_and_Thread_Safety_Practices_and_Issues_in_Real-World_Rust_Programs阅读/image2.png)<br>
-      当输入数据有效时，在第3行创建了一个BioSlice对象，并将其地址分配给指针p在第2行。p用于调用不安全函数CMS_sign()在第12行，并且在该函数内部被解引用。然而，BioSlice对象的生命周期在第5行结束，并且对象将在那里被丢弃。因此，使用p是在对象被释放后。
-  - **Double free**
-
-# Thread Safety Issues
+# Unexpected Panic Issues
 文章中主要将线程错误类型分为2大类：
 
   - **Blocking Bugs**
@@ -52,8 +28,6 @@ mathjax: true
 
     - **Condvar**
     - **Channel**
-    - **Once**
-  
   - **Non-Blocking Bugs**
     ![](/Understanding_Memory_and_Thread_Safety_Practices_and_Issues_in_Real-World_Rust_Programs阅读/image4.png)<br>
     AuthorityRound是一个实现了Sync特性的结构体（因此，声明为Arc后，AuthorityRound对象可以被多个线程共享）。proposed 字段是一个原子布尔变量，初始化为false。函数generate_seal()的意图是一次只返回一个Seal对象，而程序员（不当地）在第3行和第4行使用 proposed 字段来实现这个目标。当两个线程在同一个对象上调用generate_seal()，并且它们都在执行第3行之前执行第4行之前完成时，两个线程都会得到一个Seal对象作为函数的返回值，违反了程序的预期目标。修补程序是在第6行使用原子指令来替换第3行和第4行。
@@ -70,4 +44,7 @@ mathjax: true
 # 实验
 实验具体代码位于[https://github.com/system-pclub/rust-study](https://github.com/system-pclub/rust-study)。采用的方法是打印出 MIR，然后 Python/C++ 编写 detector 来分析。
 
-缺点：只能分析项目本级的 MIR，无法将项目及其所依赖的 crate 作为整体分析，若想分析所依赖 crate，必须单独进行分析。
+缺点：
+
+- 只能分析项目本级的 MIR，无法将项目及其所依赖的 crate 作为整体分析，若想分析所依赖 crate，必须单独进行分析。
+- 没有考虑到数值的合理性。
