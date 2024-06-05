@@ -56,7 +56,7 @@ mathjax: true
   
   - **Non-Blocking Bugs**
     ![](/Understanding_Memory_and_Thread_Safety_Practices_and_Issues_in_Real-World_Rust_Programs阅读/image4.png)<br>
-    AuthorityRound是一个实现了Sync特性的结构体（因此，声明为Arc后，AuthorityRound对象可以被多个线程共享）。proposed 字段是一个原子布尔变量，初始化为false。函数generate_seal()的意图是一次只返回一个Seal对象，而程序员（不当地）在第3行和第4行使用 proposed 字段来实现这个目标。当两个线程在同一个对象上调用generate_seal()，并且它们都在执行第3行之前执行第4行之前完成时，两个线程都会得到一个Seal对象作为函数的返回值，违反了程序的预期目标。修补程序是在第6行使用原子指令来替换第3行和第4行。
+    AuthorityRound是一个实现了Sync特性的结构体（因此，声明为Arc后，AuthorityRound对象可以被多个线程共享）。proposed 字段是一个原子布尔变量，初始化为false。函数generate_seal()的意图是一次只返回一个Seal对象，而程序员（不当地）在第3行和第4行使用 proposed 字段来实现这个目标。当两个线程在同一个对象上调用generate_seal()，并且它们都处在第3行之后第4行之前时，两个线程都会得到一个Seal对象作为函数的返回值，违反了程序的预期目标。修补程序是在第6行使用原子指令来替换第3行和第4行。
 
     在此错误代码中，generate_seal() 函数通过更改 proposed 字段的值来修改不可变借用参数 &self。如果函数的输入参数设置为&mut self（可变借用），则当在没有持有锁的情况下调用generate_seal()时，Rust编译器将报告错误。换句话说，如果程序员使用可变借用，那么他们就可以在 Rust 编译器的帮助下避免该错误。
 
@@ -70,4 +70,6 @@ mathjax: true
 # 实验
 实验具体代码位于[https://github.com/system-pclub/rust-study](https://github.com/system-pclub/rust-study)。采用的方法是打印出 MIR，然后 Python/C++ 编写 detector 来分析。
 
-缺点：只能分析项目本级的 MIR，无法将项目及其所依赖的 crate 作为整体分析，若想分析所依赖 crate，必须单独进行分析。
+缺点：
+
+- 没有考虑到数值的合理性，无法查找出数值上存在的问题。

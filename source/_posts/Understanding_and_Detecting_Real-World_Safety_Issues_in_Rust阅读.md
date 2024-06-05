@@ -16,23 +16,19 @@ mathjax: true
 本文是 [Understanding Memory and Thread Safety Practices and Issues in Real-World Rust Programs](https://jtzhpf.github.io/2024/03/25/Understanding_Memory_and_Thread_Safety_Practices_and_Issues_in_Real-World_Rust_Programs阅读/) 的续作，在前文 70 个内存安全问题和 100 个线程安全问题的基础上，增加了对 110 个 panic 问题的研究。
 
 # Unexpected Panic Issues
-文章中主要将线程错误类型分为2大类：
+文章中主要将 Panic 问题类型分为5类：
 
-  - **Blocking Bugs**
-    - **Mutex and RwLock**
-      ![](/Understanding_Memory_and_Thread_Safety_Practices_and_Issues_in_Real-World_Rust_Programs阅读/image3.png)<br>
-
-      尽管双锁和锁顺序冲突等问题在传统语言中也很常见，但 Rust 复杂的生命周期规则及其隐式解锁机制使程序员更难编写无阻塞错误的代码。
-
-      变量client是由RwLock保护的Inner对象。在第3行，它的读取锁被获取，并且其m字段被用作调用函数connect()的输入。如果connect()返回Ok，则在第7行获取写锁，并且在第8行修改内部对象。第7行处的写锁将导致双重锁定，因为由client.read()返回的临时引用持有对象的生命周期跨越整个匹配代码块，并且读取锁一直保持到第11行。修补程序是将connect()的返回保存到一个局部变量中，以在第4行释放读锁，而不是直接将返回值用作匹配代码块的条件。
-
-    - **Condvar**
-    - **Channel**
-  - **Non-Blocking Bugs**
-    ![](/Understanding_Memory_and_Thread_Safety_Practices_and_Issues_in_Real-World_Rust_Programs阅读/image4.png)<br>
-    AuthorityRound是一个实现了Sync特性的结构体（因此，声明为Arc后，AuthorityRound对象可以被多个线程共享）。proposed 字段是一个原子布尔变量，初始化为false。函数generate_seal()的意图是一次只返回一个Seal对象，而程序员（不当地）在第3行和第4行使用 proposed 字段来实现这个目标。当两个线程在同一个对象上调用generate_seal()，并且它们都在执行第3行之前执行第4行之前完成时，两个线程都会得到一个Seal对象作为函数的返回值，违反了程序的预期目标。修补程序是在第6行使用原子指令来替换第3行和第4行。
-
-    在此错误代码中，generate_seal() 函数通过更改 proposed 字段的值来修改不可变借用参数 &self。如果函数的输入参数设置为&mut self（可变借用），则当在没有持有锁的情况下调用generate_seal()时，Rust编译器将报告错误。换句话说，如果程序员使用可变借用，那么他们就可以在 Rust 编译器的帮助下避免该错误。
+  - **Missing error handling**<br>
+    Rust提供了Result和Option枚举，供被调用者返回值（Ok(T)或Some(T)）或通知调用者遇到的执行错误（Err(E)或None）。此外，为了提高编程便利性，Rust允许程序员假设被调用函数总是成功执行，并直接使用unwrap()或expect()返回的Result（或Option）对象上检索实际的返回值。然而，如果这种假设是错误的，unwrap()（或expect()）调用会触发恐慌。<br>
+    ![](/Understanding_and_Detecting_Real-World_Safety_Issues_in_Rust阅读/image1.png)
+    图10说明了Servo中的一个例子，以此来说明这个类别。程序员错误地假设第3行的parse()函数调用总是会返回Ok(Url)，从而导致他在返回的Result对象上调用unwrap()。然而，parse()函数调用可能会失败，并返回Err(ParseError)。因此，会触发恐慌。
+  - **Wrong arithmetic operations**<br>
+    for example, overflow, dividing by zero, casting a value to a wrong type
+  - **Assertion errors**<br>
+    程序员手动申明断言导致的，例如panic!(), unimplemented!(), unreachable!(), assert!()。
+  - **Out of bounds**
+  - **Others**
+    例如，触发无限递归函数调用时堆栈溢出，调用了错误的库函数。
 
 # Suggestions
 - IDE 对生存期进行可视化分析
@@ -42,9 +38,10 @@ mathjax: true
 - 动态分析
 
 # 实验
-实验具体代码位于[https://github.com/system-pclub/rust-study](https://github.com/system-pclub/rust-study)。采用的方法是打印出 MIR，然后 Python/C++ 编写 detector 来分析。
+实验具体代码位于[https://github.com/BurtonQin/lockbud](https://github.com/BurtonQin/lockbud)。采用的方法是打印出 MIR，然后 Python/C++ 编写 detector 来分析。
 
-缺点：
+已做到接近完美，内存的所有错误都能查找出（得益于rust语言直接标注了 StorageLive 和 StorageDead）
 
-- 只能分析项目本级的 MIR，无法将项目及其所依赖的 crate 作为整体分析，若想分析所依赖 crate，必须单独进行分析。
-- 没有考虑到数值的合理性。
+Thread Safety Issues 存在误报，因为 rust MIR 无显式的 unlock() 语句，需要 gen-kill 算法来计算 unlock 的位置。
+
+Unexpected Panic Issues 也很简单，直接对着 Panic 语句来对代码进行检查。
