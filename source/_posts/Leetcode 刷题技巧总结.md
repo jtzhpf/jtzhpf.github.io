@@ -447,10 +447,211 @@ classDiagram
 虽然双端队列的实现并非严格禁止插入 `null` 元素，但强烈建议不要这样做。任何允许插入 `null` 元素的双端队列实现的用户，都强烈建议不要利用插入 `null` 的能力。这是因为 `null` 被各种方法用作特殊的返回值来表示双端队列为空。
 
 双端队列的实现通常不会定义基于元素的 `equals` 和 `hashCode` 方法，而是从 `Object` 类继承基于标识的版本。
-### Queue
 
 ### List
+在刷 LeetCode 时，Java 的`List`接口（通常使用`ArrayList`或`LinkedList`实现）有以下一些常用操作：
+
+#### 初始化
+```java
+List<Integer> list = new ArrayList<>();  // 或者 new LinkedList<>()
+```
+
+#### 添加元素
+- `add(E element)`：在列表末尾添加元素。
+```java
+list.add(1);
+```
+- `add(int index, E element)`：在指定索引位置添加元素。
+```java
+list.add(1, 2);
+```
+
+#### 获取元素
+- `get(int index)`：获取指定索引位置的元素。
+```java
+int element = list.get(0);
+```
+
+#### 删除元素
+- `remove(int index)`：删除指定索引位置的元素。
+```java
+list.remove(0);
+```
+- `remove(Object o)`：删除指定的元素。
+```java
+list.remove(Integer.valueOf(1));
+```
+
+#### 修改元素
+- `set(int index, E element)`：将指定索引位置的元素修改为给定元素。
+```java
+list.set(0, 3);
+```
+
+#### 获取列表大小
+- `size()`：获取列表中元素的个数。
+```java
+int size = list.size();
+```
+
+#### 判断是否包含元素
+- `contains(Object o)`：判断列表是否包含指定元素。
+```java
+boolean contains = list.contains(2);
+```
+
+#### 清空列表
+- `clear()`：清空列表中的所有元素。
+```java
+list.clear();
+```
+
+#### 遍历列表
+- 使用`for`循环：
+```java
+for (int i = 0; i < list.size(); i++) {
+    int element = list.get(i);
+    // 处理元素
+}
+```
+- 使用增强`for`循环：
+```java
+for (int element : list) {
+    // 处理元素
+}
+```
+- 使用迭代器`Iterator`：
+```java
+Iterator<Integer> iterator = list.iterator();
+while (iterator.hasNext()) {
+    int element = iterator.next();
+    // 处理元素
+}
+```
+
 
 ### Set
+在刷 LeetCode 时，Java 的`Set`接口（常见的实现类如`HashSet`和`TreeSet`）有以下常用操作：
+
+#### 初始化
+```java
+Set<Integer> set = new HashSet<>();  // 或者 new TreeSet<>()
+```
+
+#### 添加元素
+```java
+set.add(1);
+```
+
+#### 判断元素是否存在
+```java
+boolean exists = set.contains(1);
+```
+
+#### 删除元素
+```java
+set.remove(1);
+```
+
+#### 获取集合大小
+```java
+int size = set.size();
+```
+
+#### 清空集合
+```java
+set.clear();
+```
+
+#### 遍历集合
+- 使用增强`for`循环：
+```java
+for (int element : set) {
+    // 处理元素
+}
+```
+
+#### 集合运算
+- 求交集：
+```java
+Set<Integer> set1 = new HashSet<>();
+Set<Integer> set2 = new HashSet<>();
+// 求交集并存入新的集合
+Set<Integer> intersection = new HashSet<>(set1);
+intersection.retainAll(set2);
+```
+- 求并集：
+```java
+Set<Integer> union = new HashSet<>(set1);
+union.addAll(set2);
+```
+- 求差集：
+```java
+Set<Integer> difference = new HashSet<>(set1);
+difference.removeAll(set2);
+```
 
 ### Map
+在刷 LeetCode 时，Java 的`Map`接口（常见的实现类如`HashMap`和`TreeMap`）有以下常用操作：
+
+#### 初始化
+```java
+Map<String, Integer> map = new HashMap<>();  // 或者 new TreeMap<>()
+```
+
+#### 添加键值对
+```java
+map.put("key1", 10);
+```
+
+#### 获取值
+```java
+int value = map.get("key1");
+```
+
+#### 判断键是否存在
+```java
+boolean containsKey = map.containsKey("key1");
+```
+
+#### 删除键值对
+```java
+map.remove("key1");
+```
+
+#### 获取键集合
+```java
+Set<String> keys = map.keySet();
+```
+
+#### 获取值集合
+```java
+Collection<Integer> values = map.values();
+```
+
+#### 判断是否为空
+```java
+boolean isEmpty = map.isEmpty();
+```
+
+#### 清空
+```java
+map.clear();
+```
+
+#### 遍历
+- 通过键遍历：
+```java
+for (String key : map.keySet()) {
+    int value = map.get(key);
+    // 处理键值对
+}
+```
+- 通过键值对遍历：
+```java
+for (Map.Entry<String, Integer> entry : map.entrySet()) {
+    String key = entry.getKey();
+    int value = entry.getValue();
+    // 处理键值对
+}
+```
