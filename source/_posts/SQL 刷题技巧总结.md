@@ -27,7 +27,17 @@ DATEDIFF('2007-12-31','2007-12-30');   # 1
 DATEDIFF('2010-12-30','2010-12-31');   # -1
 ```
 
+## TIMESTAMPDIFF
+用于计算两者的时间差
+```SQL
+TIMESTAMPDIFF(unit,datetime_expr1,datetime_expr2)
+```
 
+```SQL
+SELECT TIMESTAMPDIFF(MONTH,'2003-02-01','2003-05-01');  # 3
+mysql> SELECT TIMESTAMPDIFF(YEAR,'2002-05-01','2001-01-01');  # -1
+mysql> SELECT TIMESTAMPDIFF(MINUTE,'2003-02-01','2003-05-01 12:05:55'); # 128885
+```
 ## DATE_ADD
 给日期添加指定的时间间隔
 
@@ -65,6 +75,7 @@ SELECT DATE_ADD(MIN(event_date), INTERVAL 3 DAY) AS second_date
 ## DATE_SUB
 从日期减去指定的时间间隔
 
+
 # 其他
 ## ROUND
 对某个数值域进行指定小数位数的四舍五入
@@ -89,7 +100,7 @@ IFNULL(expression, alt_value)
 SELECT IFNULL(NULL, "W3Schools.com");
 ```
 
-##
+## CASE
 ```SQL
 CASE
     WHEN condition1 THEN result1
@@ -97,4 +108,27 @@ CASE
     WHEN conditionN THEN resultN
     ELSE result
 END;
+```
+```SQL
+SELECT CustomerName, City, Country
+FROM Customers
+ORDER BY
+(CASE
+    WHEN City IS NULL THEN Country
+    ELSE City
+END);
+```
+
+## 开窗函数
+```SQL
+SELECT 
+聚合函数 OVER(PARTITION BY condition1 ORDER BY condition2)
+FROM table;
+```
+```SQL
+SELECT
+year, country, product, profit,
+ROW_NUMBER() OVER(PARTITION BY country) AS row_num1,
+ROW_NUMBER() OVER(PARTITION BY country ORDER BY year, product) AS row_num2
+FROM sales;
 ```
