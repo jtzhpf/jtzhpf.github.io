@@ -138,57 +138,32 @@ n=?
 
 需要注意的是，某些特殊字符在作为分隔符时需要进行转义，因为它们在正则表达式中有特殊含义，例如`.*+^$|?()[]{}\`等。如果要使用这些字符作为分隔符，需要加上相应的转义字符，如`\\.`表示点，`\\|`表示竖线等。另外，如果分隔符连续出现，可能会产生空字符串作为分割后的子字符串。在实际使用中，要根据具体需求来处理这些情况。
 
-## Collections
+## Collection
+![](/Leetcode%20刷题技巧总结/java_collections_overview.png)
+
 ```mermaid
+---
+title: Collection
+---
 classDiagram
     Collection <|-- List
     Collection <|-- Set
     Collection <|-- Queue
     Collection <|-- Deque
     List <|-- ArrayList
-    List <|-- LinkedList
     List <|-- Vector
+    List <|-- CopyOnWriteArrayList
+    List <|-- LinkedList
     Vector <|-- Stack
-    Set <|-- HashSet
-    Set <|-- LinkedHashSet
-    Set <|-- TreeSet
     Queue <|-- LinkedList
     Queue <|-- PriorityQueue
     Deque <|-- LinkedList
     Deque <|-- ArrayDeque
-    Map <|-- HashMap
-    Map <|-- LinkedHashMap
-    Map <|-- TreeMap
-    Map <|-- Hashtable
-    Hashtable <|-- Properties
-    Map <|-- ConcurrentHashMap
-    List <|-- CopyOnWriteArrayList
+    Set <|-- HashSet
+    Set <|-- LinkedHashSet
+    Set <|-- TreeSet
 
-    class Collection {
-        <<interface>>
-    }
-
-    class List {
-        <<interface>>
-    }
-
-    class Set {
-        <<interface>>
-    }
-
-    class Queue {
-        <<interface>>
-    }
-
-    class Deque {
-        <<interface>>
-    }
-
-    class Map {
-        <<interface>>
-    }
-
-       class ArrayList {
+    class ArrayList {
         // 用法
         - 适合随机访问和遍历，查询速度快。
         - 初始化时可指定容量，避免频繁扩容。
@@ -257,6 +232,26 @@ classDiagram
         - 不支持容量限制。
     }
 
+    class CopyOnWriteArrayList {
+        // 用法
+        - 适用于读多写少的并发场景。
+        // 注意事项
+        - 内存消耗较大，写入时复制整个数组。
+    }
+```
+
+```mermaid
+---
+title: Map
+---
+classDiagram
+    Map <|-- HashMap
+    Map <|-- LinkedHashMap
+    Map <|-- TreeMap
+    Map <|-- Hashtable
+    Map <|-- ConcurrentHashMap
+    Hashtable <|-- Properties
+    
     class HashMap {
         // 用法
         - 常用的键值对存储结构。
@@ -299,12 +294,5 @@ classDiagram
         - 高并发环境下的键值对存储。
         // 注意事项
         - 部分操作可能不具备原子性。
-    }
-
-    class CopyOnWriteArrayList {
-        // 用法
-        - 适用于读多写少的并发场景。
-        // 注意事项
-        - 内存消耗较大，写入时复制整个数组。
     }
 ```
