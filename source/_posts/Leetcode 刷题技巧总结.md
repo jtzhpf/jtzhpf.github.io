@@ -19,11 +19,11 @@ timeline: code  # 展示在时间线列表中
 
 
 # JAVA
-
-## String
+## 字符串操作
+### String
 在刷 LeetCode 时，Java 的`String`类有以下一些常用操作：
 
-### 字符串拼接
+#### 字符串拼接
 使用`+`运算符可以方便地将多个字符串拼接在一起。
 例如：
 ```java
@@ -32,14 +32,14 @@ String str2 = "World";
 String result = str1 + " " + str2; 
 ```
 
-### 获取字符串长度
+#### 获取字符串长度
 通过`length()`方法获取字符串的长度。
 ```java
 String text = "This is a test";
 int length = text.length(); 
 ```
 
-### 字符提取
+#### 字符提取
 可以使用`charAt(int index)`方法获取指定位置的字符。
 例如：
 ```java
@@ -47,7 +47,7 @@ String word = "Java";
 char ch = word.charAt(2); 
 ```
 
-### 子字符串获取
+#### 子字符串获取
 `substring(int beginIndex)`和`substring(int beginIndex, int endIndex)`方法用于获取子字符串。
 ```java
 String sentence = "Hello Java World";
@@ -55,7 +55,7 @@ String sub1 = sentence.substring(6);
 String sub2 = sentence.substring(6, 10); 
 ```
 
-### 字符串比较
+#### 字符串比较
 可以使用`equals(Object anObject)`方法比较两个字符串的内容是否相等。
 ```java
 String strA = "apple";
@@ -65,14 +65,14 @@ if (strA.equals(strB)) {
 }
 ```
 
-### 字符串转换
+#### 字符串转换
 例如将字符串转换为字符数组，使用`toCharArray()`方法。
 ```java
 String str = "example";
 char[] charArray = str.toCharArray(); 
 ```
 
-### 字符串拆分
+#### 字符串拆分
 例如将字符串拆分为字符串数组，使用`split(String regex)`或`split(String regex, int limit)`方法。
 
 - `regex`：要作为分隔符的正则表达式。可以是单个字符、字符序列或更复杂的正则表达式模式。例如，使用`","`来按照逗号进行分割，使用`"\\."`来按照点进行分割（点在正则表达式中有特殊含义，所以需要转义）。
@@ -137,6 +137,105 @@ n=?
 ```
 
 需要注意的是，某些特殊字符在作为分隔符时需要进行转义，因为它们在正则表达式中有特殊含义，例如`.*+^$|?()[]{}\`等。如果要使用这些字符作为分隔符，需要加上相应的转义字符，如`\\.`表示点，`\\|`表示竖线等。另外，如果分隔符连续出现，可能会产生空字符串作为分割后的子字符串。在实际使用中，要根据具体需求来处理这些情况。
+
+
+### StringBuilder(非线程安全) & StringBuffer(线程安全)
+在刷 LeetCode 时，`StringBuilder`和`StringBuffer`常用于高效地构建和修改字符串。
+
+#### 初始化
+```java
+StringBuilder sb = new StringBuilder();
+StringBuffer sf = new StringBuffer();
+```
+
+#### 添加内容
+可以使用`append`方法添加各种类型的数据，如字符串、整数、浮点数等。
+```java
+append(boolean b)
+append(char c)
+append(char[] str)
+append(char[] str, int offset, int len)
+append(CharSequence s)
+append(CharSequence s, int start, int end)
+append(double d)
+append(float f)
+append(int i)
+append(long lng)
+append(Object obj)
+append(String str)
+append(StringBuffer sb)
+```
+
+```java
+sb.append("Hello");
+sb.append(123);
+sf.append(3.14);
+```
+
+#### 删除部分内容
+通过`delete`方法删除指定范围内的字符。
+```java
+sb.delete(0, 5);  // 删除从索引 0 到 4（包括 4）的字符
+```
+
+#### 插入内容
+使用`insert`方法在指定位置插入数据。
+```java
+sb.insert(2, "World");  // 在索引 2 处插入 "World"
+```
+
+#### 替换内容
+借助`replace`方法替换指定范围内的字符。
+```java
+sb.replace(1, 3, "Java");  // 替换索引 1 到 2 的字符为 "Java"
+```
+
+#### 反转字符串
+利用`reverse`方法将字符串反转。
+```java
+sb.reverse();
+```
+
+#### 获取字符串
+通过`toString`方法将`StringBuilder`或`StringBuffer`对象转换为`String`类型。
+```java
+String result = sb.toString();
+```
+
+以下是 `StringBuilder` 和 `StringBuffer` 在刷 LeetCode 中可能会用到的一些其他操作：
+
+#### 清空内容
+使用 `setLength(0)` 方法可以清空 `StringBuilder` 或 `StringBuffer` 的内容。
+
+#### 获取指定位置的字符
+可以使用 `charAt(int index)` 方法获取指定索引位置的字符。
+
+### 设置指定位置的字符
+通过 `setCharAt(int index, char ch)` 方法来设置指定索引位置的字符。
+
+#### 获取容量
+`capacity()` 方法能获取当前对象的内部字符数组的容量。
+
+#### 获取字符串长度
+```java
+StringBuilder sb = new StringBuilder("Java");
+int length = sb.length();
+```
+```java
+StringBuffer sbuffer = new StringBuffer("Python");
+int length = sbuffer.length();
+```
+
+#### 截取子字符串
+```java
+StringBuilder sb = new StringBuilder("HelloWorld");
+String sub = sb.substring(5); 
+```
+```java
+StringBuffer sbuffer = new StringBuffer("JavaLanguage");
+String sub = sbuffer.substring(4, 8);
+```
+
 
 ## Collection
 ![](/Leetcode%20刷题技巧总结/java_collections_overview.png)
@@ -296,3 +395,62 @@ classDiagram
         - 部分操作可能不具备原子性。
     }
 ```
+
+### Deque
+**双端队列（Deque）**
+
+双端队列是一种支持在两端进行元素插入和删除的线性集合。“Deque”这个名称是“double ended queue”（双端队列）的缩写，通常发音为“deck”。大多数双端队列的实现对其可能包含的元素数量没有固定限制，但这个接口也支持容量受限的双端队列以及没有固定大小限制的双端队列。
+
+这个接口定义了访问双端队列两端元素的方法。提供了插入、删除和检查元素的方法。每种方法都有两种形式：一种在操作失败时抛出异常，另一种返回一个特殊值（根据操作，可能为 `null` 或 `false`）。插入操作的后一种形式专门用于容量受限的双端队列实现；在大多数实现中，插入操作不会失败。
+
+上述十二种方法总结在以下表格中：
+
+**双端队列方法总结**
+
+|  第一个元素（头部）抛出异常  |  第一个元素（头部）特殊值  |  最后一个元素（尾部）抛出异常  |  最后一个元素（尾部）特殊值  |
+| :---: | :---: | :---: | :---: |
+| `addFirst(e)`  | `offerFirst(e)`  | `addLast(e)`  | `offerLast(e)`  |
+| `removeFirst()`  | `pollFirst()`  | `removeLast()`  | `pollLast()`  |
+| `getFirst()`  | `peekFirst()`  | `getLast()`  | `peekLast()`  |
+
+这个接口扩展了 `Queue` 接口。
+
+当双端队列用作队列时，会产生先进先出（FIFO）的行为。元素在双端队列的末尾添加，并从开头移除。从 `Queue` 接口继承的方法与双端队列方法的精确对等关系如下表所示：
+
+**队列和双端队列方法的比较**
+
+|  队列方法  |  等效的双端队列方法  |
+| :---: | :---: |
+| `add(e)`  | `addLast(e)`  |
+| `offer(e)`  | `offerLast(e)`  |
+| `remove()`  | `removeFirst()`  |
+| `poll()`  | `pollFirst()`  |
+| `element()`  | `getFirst()`  |
+| `peek()`  | `peekFirst()`  |
+
+双端队列也可以用作后进先出（LIFO）栈。应该优先使用这个接口而不是遗留的 `Stack` 类。当双端队列用作栈时，元素在双端队列的开头进行压入和弹出。栈方法与双端队列方法的精确对等关系如下表所示：
+
+**栈和双端队列方法的比较**
+
+|  栈方法  |  等效的双端队列方法  |
+| :---: | :---: |
+| `push(e)`  | `addFirst(e)`  |
+| `pop()`  | `removeFirst()`  |
+| `peek()`  | `peekFirst()`  |
+
+请注意，当双端队列用作队列或栈时，`peek` 方法都能很好地工作；在任何一种情况下，元素都是从双端队列的开头获取的。
+
+这个接口提供了两个方法来删除内部元素，`removeFirstOccurrence` 和 `removeLastOccurrence` 。
+
+与 `List` 接口不同，这个接口不提供对元素的基于索引的访问支持。
+
+虽然双端队列的实现并非严格禁止插入 `null` 元素，但强烈建议不要这样做。任何允许插入 `null` 元素的双端队列实现的用户，都强烈建议不要利用插入 `null` 的能力。这是因为 `null` 被各种方法用作特殊的返回值来表示双端队列为空。
+
+双端队列的实现通常不会定义基于元素的 `equals` 和 `hashCode` 方法，而是从 `Object` 类继承基于标识的版本。
+### Queue
+
+### List
+
+### Set
+
+### Map
