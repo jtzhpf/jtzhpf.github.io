@@ -651,3 +651,84 @@ for (Map.Entry<String, Integer> entry : map.entrySet()) {
     // 处理键值对
 }
 ```
+
+# 技巧
+
+## 基础类型转换
+在 Java 中，刷 LeetCode 时常用的不同类型之间互相转换的方法有以下几种：
+
+**整数与字符串之间的转换**：
+- `Integer.toString(int)` ：将整数转换为字符串。例如：`Integer.toString(123)` 将返回字符串 `"123"` 。
+- `Integer.parseInt(String)` ：将字符串转换为整数。例如：`Integer.parseInt("123")` 将返回整数 `123` 。
+
+**字符与整数之间的转换**：
+- `(int)char` ：将字符转换为对应的 ASCII 码值。例如：`(int)'A'` 将返回 `65` 。
+- `char(int)` ：将整数（代表 ASCII 码值）转换为对应的字符。例如：`char(65)` 将返回字符 `'A'` 。
+
+**浮点数与字符串之间的转换**：
+- `Double.toString(double)` ：将双精度浮点数转换为字符串。例如：`Double.toString(3.14)` 。
+- `Double.parseDouble(String)` ：将字符串转换为双精度浮点数。例如：`Double.parseDouble("3.14")` 。
+
+**字符串与其他基本数据类型的转换**：
+- 除了上述提到的整数和浮点数，对于其他基本数据类型（如 `short` 、 `long` 、 `float` 等），也有相应的 `parseXXX` 和 `toString` 方法进行转换。
+
+## List 和数组之间的相互转换
+
+**数组转 `List`**：
+
+使用 `Arrays.asList()` 方法，但需要注意它返回的 `List` 是不可变的。
+```java
+int[] arr = {1, 2, 3};
+List<Integer> list = Arrays.asList(1, 2, 3);
+```
+
+如果要得到一个可变的 `List` ，可以手动遍历数组添加元素到新的 `List` 中。
+```java
+int[] arr = {1, 2, 3};
+List<Integer> list = new ArrayList<>();
+for (int num : arr) {
+    list.add(num);
+}
+```
+
+**`List` 转数组**：
+
+使用 `toArray()` 方法。
+```java
+List<Integer> list = Arrays.asList(1, 2, 3);
+Integer[] arr = list.toArray(new Integer[0]);
+```
+
+或者指定数组的长度。
+```java
+List<Integer> list = Arrays.asList(1, 2, 3);
+Integer[] arr = list.toArray(new Integer[list.size()]);
+```
+
+## String 和 char 数组之间的相互转换
+
+在 Java 中，`String` 和 `char` 数组之间的相互转换有多种方法，以下为您详细介绍：
+
+**`String` 转换为 `char` 数组**：
+```java
+String str = "Hello";
+char[] charArray = str.toCharArray();
+```
+例如，如果 `str` 的值为 `"World"` ，转换后的 `charArray` 就是 `['W', 'o', 'r', 'l', 'd']` 。
+
+**`char` 数组转换为 `String`**：
+```java
+char[] charArray = {'H', 'e', 'l', 'l', 'o'};
+String str = new String(charArray);
+```
+再比如，`charArray` 为 `['J', 'a', 'v', 'a']` ，转换得到的 `str` 就是 `"Java"` 。
+
+还可以通过 `StringBuilder` 或 `StringBuffer` 来实现转换：
+```java
+char[] charArray = {'H', 'e', 'l', 'l', 'o'};
+StringBuilder stringBuilder = new StringBuilder();
+for (char c : charArray) {
+    stringBuilder.append(c);
+}
+String str = stringBuilder.toString();
+```
