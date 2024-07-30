@@ -652,6 +652,52 @@ for (Map.Entry<String, Integer> entry : map.entrySet()) {
 }
 ```
 
+#### computeIfAbsent 方法
+
+`computeIfAbsent` 方法是 Java 8 在 `java.util.Map` 接口中引入的一个默认方法。它主要用于简化在 Map 中根据键获取值的代码逻辑。如果指定的键在 Map 中不存在，它将计算指定键的值并将其放入 Map 中。
+
+方法签名如下：
+```java
+default V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction)
+```
+
+参数说明：
+
+- `key`：Map 中的键。
+- `mappingFunction`：一个函数，接受一个键并返回一个值。
+
+
+如果键存在，则返回当前映射的值；如果键不存在，则返回计算后的值。
+
+**使用场景：**
+`computeIfAbsent` 方法通常用于避免重复的检查和插入操作，简化代码，提升可读性。例如，当你需要从 Map 中获取某个值，如果该值不存在，则计算并插入新的值时，这个方法非常有用。
+
+**示例：**
+
+假设我们有一个 Map 用来存储学生的成绩，当我们需要获取一个学生的成绩时，如果该学生的成绩不存在，我们会默认给他一个分数：
+
+```java
+import java.util.HashMap;
+import java.util.Map;
+
+public class ComputeIfAbsentExample {
+    public static void main(String[] args) {
+        Map<String, Integer> studentScores = new HashMap<>();
+        
+        // 给定的默认分数计算函数
+        studentScores.put("Alice", 85);
+
+        // 使用computeIfAbsent方法，如果“Bob”不存在于Map中，则添加并返回默认分数70
+        Integer score = studentScores.computeIfAbsent("Bob", k -> 70);
+        System.out.println("Bob's score: " + score); // 输出：Bob's score: 70
+
+        // 再次获取Bob的分数，这次直接从Map中获取
+        score = studentScores.get("Bob");
+        System.out.println("Bob's score: " + score); // 输出：Bob's score: 70
+    }
+}
+```
+
 # 技巧
 
 ## 基础类型转换
