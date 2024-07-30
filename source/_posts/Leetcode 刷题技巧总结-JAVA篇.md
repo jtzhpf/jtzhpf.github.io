@@ -698,6 +698,80 @@ public class ComputeIfAbsentExample {
 }
 ```
 
+#### entrySet 方法
+
+在 Java 中，`entrySet` 方法是 `java.util.Map` 接口的一部分。它返回该 Map 中所有键值对 (Map.Entry) 的集合视图。通过 `entrySet`，你可以遍历 Map 的所有键值对，并对其进行操作。
+
+**方法签名：**
+
+```java
+Set<Map.Entry<K, V>> entrySet()
+```
+
+**使用场景：**
+
+`entrySet` 通常用于遍历 Map 或者在 Map 的键值对上进行批量操作。
+
+**示例：**
+
+以下示例展示了如何使用 `entrySet` 遍历一个 Map 并打印出所有的键值对：
+
+```java
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+public class EntrySetExample {
+    public static void main(String[] args) {
+        Map<String, Integer> studentScores = new HashMap<>();
+        studentScores.put("Alice", 85);
+        studentScores.put("Bob", 70);
+        studentScores.put("Charlie", 90);
+
+        // 获取Map的entrySet视图
+        Set<Map.Entry<String, Integer>> entries = studentScores.entrySet();
+
+        // 遍历Map的所有键值对
+        for (Map.Entry<String, Integer> entry : entries) {
+            System.out.println(entry.getKey() + ": " + entry.getValue());
+        }
+    }
+}
+```
+
+**常见操作：**
+
+1. **遍历 Map：**
+
+   使用 `entrySet` 遍历 Map 时，每个元素都是一个 `Map.Entry` 对象，你可以通过 `entry.getKey()` 和 `entry.getValue()` 来获取键和值。
+
+2. **修改 Map：**
+
+   在遍历时，可以直接通过 `Map.Entry` 对象修改 Map 中的值。例如：
+
+   ```java
+   for (Map.Entry<String, Integer> entry : entries) {
+       if (entry.getKey().equals("Alice")) {
+           entry.setValue(95); // 修改Alice的分数
+       }
+   }
+   ```
+
+3. **删除元素：**
+
+   使用 `Iterator` 时，可以在遍历过程中安全地删除元素：
+
+   ```java
+   Iterator<Map.Entry<String, Integer>> iterator = entries.iterator();
+   while (iterator.hasNext()) {
+       Map.Entry<String, Integer> entry = iterator.next();
+       if (entry.getKey().equals("Bob")) {
+           iterator.remove(); // 删除Bob的记录
+       }
+   }
+   ```
+
+
 # 技巧
 
 ## 基础类型转换
