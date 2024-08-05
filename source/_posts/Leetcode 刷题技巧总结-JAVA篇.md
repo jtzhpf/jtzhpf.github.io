@@ -771,7 +771,12 @@ public class EntrySetExample {
    }
    ```
 
+### Collection 嵌套
 
+```java
+Map<Integer, List<Integer>> map = new HashMap<Integer, List<Integer>>();        // 正确
+Map<Integer, List<Integer>> map = new HashMap<Integer, ArrayList<Integer>>();   // 错误
+```
 # 技巧
 
 ## 基础类型转换
