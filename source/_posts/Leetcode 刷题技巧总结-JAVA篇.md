@@ -774,8 +774,9 @@ public class EntrySetExample {
 ### Collection 嵌套
 
 ```java
-Map<Integer, List<Integer>> map = new HashMap<Integer, List<Integer>>();        // 正确
 Map<Integer, List<Integer>> map = new HashMap<Integer, ArrayList<Integer>>();   // 错误
+Map<Integer, List<Integer>> map = new HashMap<Integer, List<Integer>>();        // 正确
+map.add(new ArrayList<Integer>());
 ```
 # 技巧
 
