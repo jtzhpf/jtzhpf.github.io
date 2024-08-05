@@ -603,6 +603,7 @@ map.put("key1", 10);
 #### 获取值
 ```java
 int value = map.get("key1");
+int value = map.getOrDefault("key1", "key2");
 ```
 
 #### 判断键是否存在
