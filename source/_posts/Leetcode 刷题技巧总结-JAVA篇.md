@@ -68,6 +68,21 @@ String str = "example";
 char[] charArray = str.toCharArray(); 
 ```
 
+反向转换：
+1. 直接在构造String时建立。 
+
+```java
+char c[] = {'s', 'g', 'k'}; 
+String str = new String(c);
+```
+
+2. String 有 valueOf() 方法可以直接转换。 
+
+```java
+char[] c = {'s','g','h'}; 
+String str = String.valueOf(c);
+```
+
 #### 字符串拆分
 例如将字符串拆分为字符串数组，使用`split(String regex)`或`split(String regex, int limit)`方法。
 
@@ -449,7 +464,8 @@ classDiagram
 
 #### 初始化
 ```java
-List<Integer> list = new ArrayList<>();  // 或者 new LinkedList<>()
+List<Integer> list = new ArrayList<>();     // 或者 new LinkedList<>()
+List<Integer> list = new ArrayList<>(10);   // 无法初始化size, 只是初始化了capacity
 ```
 
 #### 添加元素
@@ -771,6 +787,33 @@ public class EntrySetExample {
        }
    }
    ```
+
+#### Pair
+java 默认不提供 Pair，需要我们自行提供。
+
+```java
+class Solution {
+    // Simple Pair class as JavaFX Pair is not available by default
+    static class Pair<K, V> {
+        private K key;
+        private V value;
+
+        public Pair(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        public K getKey() {
+            return key;
+        }
+
+        public V getValue() {
+            return value;
+        }
+    }
+    ...
+}
+```
 
 ### Collection 嵌套
 
