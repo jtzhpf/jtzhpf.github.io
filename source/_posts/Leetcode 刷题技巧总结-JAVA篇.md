@@ -902,3 +902,48 @@ for (char c : charArray) {
 }
 String str = stringBuilder.toString();
 ```
+
+## 基本数据类型传引用
+
+基本数据类型无法作为引用形式传递，但是可以通过只有一个元素的数组来实现传引用。
+
+```java
+// n皇后
+class Solution {
+    boolean check(int i, int j, int n, int[][] t){
+        for(int k=0; k<n; k++){
+            if(t[i][k]==1||t[k][j]==1){
+                return false;
+            }
+        }
+        for (int k = 0; k < n; k++) {
+            for (int l = 0; l < n; l++) {
+                if ((i - j == k - l || i + j == k + l) && t[k][l] == 1) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    void totalNQueens(int i, int n, int[][] t, int[] res){
+        if(i==n){
+            res[0]++;
+        }else{
+            for(int j=0; j<n; j++){
+                if(check(i,j,n,t)){
+                    t[i][j]=1;
+                    totalNQueens(i+1, n, t, res);
+                    t[i][j]=0;
+                }
+            }
+        }
+    }
+
+    public int totalNQueens(int n) {
+        int[] res={0};
+        int[][] t = new int[n][n];
+        totalNQueens(0, n, t, res);
+        return res[0];
+    }
+}
+```
