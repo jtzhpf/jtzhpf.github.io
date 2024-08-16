@@ -149,6 +149,19 @@ n=?
 
 需要注意的是，某些特殊字符在作为分隔符时需要进行转义，因为它们在正则表达式中有特殊含义，例如`.*+^$|?()[]{}\`等。如果要使用这些字符作为分隔符，需要加上相应的转义字符，如`\\.`表示点，`\\|`表示竖线等。另外，如果分隔符连续出现，可能会产生空字符串作为分割后的子字符串。在实际使用中，要根据具体需求来处理这些情况。
 
+#### 字符串合并
+```java
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> list = Arrays.asList("apple", "banana", "cherry");
+        String result = String.join(", ", list);
+        System.out.println(result); // Outputs: apple, banana, cherry
+    }
+}
+```
 
 ### StringBuilder(非线程安全) & StringBuffer(线程安全)
 在刷 LeetCode 时，`StringBuilder`和`StringBuffer`常用于高效地构建和修改字符串。
@@ -947,3 +960,48 @@ class Solution {
     }
 }
 ```
+
+## 取随机数
+在 Java 中，你可以使用多种方法来生成随机数。以下是几种常用的方法：
+
+1. **使用 `Math.random()`**:
+   ```java
+   double randomValue = Math.random(); // 生成一个 [0.0, 1.0) 之间的随机数
+   ```
+
+   如果你需要生成一个特定范围的随机整数，可以这样做：
+   ```java
+   int min = 1;
+   int max = 10;
+   int randomInt = min + (int)(Math.random() * (max - min + 1));
+   ```
+
+2. **使用 `java.util.Random` 类**:
+   ```java
+   import java.util.Random;
+
+   Random random = new Random();
+   int randomInt = random.nextInt(10); // 生成 [0, 10) 之间的随机整数
+   ```
+
+   你还可以生成指定范围内的随机整数：
+   ```java
+   int min = 1;
+   int max = 10;
+   int randomIntInRange = min + random.nextInt(max - min + 1);
+   ```
+
+3. **使用 `java.util.concurrent.ThreadLocalRandom`** (适用于并发环境):
+   ```java
+   import java.util.concurrent.ThreadLocalRandom;
+
+   int randomInt = ThreadLocalRandom.current().nextInt(10); // 生成 [0, 10) 之间的随机整数
+   ```
+
+   生成指定范围内的随机整数：
+   ```java
+   int min = 1;
+   int max = 10;
+   int randomIntInRange = ThreadLocalRandom.current().nextInt(min, max + 1);
+   ```
+
