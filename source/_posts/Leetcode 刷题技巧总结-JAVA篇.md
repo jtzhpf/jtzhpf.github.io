@@ -163,6 +163,18 @@ public class Main {
 }
 ```
 
+#### 删除前后空格
+```java
+public class Main {
+    public static void main(String[] args) {
+        String str = "  Hello, World!  ";
+        String trimmedStr = str.trim();
+        System.out.println(trimmedStr); // Outputs: "Hello, World!"
+    }
+}
+
+```
+
 ### StringBuilder(非线程安全) & StringBuffer(线程安全)
 在刷 LeetCode 时，`StringBuilder`和`StringBuffer`常用于高效地构建和修改字符串。
 
@@ -1005,3 +1017,136 @@ class Solution {
    int randomIntInRange = ThreadLocalRandom.current().nextInt(min, max + 1);
    ```
 
+## 获得某一数据类型的最大值/最小值
+```java
+Integer.MAX_VALUE
+Integer.MIN_VALUE
+```
+
+# 常用算法
+## 快速排序
+经过测试，发现与pivot比较判等对性能影响极大。
+方案一：前后需要swap，先交换再处理后交换，用时35ms
+```java
+class Solution {
+    public int[] sortArray(int[] nums) {
+        quicksort(nums,0,nums.length-1);
+        return nums;
+    }
+    void swap(int[] nums, int i, int j){
+        int temp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = temp;
+    }
+    void quicksort(int[] nums, int left, int right){
+        if(left<right){
+            int random = new Random().nextInt(right+1-left)+left;
+            swap(nums,left,random);
+            int pivot=nums[left];
+            int l=left+1, r=right;
+            while(l<=r){
+                while (l<=r && nums[l] < pivot)l++;
+                while (l<=r && nums[r] > pivot)r--;
+                if (l<=r) swap(nums, l++, r--);
+            }
+            swap(nums,left,r);
+            quicksort(nums, left, r);
+            quicksort(nums, r+1, right);
+        }
+    }
+}
+```
+
+方案二：前后无需swap，利用do-while，用时50ms
+```java
+class Solution {
+    public int[] sortArray(int[] nums) {
+        quicksort(nums,0,nums.length-1);
+        return nums;
+    }
+    void swap(int[] nums, int i, int j){
+        int temp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = temp;
+    }
+    void quicksort(int[] nums, int left, int right){
+        if(left>=right) return;
+        int random = new Random().nextInt(right-left)+left;
+        int pivot = nums[random];
+        int l = left-1;
+        int r = right+1;
+        while(l<r){
+            do l++;while(nums[l]<pivot);
+            do r--;while(nums[r]>pivot);
+            if(l<r)swap(nums,l,r);
+        }
+        quicksort(nums,left,r);
+        quicksort(nums,r+1,right);
+    }
+}
+```
+
+方案三：严蔚敏版，交错替换，与pivot比较判等，用时1800ms
+```java
+class Solution {
+    public int[] sortArray(int[] nums) {
+        quicksort(nums,0,nums.length-1);
+        return nums;
+    }
+    void swap(int[] nums, int i, int j){
+        int temp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = temp;
+    }
+    void quicksort(int[] nums, int left, int right){
+        if(left<right){
+            int random = new Random().nextInt(right-left+1)+left;
+            swap(nums, random, left);
+            int l=left,r=right;
+            int pivot = nums[l];
+            while(l < r){
+                while(l < r && nums[r]>=pivot)r--;
+                nums[l] = nums[r];
+                while(l < r && nums[l]<=pivot)l++;
+                nums[r] = nums[l];
+            }
+            nums[l] = pivot;
+            quicksort(nums,left,l);
+            quicksort(nums,l+1,right);
+        }
+    }
+}
+```
+
+方案四：快慢指针，用时2500ms
+```java
+class Solution {
+    public int[] sortArray(int[] nums) {
+        quicksort(nums,0,nums.length-1);
+        return nums;
+    }
+    void swap(int[] nums, int i, int j) {
+        int temp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = temp;
+    }
+    void quicksort(int[] nums, int left, int right){
+        if(left<right){
+            int random = new Random().nextInt(right - left + 1) + left;
+            swap(nums, left, random);
+
+            int pivot = left;
+            int index = pivot+1;
+            for (int i = index; i <= right; i++) {
+                if (nums[i] < nums[pivot]) {
+                    swap(nums, i, index);
+                    index++;
+                }
+            }
+            swap(nums, pivot, index-1);
+            quicksort(nums,left,index-2);
+            quicksort(nums,index,right);
+        }
+    }
+}
+```
