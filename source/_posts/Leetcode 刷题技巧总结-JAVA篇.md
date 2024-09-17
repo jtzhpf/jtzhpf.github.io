@@ -431,6 +431,122 @@ classDiagram
         - 部分操作可能不具备原子性。
     }
 ```
+### Queue
+#### PriorityQueue
+在Java中，`Queue` 是一个接口，而 `PriorityQueue` 是该接口的一个具体实现。
+
+   - **`PriorityQueue`** 是 `Queue` 的一个实现类，它是一个基于优先级堆的队列。`PriorityQueue` 保证每次访问或删除的元素是队列中优先级最高的元素（根据自然顺序或提供的比较器进行排序）。
+
+   - **`PriorityQueue`** 按元素的优先级排序，而不是插入顺序。最小的元素（根据自然顺序或比较器决定）会首先被处理。例如，数字1优先于2，字符串"A"优先于"B"。
+
+   - **`PriorityQueue`** 底层使用的是一个动态数组，并且以二叉堆（Binary Heap）的形式存储数据。它保证在插入或删除元素时能够保持堆的结构。
+
+   - **`PriorityQueue`** 适用于需要按优先级处理元素的场景，常用于任务的优先级调度、处理基于优先级的事件等。
+
+在LeetCode刷题时，`PriorityQueue` 是一个非常常用的工具，尤其在处理需要动态获取最小值或最大值的问题时（如Top K问题、合并K个有序链表、滑动窗口最大值等）。`PriorityQueue` 提供了很多便捷的方法，以下是常用的操作和一些典型用法：
+
+Java中的 `PriorityQueue` 默认是**最小堆**，也就是每次 `poll()` 或 `peek()` 时返回的是当前队列中最小的元素。假设需要在最小堆的基础上实现**最大堆**，可以传递一个自定义的比较器。
+
+
+以下是一些 LeetCode 经典题目中使用 `PriorityQueue` 的场景：
+
+1. **合并K个有序链表**
+   - 题目: [LeetCode 23 - 合并K个排序链表](https://leetcode.cn/problems/merge-k-sorted-lists/)
+   - 解决思路: 使用 `PriorityQueue` 来存储每个链表的头结点，按节点值进行排序（默认是最小堆）。每次从队列中取出最小的节点，然后将其连接到结果链表，同时将该节点的下一个节点加入队列。
+   
+   ```java
+   public ListNode mergeKLists(ListNode[] lists) {
+       PriorityQueue<ListNode> pq = new PriorityQueue<>((a, b) -> (a.val - b.val));
+       for (ListNode list : lists) {
+           if (list != null) pq.offer(list);
+       }
+       ListNode dummy = new ListNode(0);
+       ListNode curr = dummy;
+       while (!pq.isEmpty()) {
+           ListNode node = pq.poll();
+           curr.next = node;
+           curr = curr.next;
+           if (node.next != null) pq.offer(node.next);
+       }
+       return dummy.next;
+   }
+   ```
+
+2. **寻找数组中的第K大元素**
+   - 题目: [LeetCode 215 - 数组中的第K个最大元素](https://leetcode.cn/problems/kth-largest-element-in-an-array/)
+   - 解决思路: 可以用一个大小为 K 的**最小堆**来维护当前最大的 K 个元素。当堆中的元素超过 K 个时，移除最小的元素，最后堆顶元素就是第 K 大的元素。
+
+   ```java
+   public int findKthLargest(int[] nums, int k) {
+       PriorityQueue<Integer> pq = new PriorityQueue<>();
+       for (int num : nums) {
+           pq.offer(num);
+           if (pq.size() > k) {
+               pq.poll();
+           }
+       }
+       return pq.peek();
+   }
+   ```
+
+3. **滑动窗口最大值**
+   - 题目: [LeetCode 239 - 滑动窗口最大值](https://leetcode.cn/problems/sliding-window-maximum/)
+   - 解决思路: 你可以使用最大堆（优先队列）来跟踪滑动窗口中的最大值。对于每个滑动窗口，向堆中添加新元素，并移除已超出窗口范围的元素。
+
+   ```java
+   public int[] maxSlidingWindow(int[] nums, int k) {
+       PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> b[0] - a[0]); // 最大堆
+       int n = nums.length;
+       int[] res = new int[n - k + 1];
+       for (int i = 0; i < n; i++) {
+           pq.offer(new int[]{nums[i], i});
+           if (i >= k - 1) {
+               while (pq.peek()[1] <= i - k) { // 移除不在窗口中的元素
+                   pq.poll();
+               }
+               res[i - k + 1] = pq.peek()[0]; // 当前窗口的最大值
+           }
+       }
+       return res;
+   }
+   ```
+
+4. **前K个高频元素**
+   - 题目: [LeetCode 347 - 前 K 个高频元素](https://leetcode.cn/problems/top-k-frequent-elements/)
+   - 解决思路: 使用**最小堆**存储频率前K高的元素。遍历所有元素及其频率，当堆中的元素数量超过K时，移除堆顶元素，最终堆中的元素就是频率前K高的元素。
+
+   ```java
+   public int[] topKFrequent(int[] nums, int k) {
+       Map<Integer, Integer> freqMap = new HashMap<>();
+       for (int num : nums) {
+           freqMap.put(num, freqMap.getOrDefault(num, 0) + 1);
+       }
+
+       PriorityQueue<Map.Entry<Integer, Integer>> pq = new PriorityQueue<>((a, b) -> a.getValue() - b.getValue());
+
+       for (Map.Entry<Integer, Integer> entry : freqMap.entrySet()) {
+           pq.offer(entry);
+           if (pq.size() > k) {
+               pq.poll();
+           }
+       }
+
+       int[] result = new int[k];
+       for (int i = 0; i < k; i++) {
+           result[i] = pq.poll().getKey();
+       }
+       return result;
+   }
+   ```
+
+4. **自定义比较器（最大堆）**
+默认情况下，`PriorityQueue` 是最小堆。如果需要实现**最大堆**，可以传递一个自定义的比较器。例如：
+```java
+PriorityQueue<Integer> maxHeap = new PriorityQueue<>((a, b) -> b - a);
+```
+这种方式在解决涉及最大值的问题时非常有用。
+
+
 
 ### Deque
 **双端队列（Deque）**
@@ -1026,6 +1142,7 @@ Integer.MIN_VALUE
 # 常用算法
 ## 快速排序
 经过测试，发现与pivot比较判等对性能影响极大。
+
 方案一：前后需要swap，先交换再处理后交换，用时35ms
 ```java
 class Solution {

@@ -22,11 +22,17 @@ timeline: article  # 展示在时间线列表中
 
 > If a class is defined in a header file and has a vtable (either it has virtual methods or it derives from classes with virtual methods), it must always have at least one out-of-line virtual method in the class. Without this, the compiler will copy the vtable and RTTI into every .o file that #includes the header, bloating .o file sizes and increasing link times.
 
-如果一个类定义在header文件中，并且有虚函数或者派生自有虚函数的类，那么它就会有一个vtable。
+在 Clang 和 LLVM 的代码中，有时会看到一个空的虚函数 `virtual void anchor();`，其存在的主要目的是优化编译器生成的代码，具体来说是避免多个 `.o` 文件中重复生成虚表（vtable）和运行时类型信息（RTTI）。这是一种遵循 LLVM 编码标准的优化策略。
 
-对于有vtable的类，编译器需要为每个包含该头文件的编译单元生成vtable的副本。如果类中所有的虚函数都是内联的(inline)，那么vtable就会非常小，只包含几个函数指针。编译器为了优化，会选择把这种小的vtable和RTTI信息内联到每个包含头文件的.o文件中。
+根据 LLVM 编码标准中的解释，定义在头文件中的类，如果包含虚函数或继承自具有虚函数的类，那么该类必须有至少一个 **out-of-line**（非内联）的虚函数实现。原因是：
 
-但是如果类中有至少一个实体虚函数，那么vtable大小会非常大，包含这个虚函数的指针和其他从基类继承的虚函数指针。这时编译器就不会内联整个大的vtable了，只会在每个.o文件中放一个指向这个vtable的指针，真正的vtable只会存在于定义该类的那个编译单元中。这样可以避免vtable被复制多次浪费空间，也加快了链接时间，因为不需要合并重复的符号了。
+1. **虚表（vtable）和 RTTI 的重复**：如果一个类的所有虚函数都在头文件中定义，编译器会在每个包含该头文件的 `.o` 文件中都生成一份虚表和 RTTI。这会导致：
+   - `.o` 文件的大小变大。
+   - 链接时间增加，因为每个 `.o` 文件都有相同的虚表和 RTTI，链接器需要处理这些重复的内容。
+
+2. **避免膨胀**：通过提供一个 out-of-line 的虚函数（即该函数的实现放在 `.cpp` 文件中，而非直接在头文件中定义），编译器能够确保虚表和 RTTI 只在一个地方生成，从而避免重复和膨胀。
+
+在很多情况下，这个 out-of-line 的虚函数会是一个空实现，如 `virtual void anchor();`，它的唯一目的就是提供这个 out-of-line 定义。这样做的好处是简化了类的定义，同时达到了优化编译结果的目的。
 
 为了避免这个问题，有以下建议:
 
