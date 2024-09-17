@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf8"/>
+    <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
+    <title>
+      
+        Linux内核面试题 | ZPF.SITE
+      
+    </title>
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    
+      <link rel="apple-touch-icon"
+            sizes="180x180"
+            href="/images/apple-touch-icon.png"/>
+    
+    
+      <link rel="icon"
+            type="image/png"
+            sizes="32x32"
+            href="/images/favicon-32x32.png"/>
+    
+    
+      <link rel="icon"
+            type="image/png"
+            sizes="16x16"
+            href="/images/favicon-16x16.png"/>
+    
+    
+      <link rel="mask-icon"
+            href="/images/logo.svg"
+            color=""/>
+    
+    
+    
+      
+  <style>
+    @font-face {
+        font-family:sourceHanSerif;
+        src: url(/font/regular.ttf);
+        font-weight: regular;
+    }
+  </style>
+
+  <style>
+    @font-face {
+        font-family:sourceHanSerif;
+        src: url(/font/bold.ttf);
+        font-weight: bold;
+    }
+  </style>
+
+
+    
+    <link rel="stylesheet"
+          type="text/css"
+          href='/css/layout.css'/>
+    
+    
+  <link rel="stylesheet" type="text/css" href="/css/post.css"/>
+  
+
+  <meta name="generator" content="Hexo 6.3.0"><style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style></head>
+  <body>
+    <div class="head">
+      <div class="nav">
+        <a href='/' class="nav-logo">
+          <img alt="logo" height="60px" width="60px" src="/images/logo.svg"/>
+        </a>
+        <input id="navBtn" type="checkbox"/>
+        <div class="nav-menu">
+          
+            
+              <a class="nav-menu-item" href="/CS&Maths">Computer Science & Maths</a>
+            
+              <a class="nav-menu-item" href="/Life">Life</a>
+            
+          
+          
+        </div>
+        <label class="nav-btn" for="navBtn"></label>
+      </div>
+    </div>
+    <div class="body">
+      
+  <article class="post-content">
+    <div class="post-inner">
+      <div class="post-content__head">
+        <div class="post-title">Linux内核面试题</div>
+        <div class="post-info">
+          
+  <a href="/tags/Linux/" class="post-tag">#Linux</a><a href="/tags/Kernel/" class="post-tag">#Kernel</a>
+
+
+          <span class="post-date">2024-08-28</span>
+        </div>
+      </div>
+      
+      <div class="post-content__body">
+        
+          <div class="post-gallery">
+            
+          </div>
+        
+        <h1 id="中断">中断</h1>
+<p>Linux中的中断机制是操作系统与硬件设备进行交互的一种重要方式。在操作系统中，中断允许硬件设备向CPU发送信号，要求CPU暂停当前的操作并及时处理硬件事件。中断机制对于系统的性能和响应速度至关重要。</p>
+<h3 id="中断的基本概念">1. 中断的基本概念</h3>
+<ul>
+<li><strong>中断</strong>：是硬件设备发给CPU的信号，通知CPU需要处理某个事件。中断使得CPU可以从当前执行的程序中断，转而执行特定的中断处理程序（ISR，Interrupt Service Routine）。</li>
+<li><strong>中断向量</strong>：是指向中断处理程序的指针。每种中断都有一个特定的中断向量，CPU通过中断向量来找到相应的中断处理程序。</li>
+</ul>
+<h3 id="中断的分类">2. 中断的分类</h3>
+<p>中断通常分为以下几类：</p>
+<h4 id="硬件中断hardware-interrupt">硬件中断（Hardware Interrupt）</h4>
+<p>硬件中断由外部硬件设备触发，例如键盘输入、鼠标点击、网络数据包的到达等。当这些事件发生时，硬件设备向CPU发出中断请求（IRQ，Interrupt Request）。硬件中断的特点是异步触发，即不依赖于当前正在执行的程序。</p>
+<h4 id="软件中断software-interrupt">软件中断（Software Interrupt）</h4>
+<p>软件中断是由软件通过特定的指令（例如 <code>int</code> 指令）来触发的。软件中断通常用于系统调用、上下文切换或其他需要操作系统介入的场合。</p>
+<h4 id="异常exception">异常（Exception）</h4>
+<p>异常是一种特殊的中断，通常由程序执行过程中发生的错误或异常条件触发，如除零错误、非法指令等。异常处理程序通常会试图纠正错误，或者终止异常进程。</p>
+<h4 id="可屏蔽中断maskable-interrupt">可屏蔽中断（Maskable Interrupt）</h4>
+<p>可屏蔽中断是指可以被CPU忽略或屏蔽的中断。操作系统可以通过设置特定的控制寄存器来屏蔽这些中断。</p>
+<h4 id="不可屏蔽中断non-maskable-interruptnmi">不可屏蔽中断（Non-Maskable Interrupt，NMI）</h4>
+<p>不可屏蔽中断是不能被屏蔽的紧急中断，通常用于处理需要立即响应的关键事件，如硬件故障。</p>
+<h3 id="中断处理过程">3. 中断处理过程</h3>
+<p>中断处理过程通常包括以下几个步骤：</p>
+<h4 id="中断请求">1. 中断请求</h4>
+<p>硬件设备向CPU发出中断请求，通常通过一个专门的中断控制器（如Intel的8259 PIC或APIC）进行管理。中断控制器会将中断请求发送给CPU，并根据中断的优先级决定处理顺序。</p>
+<h4 id="保存上下文">2. 保存上下文</h4>
+<p>当CPU接收到中断请求后，它会暂停当前正在执行的任务，并保存当前的CPU寄存器状态到堆栈中，以便中断处理完成后能够恢复到原来的任务。</p>
+<h4 id="中断向量表查找">3. 中断向量表查找</h4>
+<p>CPU通过中断向量表（IVT, Interrupt Vector Table）查找对应的中断处理程序地址，并跳转到该处理程序执行。</p>
+<h4 id="执行中断处理程序">4. 执行中断处理程序</h4>
+<p>中断处理程序（ISR）负责处理具体的中断事件。ISR的任务通常是尽可能快速地处理硬件事件，或者将需要进一步处理的任务交给后续的机制（如软中断或任务队列）。</p>
+<h4 id="恢复上下文">5. 恢复上下文</h4>
+<p>中断处理程序执行完成后，CPU会恢复之前保存的寄存器状态，继续执行被中断的任务。</p>
+<h3 id="中断的延迟与抖动">4. 中断的延迟与抖动</h3>
+<ul>
+<li><strong>中断延迟</strong>：是指从中断请求发出到中断处理程序开始执行之间的时间延迟。中断延迟越短，系统的响应速度就越快。</li>
+<li><strong>中断抖动</strong>：是指中断处理时间的变动量。理想情况下，中断处理时间应当是稳定的，抖动越小，系统的实时性越好。</li>
+</ul>
+<h3 id="linux中的软中断与下半部">5. Linux中的软中断与下半部</h3>
+<p>在Linux中，中断处理被分为上半部和下半部：</p>
+<h4 id="上半部top-half">上半部（Top Half）</h4>
+<p>上半部是中断处理程序在硬中断上下文中立即执行的部分，通常负责处理紧急任务，并尽量简短，以减少中断关闭时间。</p>
+<h4 id="下半部bottom-half">下半部（Bottom Half）</h4>
+<p>下半部用于处理那些不需要立即执行的任务，以降低中断处理对系统的影响。Linux中有几种机制实现下半部：</p>
+<ul>
+<li><strong>软中断（Softirq）</strong>：软中断是内核的一种机制，用于处理较低优先级的中断任务。它由<code>ksoftirqd</code>内核线程处理。</li>
+<li><strong>任务队列（Tasklets）</strong>：Tasklets是基于软中断的轻量级机制，允许将任务分解成更小的任务片段，延迟到更合适的时间执行。</li>
+<li><strong>工作队列（Workqueues）</strong>：工作队列允许内核线程在进程上下文中处理任务，而不是在中断上下文中处理。这样可以进行阻塞操作，比如睡眠等待。</li>
+</ul>
+<h3 id="中断平衡interrupt-balancing">6. 中断平衡（Interrupt Balancing）</h3>
+<p>在多处理器系统中，中断平衡机制用于将中断负载均衡分配到不同的CPU上，避免单个CPU因处理大量中断而成为性能瓶颈。Linux内核中有一个名为<code>irqbalance</code>的守护进程，专门负责中断的负载均衡。</p>
+<h3 id="中断处理的挑战">7. 中断处理的挑战</h3>
+<p>中断处理面临的一些挑战包括：</p>
+<ul>
+<li><strong>中断风暴</strong>：大量频繁的中断请求可能导致系统资源耗尽，影响系统性能。</li>
+<li><strong>中断上下文的限制</strong>：在中断上下文中无法执行可能会阻塞的操作，如睡眠等待或访问文件系统。</li>
+<li><strong>优先级反转</strong>：当低优先级任务持有高优先级任务所需的资源时，会导致高优先级任务无法及时获得CPU资源。</li>
+</ul>
+<h3 id="中断处理中的竞态条件">8.中断处理中的竞态条件</h3>
+<p>由于中断处理程序可能会与其他处理程序或用户进程并发执行，因此必须小心处理共享资源。Linux内核通过自旋锁（spinlock）等机制来保护这些共享资源，避免竞态条件的发生。</p>
+<h3 id="procinterrupts-文件">9. /proc/interrupts 文件</h3>
+<p>Linux内核维护一个文件 /proc/interrupts，记录了系统中每个CPU上发生的中断次数及中断处理程序的名称。可以通过查看这个文件来了解系统中断的分布情况和处理性能。</p>
+<h3 id="总结">10. 总结</h3>
+<p>中断机制是Linux操作系统与硬件交互的核心组件，它使得系统能够及时响应外部事件，并保证系统的高效运行。通过将中断处理分为上半部和下半部，Linux能够有效管理中断处理的复杂性，并且通过软中断、任务队列和工作队列等机制进一步优化中断处理的性能。中断平衡在多处理器系统中至关重要，确保中断负载能够合理分配，避免性能瓶颈。</p>
+<p>了解中断机制对于理解Linux内核的工作原理和优化系统性能具有重要意义。</p>
+<h2 id="软中断任务队列和工作队列">软中断、任务队列和工作队列</h2>
+<p>让我们详细探讨这三个概念：软中断（Softirq）、任务队列（Tasklets）和工作队列（Workqueues），它们在 Linux 内核中用于处理不同类型的中断和延迟执行任务。</p>
+<h3 id="软中断softirq">1. 软中断（Softirq）</h3>
+<h4 id="概述">概述</h4>
+<p>软中断（Softirq）是一种用于处理低优先级中断任务的机制。它是内核的一部分，允许某些任务在硬中断上下文外以较低的优先级执行。软中断的执行是在系统层面上调度的，不依赖于具体的设备或进程。</p>
+<h4 id="主要特点">主要特点</h4>
+<ul>
+<li><strong>异步执行</strong>：软中断并不会立即执行，而是由内核在合适的时机调度执行。</li>
+<li><strong>每个 CPU 核心独立处理</strong>：每个 CPU 核心都有自己的软中断处理队列，因此软中断的处理是并行的。</li>
+<li><strong>主要用于网络协议栈</strong>：在 Linux 内核中，软中断广泛用于网络协议栈（如处理网络数据包），因为这些任务不需要立即完成，可以稍后处理。</li>
+</ul>
+<h4 id="处理机制">处理机制</h4>
+<p>软中断由内核线程 <code>ksoftirqd</code> 负责处理。<code>ksoftirqd</code> 是一个低优先级线程，通常在系统空闲时运行，执行被延迟的软中断任务。软中断通过软中断向量（Softirq Vector）管理，不同的任务类型对应不同的向量，内核通过这些向量调度相应的任务。</p>
+<h3 id="任务队列tasklets">2. 任务队列（Tasklets）</h3>
+<h4 id="概述-1">概述</h4>
+<p>Tasklets 是基于软中断的一种更轻量级的延迟执行机制。它允许将任务分解为更小的任务片段，可以在稍后或更合适的时间执行。与软中断相比，Tasklets 更简单易用，主要用于较小的、简单的延迟执行任务。</p>
+<h4 id="主要特点-1">主要特点</h4>
+<ul>
+<li><strong>轻量级</strong>：Tasklets 是在软中断基础上实现的，但它们比软中断更易于使用，适合处理简单的任务。</li>
+<li><strong>不可重入</strong>：同一个 Tasklet 不能在同一个 CPU 核心上同时执行（不可重入），但它可以在不同的 CPU 核心上并行执行。</li>
+<li><strong>适用范围</strong>：Tasklets 通常用于需要在中断上下文中完成但不需要立即执行的任务，如调度定时器、延迟网络包处理等。</li>
+</ul>
+<h4 id="处理机制-1">处理机制</h4>
+<p>Tasklets 是通过调度软中断来实现的。在内核中，每个 Tasklet 都与一个软中断向量关联。Tasklets 的执行顺序是 FIFO（先进先出），并且由内核在软中断上下文中执行。</p>
+<h3 id="工作队列workqueues">3. 工作队列（Workqueues）</h3>
+<h4 id="概述-2">概述</h4>
+<p>工作队列（Workqueues）是一种更灵活的机制，允许在进程上下文中执行任务，而不是在中断上下文中。工作队列适用于那些需要延迟执行的任务，但这些任务可能涉及需要阻塞的操作，如内存分配或文件系统访问。</p>
+<h4 id="主要特点-2">主要特点</h4>
+<ul>
+<li><strong>进程上下文</strong>：与软中断和 Tasklets 不同，工作队列在进程上下文中执行，因此可以执行阻塞操作。这使得工作队列非常适合需要等待资源的任务。</li>
+<li><strong>用户定义的工作线程</strong>：工作队列可以由内核线程执行，这些线程是专门为处理工作队列任务而创建的。内核提供了多个系统默认的工作队列，也允许用户创建自己的工作队列。</li>
+<li><strong>适用范围广</strong>：工作队列通常用于需要在进程上下文中执行的任务，如网络协议栈中的数据包处理、驱动程序中的设备控制等。</li>
+</ul>
+<h4 id="处理机制-2">处理机制</h4>
+<p>在使用工作队列时，开发者可以定义一个工作函数，并将其加入工作队列。内核的工作线程会从队列中取出工作函数并执行。工作队列的优势在于它允许延迟任务执行，同时具备更高的灵活性和阻塞操作支持。</p>
+<h3 id="三者的对比">4. 三者的对比</h3>
+<ul>
+<li><strong>上下文</strong>：软中断和 Tasklets 都是在中断上下文中执行的，不能进行阻塞操作；而工作队列是在进程上下文中执行，可以进行阻塞操作。</li>
+<li><strong>优先级</strong>：软中断具有较高的优先级，并且是为处理系统级别的延迟任务设计的；Tasklets 是基于软中断的，但优先级比软中断稍低；工作队列优先级最低，但具有最大的灵活性。</li>
+<li><strong>复杂性</strong>：软中断和 Tasklets 适合简单的、无需阻塞的延迟任务；工作队列适合复杂的、可能需要阻塞的任务。</li>
+</ul>
+<h3 id="实际应用">5. 实际应用</h3>
+<ul>
+<li><strong>软中断</strong>：用于处理网络数据包、定时器等需要延迟但优先级较高的任务。</li>
+<li><strong>Tasklets</strong>：用于简单的延迟执行任务，如延迟处理中断产生的任务、执行定时操作等。</li>
+<li><strong>工作队列</strong>：用于需要更长时间执行或可能阻塞的任务，如文件系统操作、驱动程序中的设备操作等。</li>
+</ul>
+<p>通过这三种机制，Linux 内核能够高效地管理和调度各种类型的延迟任务，确保系统的实时性和稳定性。</p>
+
+      </div>
+    </div>
+    
+      <script src='https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js'></script>
+      <script>
+        if (window.mermaid) {
+          mermaid.initialize({"startOnload":true});
+        }
+      </script>
+    
+  </article>
+  <div class="post__foot">
+    
+    <div class="post-nav">
+  
+    <div class="post-nav-item-left"></div>
+  
+  <div class="vhr"></div>
+  
+    <a class="post-nav-item-right" href="/2024/08/28/%E7%BD%91%E7%BB%9C%E9%9D%A2%E8%AF%95%E9%A2%98%E6%B1%87%E6%80%BB/">
+      <div class="text-align">
+        <span class="text-small">下一篇</span>
+        <svg t="1670570876164"
+             class="icon"
+             viewBox="0 0 1024 1024"
+             transform="scale(-1,-1)"
+             width="16"
+             height="16">
+          <path d="M384 512L731.733333 202.666667c17.066667-14.933333 19.2-42.666667 4.266667-59.733334-14.933333-17.066667-42.666667-19.2-59.733333-4.266666l-384 341.333333c-10.666667 8.533333-14.933333 19.2-14.933334 32s4.266667 23.466667 14.933334 32l384 341.333333c8.533333 6.4 19.2 10.666667 27.733333 10.666667 12.8 0 23.466667-4.266667 32-14.933333 14.933333-17.066667 14.933333-44.8-4.266667-59.733334L384 512z" p-id="14596"/>
+        </svg>
+      </div>
+      网络面试题
+    </a>
+  
+</div>
+
+    
+      <div class="related-post">
+  <div class="related__head">
+  <a href="/tags/Linux/" class="post-tag">#Linux</a><a href="/tags/Kernel/" class="post-tag">#Kernel</a>
+
+</div>
+  <div class="realated__body">
+    
+      <div class="null"><div class="null-item"><div class="null-title"><a href="/2023/09/06/All_File_Systems_Are_Not_Created_Equal:On_the_Complexity_of_Crafting_Crash-Consistent_Applications阅读/" title="All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读" rel="bookmark">All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/12/06/CP-Miner:A_Tool_for_Finding_Copy-paste_and_Related_Bugs_in_Operating_System_Code阅读/" title="CP-Miner: A Tool for Finding Copy-paste and Related Bugs in Operating System Code 阅读" rel="bookmark">CP-Miner: A Tool for Finding Copy-paste and Related Bugs in Operating System Code 阅读</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/09/26/Creating_Pipes_in_C/" title="Creating Pipes in C" rel="bookmark">Creating Pipes in C</a></div></div><div class="null-item"><div class="null-title"><a href="/2023/11/07/@蓝色老师的LLVM系列文章汇总/" title="@蓝色老师的LLVM系列文章汇总" rel="bookmark">@蓝色老师的LLVM系列文章汇总</a></div></div><div class="null-item"><div class="null-title"><a href="/2024/01/03/AddressSanitizer/" title="AddressSanitizer" rel="bookmark">AddressSanitizer</a></div></div></div>
+    
+  </div>
+</div>
+
+    
+    
+    
+      <script src="https://utteranc.es/client.js"
+    repo="jtzhpf/jtzhpf.github.io"
+    issue-term="pathname"
+    theme="github-light"
+    crossorigin="anonymous"
+    async>
+</script>
+    
+  </div>
+
+    </div>
+    <div class="foot">
+      <div class="foot-inner">
+        <div class="foot__head">
+          
+            <div class="foot-line">
+              
+                <div class="matts">海</div>
+              
+                <div class="matts">内</div>
+              
+                <div class="matts">存</div>
+              
+                <div class="matts">知</div>
+              
+                <div class="matts">己</div>
+              
+            </div>
+          
+            <div class="foot-line">
+              
+                <div class="matts">天</div>
+              
+                <div class="matts">涯</div>
+              
+                <div class="matts">若</div>
+              
+                <div class="matts">比</div>
+              
+                <div class="matts">邻</div>
+              
+            </div>
+          
+        </div>
+        <div class="foot__body">
+          
+            <div class="foot-item">
+              <div class="foot-item__head">朋友</div>
+              <div class="foot-item__body">
+                
+                  <div class="text">
+                    <img alt="link" height="20px" width="20px" src="/images/icon/icon-link.svg"/>
+                    <a class="foot-link" target="_blank" rel="noopener" href="https://dzc2000.github.io">诚</a>
+                  </div>
+                
+                  <div class="text">
+                    <img alt="link" height="20px" width="20px" src="/images/icon/icon-link.svg"/>
+                    <a class="foot-link" target="_blank" rel="noopener" href="https://nuistgy.github.io/">宇</a>
+                  </div>
+                
+                <div class="text">
+                  <img alt="link" height="20px" width="20px" src="/images/icon/icon-link+.svg"/>
+                  <a class="foot-link"
+                     href="mailto:jtzhpf@126.com?subject=%E7%94%B3%E8%AF%B7%20ZPF.SITE%20%E7%9A%84%E5%8F%8B%E9%93%BE%E4%BD%8D%E7%BD%AE">
+                  申请友链</a>
+                </div>
+              </div>
+            </div>
+          
+          
+            <div class="foot-item">
+              <div class="foot-item__head">账号</div>
+              <div class="foot-item__body">
+                
+                  <div class="text">
+                    <img alt="link" height="20px" width="20px" src="/images/logo-github.svg"/>
+                    <a class="foot-link" target="_blank" rel="noopener" href="https://github.com/jtzhpf">github</a>
+                  </div>
+                
+              </div>
+            </div>
+          
+          <div class="foot-item">
+            <div class="foot-item__head">联系</div>
+            <div class="foot-item__body">
+              <div class="text">
+                <img alt="link" height="20px" width="20px" src="/images/icon/icon-email.svg"/>
+                <a class="foot-link" href="mailto:jtzhpf@126.com">jtzhpf@126.com</a>
+              </div>
+            </div>
+          </div>
+          <div class="foot-item">
+            <div class="foot-item__head">访客</div>
+            <div class="foot-item__body">
+              <div class="text">
+                <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+                <span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+                <span class="post-meta-divider"> &nbsp;|&nbsp; </span>
+                <span id="busuanzi_container_site_uv">本站访客数<span id="busuanzi_value_site_uv"></span>人</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="copyright">
+          <a href="https://zpf.pages.dev">ZPF.SITE</a> &nbsp;|&nbsp;由&nbsp;<a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>&nbsp;及&nbsp;
+          <svg width="20" height="20" viewBox="0 0 725 725">
+            <path fill-rule="evenodd" fill="rgb(221, 221, 221)" d="M145.870,236.632 L396.955,103.578 L431.292,419.44 L156.600,522.53 L145.870,236.632 Z"/>
+            <path fill-rule="evenodd" fill="rgb(159, 159, 159)" d="M396.955,103.578 L564.345,234.486 L611.558,513.469 L431.292,419.44 L396.955,103.578 Z"/>
+            <path fill-rule="evenodd" fill="rgb(0, 0, 0)" d="M431.292,419.44 L611.558,513.469 L358.327,595.18 L156.600,522.53 L431.292,419.44 Z"/>
+          </svg>
+          <a target="_blank" rel="noopener" href="https://github.com/jtzhpf/hexo-theme-tranquility">致远</a>&nbsp;驱动
+        </div>
+      </div>
+    </div>
+    
+      <script src="https://unpkg.com/js-polyfills@0.1.43/es6.js"></script>
+      <script id="MathJax-script"
+              async
+              src="https://www.unpkg.com/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+    
+    
+  
+
+  </body>
+</html>
